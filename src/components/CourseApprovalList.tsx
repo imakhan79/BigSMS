@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { reviewCourse } from "@/app/(shared)/review-actions";
+import { approveCourse, rejectCourse, reviewCourse } from "@/app/(shared)/review-actions";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Badge, Card, CardTitle, Empty, Flash, Input, PageHeader, Table, Td, type FlashParams } from "@/components/ui";
 import { createClient } from "@/lib/supabase/server";
@@ -9,11 +9,11 @@ const STATUSES = ["draft", "pending_approval", "published", "rejected", "archive
 
 export function ReviewButtons({ id }: { id: string }) {
   return (
-    <form action={reviewCourse} className="mt-3 flex flex-wrap items-center gap-2">
+    <form className="mt-3 flex flex-wrap items-center gap-2">
       <input type="hidden" name="id" value={id} />
       <Input name="review_note" placeholder="Review note (required to reject)" className="min-w-60 flex-1" aria-label="Review note" />
-      <button name="decision" value="published" className="h-10 rounded-md bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-700">Approve</button>
-      <button name="decision" value="rejected" className="h-10 rounded-md bg-red-600 px-4 text-sm font-medium text-white hover:bg-red-700">Reject</button>
+      <button formAction={approveCourse} className="h-10 rounded-md bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-700">Approve</button>
+      <button formAction={rejectCourse} className="h-10 rounded-md bg-red-600 px-4 text-sm font-medium text-white hover:bg-red-700">Reject</button>
     </form>
   );
 }

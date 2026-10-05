@@ -10,9 +10,22 @@ import { back, str } from "@/lib/utils";
  * archive or restore. The guard_course_update trigger enforces the same rules in the database.
  */
 export async function reviewCourse(form: FormData) {
+  return applyReview(str(form, "decision"), form);
+}
+
+// Approve/Reject use one action per button (formAction) instead of the clicked
+// button's name/value, which was not reaching the server.
+export async function approveCourse(form: FormData) {
+  return applyReview("published", form);
+}
+
+export async function rejectCourse(form: FormData) {
+  return applyReview("rejected", form);
+}
+
+async function applyReview(decision: string, form: FormData) {
   const profile = await requireRole("admin", "principal");
   const base = profile.role === "admin" ? "/admin/courses" : "/principal/courses";
-  const decision = str(form, "decision");
   const allowed = profile.role === "admin" ? ["published", "rejected", "archived", "draft"] : ["published", "rejected"];
   if (!allowed.includes(decision)) back(base, "error", "That action is not allowed.");
 
