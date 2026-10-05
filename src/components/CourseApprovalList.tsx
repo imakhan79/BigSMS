@@ -11,6 +11,9 @@ export function ReviewButtons({ id }: { id: string }) {
   return (
     <form className="mt-3 flex flex-wrap items-center gap-2">
       <input type="hidden" name="id" value={id} />
+      {/* Enter submits via the first submit button; a disabled one makes Enter a no-op so
+          typing a rejection note and pressing Enter can't approve the course. */}
+      <button type="submit" disabled hidden aria-hidden="true" tabIndex={-1} />
       <Input name="review_note" placeholder="Review note (required to reject)" className="min-w-60 flex-1" aria-label="Review note" />
       <button formAction={approveCourse} className="h-10 rounded-md bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-700">Approve</button>
       <button formAction={rejectCourse} className="h-10 rounded-md bg-red-600 px-4 text-sm font-medium text-white hover:bg-red-700">Reject</button>
