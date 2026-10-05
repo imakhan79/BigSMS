@@ -1,0 +1,32 @@
+/* Zicon brand tokens (HSL, shadcn/Tailwind convention), taken from the Zicon logo
+   and the showcase-engine-hub site: maroon wordmark, orange "Z", grey swoosh, cream background. */
+:root {
+  --background: 40 60% 98%;
+  --foreground: 10 40% 12%;
+  --primary: 8 60% 29%;            /* Zicon maroon  #7A271D */
+  --primary-foreground: 40 60% 96%;
+  --secondary: 38 35% 90%;         /* cream */
+  --secondary-foreground: 8 60% 25%;
+  --accent: 33 88% 55%;            /* Zicon orange  #F0922B */
+  --accent-foreground: 10 40% 12%;
+  --muted: 30 10% 92%;
+  --muted-foreground: 0 0% 45%;    /* swoosh grey */
+  --border: 30 20% 86%;
+  --ring: 33 88% 55%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 10 20% 8%;
+  --foreground: 38 40% 94%;
+  --primary: 8 70% 45%;
+  --primary-foreground: 40 60% 96%;
+  --secondary: 10 20% 16%;
+  --secondary-foreground: 38 40% 94%;
+  --accent: 33 90% 58%;
+  --accent-foreground: 10 40% 10%;
+  --muted: 10 15% 18%;
+  --muted-foreground: 30 10% 65%;
+  --border: 10 15% 22%;
+  --ring: 33 90% 58%;
+}
