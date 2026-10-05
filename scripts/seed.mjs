@@ -13,11 +13,11 @@ const db = createClient(url, serviceKey, { auth: { persistSession: false } });
 const PASSWORD = process.env.SEED_PASSWORD ?? "Demo@12345";
 
 const USERS = [
-  { email: "admin@bigsms.test", full_name: "Aisha Admin", role: "admin" },
-  { email: "professor@bigsms.test", full_name: "Dr. Omar Professor", role: "professor" },
-  { email: "student1@bigsms.test", full_name: "Sara Student", role: "student" },
-  { email: "student2@bigsms.test", full_name: "Bilal Student", role: "student" },
-  { email: "parent@bigsms.test", full_name: "Hina Parent", role: "parent" },
+  { email: "admin@bigsms.demo", full_name: "Aisha Admin", role: "admin" },
+  { email: "professor@bigsms.demo", full_name: "Dr. Omar Professor", role: "professor" },
+  { email: "student@bigsms.demo", full_name: "Sara Student", role: "student" },
+  { email: "student2@bigsms.demo", full_name: "Bilal Student", role: "student" },
+  { email: "parent@bigsms.demo", full_name: "Hina Parent", role: "parent" },
 ];
 
 function check(result, label) {

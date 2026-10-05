@@ -21,6 +21,26 @@ export async function signIn(form: FormData) {
   redirect("/");
 }
 
+const DEMO_ACCOUNTS: Record<string, string> = {
+  admin: "admin@bigsms.demo",
+  professor: "professor@bigsms.demo",
+  student: "student@bigsms.demo",
+  parent: "parent@bigsms.demo",
+};
+
+export async function demoSignIn(form: FormData) {
+  if (process.env.DEMO_LOGIN_ENABLED === "false") back("/login", "error", "Demo login is disabled.");
+  const email = DEMO_ACCOUNTS[str(form, "role")];
+  if (!email) back("/login", "error", "Unknown demo role.");
+  const supabase = await createClient();
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password: process.env.DEMO_PASSWORD ?? "Demo@12345",
+  });
+  if (error) back("/login", "error", `Demo login failed: ${error.message}`);
+  redirect("/");
+}
+
 export async function signUp(form: FormData) {
   const role = str(form, "role");
   if (!["student", "professor", "parent"].includes(role)) back("/signup", "error", "Choose a valid role.");

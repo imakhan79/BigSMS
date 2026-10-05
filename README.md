@@ -73,14 +73,15 @@ src/
 
 3. **Seed**
    - Run `supabase/seed.sql` in the SQL Editor (categories, KPIs, settings).
-   - Run `npm run seed` to create demo accounts and a sample course.
+   - Demo accounts and sample data: `supabase db query --db-url "<connection string>" -f supabase/demo_seed.sql` (or `npm run seed` with a service role key).
+   - The login page and landing page offer one-click demo sign-in. Set `DEMO_LOGIN_ENABLED=false` to hide it in a real deployment.
 
    | Role | Email | Password |
    |---|---|---|
-   | Admin | admin@bigsms.test | Demo@12345 |
-   | Professor | professor@bigsms.test | Demo@12345 |
-   | Student | student1@bigsms.test / student2@bigsms.test | Demo@12345 |
-   | Parent | parent@bigsms.test (linked to student1) | Demo@12345 |
+   | Admin | admin@bigsms.demo | Demo@12345 |
+   | Professor | professor@bigsms.demo | Demo@12345 |
+   | Student | student@bigsms.demo / student2@bigsms.demo | Demo@12345 |
+   | Parent | parent@bigsms.demo (linked to student1) | Demo@12345 |
 
 4. **Auth settings.** In Supabase → Authentication → URL Configuration, add `http://localhost:3000/auth/callback` (and your production URL) to the redirect URLs for email confirmation and password reset.
 
