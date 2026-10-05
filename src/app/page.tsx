@@ -9,6 +9,7 @@ import {
   ClipboardCheck,
   FileStack,
   GraduationCap,
+  Landmark,
   ListChecks,
   Lock,
   ShieldCheck,
@@ -25,6 +26,11 @@ const PORTALS = [
     Icon: ShieldCheck,
     title: "Admin",
     text: "Activate accounts, approve courses, configure KPIs, manage alerts and review the full audit trail.",
+  },
+  {
+    Icon: Landmark,
+    title: "Principal",
+    text: "Approve courses before they go live and oversee every course, student result and KPI across the institution.",
   },
   {
     Icon: BookOpenCheck,
@@ -54,9 +60,9 @@ const FEATURES = [
 
 const STEPS = [
   { title: "Professor builds", text: "Create a course, add lectures and materials, then submit it for approval." },
-  { title: "Admin approves", text: "Review the outline and content, then publish it or send it back with notes." },
+  { title: "Principal approves", text: "Review the outline and content, then publish it or send it back with notes." },
   { title: "Students learn", text: "Assigned students get notified, study, submit work and take quizzes." },
-  { title: "Everyone tracks", text: "Professors grade, parents follow along, admins watch the KPIs." },
+  { title: "Everyone tracks", text: "Professors grade, parents follow along, the principal and admins watch the KPIs." },
 ];
 
 export default async function Home() {
@@ -95,7 +101,7 @@ export default async function Home() {
               Every course, every learner, <span className="text-accent">one system.</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-              Big SMS connects administrators, professors, students and parents, from course approval to the final grade.
+              Big SMS connects administrators, principals, professors, students and parents, from course approval to the final grade.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <LinkButton href="/login#demo" variant="accent" className="h-12 px-6 text-base">Try the live demo</LinkButton>
@@ -130,9 +136,9 @@ export default async function Home() {
       </section>
 
       <section id="portals" className="mx-auto max-w-6xl scroll-mt-16 px-4 py-20">
-        <h2 className="text-center text-3xl font-bold text-primary">Four portals, one platform</h2>
+        <h2 className="text-center text-3xl font-bold text-primary">Five portals, one platform</h2>
         <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">Each role gets a focused workspace with exactly the tools and data it needs.</p>
-        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
           {PORTALS.map(({ Icon, title, text }) => (
             <div key={title} className="rounded-xl border border-border bg-background p-6 shadow-sm transition-shadow hover:shadow-md">
               <span className="inline-flex rounded-lg bg-primary p-2.5 text-primary-foreground"><Icon size={22} /></span>

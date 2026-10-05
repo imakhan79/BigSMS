@@ -61,7 +61,7 @@ export async function setCourseStatus(form: FormData) {
   const { error } = await supabase.from("courses").update({ status }).eq("id", id);
   if (error) back(coursePath(id), "error", error.message);
   const messages: Record<string, string> = {
-    pending_approval: "Submitted for admin approval.",
+    pending_approval: "Submitted to the principal for approval.",
     draft: "Moved back to draft.",
     archived: "Course archived.",
   };

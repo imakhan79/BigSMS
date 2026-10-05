@@ -1,4 +1,4 @@
-export type Role = "admin" | "professor" | "student" | "parent";
+export type Role = "admin" | "principal" | "professor" | "student" | "parent";
 export type UserStatus = "pending" | "active" | "inactive";
 export type CourseStatus = "draft" | "pending_approval" | "published" | "rejected" | "archived";
 export type MaterialType = "video" | "pdf" | "book" | "notes" | "worksheet";
@@ -50,6 +50,7 @@ export interface StudentProgress {
 
 export const ROLE_HOME: Record<Role, string> = {
   admin: "/admin",
+  principal: "/principal",
   professor: "/professor",
   student: "/student",
   parent: "/parent",

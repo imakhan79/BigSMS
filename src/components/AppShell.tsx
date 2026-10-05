@@ -11,6 +11,7 @@ import type { Profile, Role } from "@/lib/types";
 
 const PORTAL_NAME: Record<Role, string> = {
   admin: "Admin Portal",
+  principal: "Principal Portal",
   professor: "Professor Portal",
   student: "Student Portal",
   parent: "Parent Portal",
@@ -28,6 +29,12 @@ export const NAV: Record<Role, NavItem[]> = {
     { href: "/admin/reports", label: "Reports & Analytics" },
     { href: "/admin/audit-logs", label: "Audit Logs" },
     { href: "/admin/settings", label: "System Settings" },
+  ],
+  principal: [
+    { href: "/principal", label: "Dashboard" },
+    { href: "/principal/courses", label: "Course Approvals" },
+    { href: "/principal/reports", label: "Reports & Analytics" },
+    { href: "/principal/alerts", label: "KPI Alerts" },
   ],
   professor: [
     { href: "/professor", label: "Dashboard" },

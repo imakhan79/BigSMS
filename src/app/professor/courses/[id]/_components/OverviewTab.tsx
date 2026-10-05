@@ -43,8 +43,8 @@ export async function OverviewTab({ course }: { course: Course }) {
         <CardTitle>Approval workflow</CardTitle>
         <ol className="mb-4 space-y-1 text-sm text-muted-foreground">
           <li>1. Build the course as a draft.</li>
-          <li>2. Submit it for admin approval.</li>
-          <li>3. Once approved it is published to assigned students.</li>
+          <li>2. Submit it to the principal for approval.</li>
+          <li>3. Once the principal approves, it is published to assigned students.</li>
         </ol>
         {course.status === "rejected" && course.review_note && (
           <p className="mb-4 rounded bg-red-50 p-3 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
@@ -57,7 +57,7 @@ export async function OverviewTab({ course }: { course: Course }) {
           )}
           {course.status === "pending_approval" && (
             <>
-              <p className="text-sm">Waiting for an administrator to review.</p>
+              <p className="text-sm">Waiting for the principal to review.</p>
               <StatusForm id={course.id} status="draft" label="Withdraw submission" variant="outline" />
             </>
           )}

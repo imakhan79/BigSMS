@@ -19,6 +19,7 @@ begin
   for u in
     select * from (values
       ('admin@bigsms.demo',      'Aisha Rahman',     'admin'),
+      ('principal@bigsms.demo',  'Prof. Tariq Hussain','principal'),
       ('professor@bigsms.demo',  'Dr. Omar Siddiqui','professor'),
       ('professor2@bigsms.demo', 'Dr. Lina Haddad',  'professor'),
       ('student@bigsms.demo',    'Sara Khan',        'student'),

@@ -45,23 +45,6 @@ export async function unlinkParent(form: FormData) {
   back("/admin/users", "ok", "Link removed.");
 }
 
-// Course approval -------------------------------------------------------------
-export async function reviewCourse(form: FormData) {
-  const supabase = await admin();
-  const decision = str(form, "decision");
-  if (!["published", "rejected", "archived", "draft"].includes(decision)) back("/admin/courses", "error", "Invalid decision.");
-  const note = str(form, "review_note");
-  if (decision === "rejected" && !note) back("/admin/courses", "error", "Give a reason when rejecting a course.");
-
-  const { error } = await supabase
-    .from("courses")
-    .update({ status: decision, ...(note ? { review_note: note } : {}) })
-    .eq("id", str(form, "id"));
-  if (error) back("/admin/courses", "error", error.message);
-  revalidatePath("/admin", "layout");
-  back("/admin/courses", "ok", `Course ${decision === "draft" ? "restored to draft" : decision}.`);
-}
-
 // Categories ------------------------------------------------------------------
 export async function createCategory(form: FormData) {
   const supabase = await admin();

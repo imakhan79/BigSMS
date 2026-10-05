@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/lib/types";
 import { cn, formatDate } from "@/lib/utils";
 
-const ROLES = ["admin", "professor", "student", "parent"] as const;
+const ROLES = ["admin", "principal", "professor", "student", "parent"] as const;
 const STATUSES = ["pending", "active", "inactive"] as const;
 
 export default async function UsersPage({

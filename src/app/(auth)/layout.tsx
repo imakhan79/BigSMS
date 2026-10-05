@@ -17,7 +17,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
             <span className="block text-accent">Learning, managed.</span>
           </h2>
           <p className="mt-4 max-w-md text-primary-foreground/80">
-            One platform for administrators, professors, students and parents: courses, approvals, assessments and progress in one place.
+            One platform for administrators, principals, professors, students and parents: courses, approvals, assessments and progress in one place.
           </p>
         </div>
         <p className="relative text-sm text-primary-foreground/60">© {new Date().getFullYear()} Zicon. Stand out from the crowd.</p>
