@@ -1,57 +1,98 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Bell, LogOut, UserRound } from "lucide-react";
-import type { ReactNode } from "react";
+import { Suspense, type ReactNode } from "react";
 import { signOut } from "@/app/(auth)/actions";
-import { NavLinks, type NavItem } from "@/components/NavLinks";
+import { Dropdown, menuItemClass } from "@/components/Dropdown";
+import { NavLinks, type NavGroup } from "@/components/NavLinks";
 import { MobileNav } from "@/components/MobileNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Avatar, Tooltip } from "@/components/ui";
 import { createClient } from "@/lib/supabase/server";
-import type { Profile, Role } from "@/lib/types";
+import { ROLE_LABEL, type Profile, type Role } from "@/lib/types";
 
 const PORTAL_NAME: Record<Role, string> = {
+  super_admin: "Super Admin Portal",
   admin: "Admin Portal",
   principal: "Principal Portal",
   professor: "Professor Portal",
+  staff: "Staff Portal",
   student: "Student Portal",
   parent: "Parent Portal",
 };
 
-export const NAV: Record<Role, NavItem[]> = {
-  admin: [
-    { href: "/admin", label: "Dashboard" },
-    { href: "/admin/users", label: "Users" },
-    { href: "/admin/courses", label: "Courses" },
-    { href: "/admin/categories", label: "Categories" },
-    { href: "/admin/question-bank", label: "Question Bank" },
-    { href: "/admin/kpis", label: "KPIs" },
-    { href: "/admin/alerts", label: "Alerts" },
-    { href: "/admin/reports", label: "Reports & Analytics" },
-    { href: "/admin/audit-logs", label: "Audit Logs" },
-    { href: "/admin/settings", label: "System Settings" },
-  ],
+function adminNav(superAdmin: boolean): NavGroup[] {
+  return [
+    { items: [{ href: "/admin", label: "Dashboard", icon: "dashboard" }] },
+    {
+      label: "Academics",
+      items: [
+        { href: "/admin/courses", label: "Courses", icon: "courses" },
+        { href: "/admin/categories", label: "Categories", icon: "categories" },
+        { href: "/admin/question-bank", label: "Question Bank", icon: "questions" },
+      ],
+    },
+    {
+      label: "Administration",
+      items: [
+        { href: "/admin/users", label: "All Users", icon: "users" },
+        { href: "/admin/users?role=student", label: "Students", icon: "students" },
+        { href: "/admin/users?role=staff", label: "Staff", icon: "staff" },
+        { href: "/admin/users?role=parent", label: "Parents", icon: "parents" },
+        ...(superAdmin ? [{ href: "/admin/workflows", label: "Approval Workflows", icon: "workflows" } as const] : []),
+      ],
+    },
+    {
+      label: "Performance",
+      items: [
+        { href: "/admin/reports", label: "Reports & Analytics", icon: "reports" },
+        { href: "/admin/kpis", label: "KPIs", icon: "kpis" },
+        { href: "/admin/alerts", label: "Alerts", icon: "alerts" },
+      ],
+    },
+    {
+      label: "System",
+      items: [
+        { href: "/admin/audit-logs", label: "Audit Logs", icon: "audit" },
+        { href: "/admin/settings", label: "Settings", icon: "settings" },
+      ],
+    },
+  ];
+}
+
+export const NAV: Record<Role, NavGroup[]> = {
+  super_admin: adminNav(true),
+  admin: adminNav(false),
   principal: [
-    { href: "/principal", label: "Dashboard" },
-    { href: "/principal/courses", label: "Course Approvals" },
-    { href: "/principal/reports", label: "Reports & Analytics" },
-    { href: "/principal/alerts", label: "KPI Alerts" },
+    { items: [{ href: "/principal", label: "Dashboard", icon: "dashboard" }] },
+    { label: "Academics", items: [{ href: "/principal/courses", label: "Course Approvals", icon: "approvals" }] },
+    {
+      label: "Performance",
+      items: [
+        { href: "/principal/reports", label: "Reports & Analytics", icon: "reports" },
+        { href: "/principal/alerts", label: "KPI Alerts", icon: "alerts" },
+      ],
+    },
   ],
   professor: [
-    { href: "/professor", label: "Dashboard" },
-    { href: "/professor/courses", label: "My Courses" },
-    { href: "/professor/question-bank", label: "Question Bank" },
-    { href: "/professor/analytics", label: "Analytics" },
+    { items: [{ href: "/professor", label: "Dashboard", icon: "dashboard" }] },
+    {
+      label: "Teaching",
+      items: [
+        { href: "/professor/courses", label: "My Courses", icon: "courses" },
+        { href: "/professor/question-bank", label: "Question Bank", icon: "questions" },
+      ],
+    },
+    { label: "Performance", items: [{ href: "/professor/analytics", label: "Analytics", icon: "reports" }] },
   ],
-  student: [
-    { href: "/student", label: "My Courses" },
-  ],
-  parent: [
-    { href: "/parent", label: "My Children" },
-  ],
+  staff: [{ items: [{ href: "/staff", label: "Dashboard", icon: "dashboard" }] }],
+  student: [{ items: [{ href: "/student", label: "My Courses", icon: "courses" }] }],
+  parent: [{ items: [{ href: "/parent", label: "My Children", icon: "students" }] }],
 };
 
 export async function AppShell({ profile, children }: { profile: Profile; children: ReactNode }) {
   const nav = NAV[profile.role];
+  const name = profile.full_name || profile.email;
   const supabase = await createClient();
   const { count } = await supabase
     .from("notifications")
@@ -60,40 +101,86 @@ export async function AppShell({ profile, children }: { profile: Profile; childr
     .is("read_at", null);
 
   return (
-    <div className="min-h-screen bg-secondary/40">
-      <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-background px-4">
-        <MobileNav items={nav} />
-        <Link href="/" className="flex items-center gap-3">
-          <Image src="/zicon-logo.png" alt="Zicon" width={96} height={56} className="h-10 w-auto rounded" priority />
-          <span className="hidden text-sm font-semibold text-primary sm:inline">{PORTAL_NAME[profile.role]}</span>
+    <div className="min-h-screen bg-background lg:pl-64">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-sidebar text-sidebar-foreground lg:flex">
+        <div className="shrink-0 border-b border-sidebar-border px-4 pb-3.5 pt-4">
+          <Link href="/" className="mx-auto block w-48 overflow-hidden rounded-md shadow-xs ring-1 ring-black/10" aria-label="Zicon home">
+            <Image src="/zicon-logo.png" alt="Zicon — Stand Out From The Crowd" width={391} height={228} className="h-auto w-full" priority />
+          </Link>
+          <p className="mt-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-sidebar-muted">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
+            {PORTAL_NAME[profile.role]}
+          </p>
+        </div>
+        <div className="flex-1 overflow-y-auto px-3 py-5">
+          <Suspense>
+            <NavLinks groups={nav} />
+          </Suspense>
+        </div>
+        <Link
+          href="/profile"
+          className="flex shrink-0 items-center gap-3 border-t border-sidebar-border px-4 py-3 transition-colors hover:bg-sidebar-hover"
+        >
+          <Avatar name={name} className="!bg-accent !text-accent-foreground" />
+          <span className="min-w-0 text-sm">
+            <span className="block truncate font-medium">{name}</span>
+            <span className="block truncate text-xs text-sidebar-muted">{ROLE_LABEL[profile.role]}</span>
+          </span>
         </Link>
+      </aside>
+
+      <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-surface/90 px-4 backdrop-blur-md sm:px-6">
+        <MobileNav groups={nav} title={PORTAL_NAME[profile.role]} />
+        <Link href="/" className="lg:hidden" aria-label="Zicon home">
+          <Image src="/zicon-logo.png" alt="Zicon" width={391} height={228} className="h-11 w-auto rounded" priority />
+        </Link>
+        <p className="hidden text-sm font-semibold text-primary sm:block lg:hidden">{PORTAL_NAME[profile.role]}</p>
         <div className="ml-auto flex items-center gap-1">
           <ThemeToggle />
-          <Link href="/notifications" className="relative rounded-md p-2 hover:bg-secondary" aria-label="Notifications">
-            <Bell size={18} />
-            {!!count && (
-              <span className="absolute -right-0.5 -top-0.5 rounded-full bg-accent px-1.5 text-[10px] font-bold text-accent-foreground">
-                {count}
-              </span>
-            )}
-          </Link>
-          <Link href="/profile" className="flex items-center gap-2 rounded-md p-2 text-sm hover:bg-secondary" aria-label="Profile">
-            <UserRound size={18} />
-            <span className="hidden md:inline">{profile.full_name || profile.email}</span>
-          </Link>
-          <form action={signOut}>
-            <button className="rounded-md p-2 hover:bg-secondary" aria-label="Log out">
-              <LogOut size={18} />
-            </button>
-          </form>
+          <Tooltip label={count ? `${count} unread` : "Notifications"} side="bottom">
+            <Link
+              href="/notifications"
+              className="relative rounded-md p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              aria-label={count ? `Notifications, ${count} unread` : "Notifications"}
+            >
+              <Bell size={18} />
+              {!!count && (
+                <span className="absolute right-1 top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-semibold tabular-nums text-accent-foreground ring-2 ring-surface">
+                  {count > 9 ? "9+" : count}
+                </span>
+              )}
+            </Link>
+          </Tooltip>
+          <div className="mx-1.5 h-6 w-px bg-border" aria-hidden />
+          <Dropdown label="Account menu" className="gap-2 py-1 pl-1 pr-2" trigger={
+            <>
+              <Avatar name={name} className="h-7 w-7 text-[11px]" />
+              <span className="hidden max-w-40 truncate text-sm font-medium md:inline">{name}</span>
+            </>
+          }>
+            <div className="border-b border-border px-2.5 pb-2 pt-1.5">
+              <p className="truncate text-sm font-medium">{name}</p>
+              <p className="truncate text-xs text-muted-foreground">{profile.email}</p>
+            </div>
+            <div className="py-1">
+              <Link href="/profile" role="menuitem" className={menuItemClass}>
+                <UserRound size={16} className="text-muted-foreground" /> Profile
+              </Link>
+              <Link href="/notifications" role="menuitem" className={menuItemClass}>
+                <Bell size={16} className="text-muted-foreground" /> Notifications
+                {!!count && <span className="ml-auto text-xs tabular-nums text-muted-foreground">{count}</span>}
+              </Link>
+            </div>
+            <form action={signOut} className="border-t border-border pt-1">
+              <button role="menuitem" className={menuItemClass}>
+                <LogOut size={16} className="text-muted-foreground" /> Sign out
+              </button>
+            </form>
+          </Dropdown>
         </div>
       </header>
-      <div className="mx-auto flex max-w-7xl">
-        <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-60 shrink-0 overflow-y-auto border-r border-border bg-background p-4 lg:block">
-          <NavLinks items={nav} />
-        </aside>
-        <main className="min-w-0 flex-1 p-4 sm:p-6">{children}</main>
-      </div>
+
+      <main className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">{children}</main>
     </div>
   );
 }

@@ -1,33 +1,41 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CheckCircle2 } from "lucide-react";
 import type { ReactNode } from "react";
+
+const POINTS = [
+  "Course approval workflows with a full audit trail",
+  "Dedicated portals for every role, from principal to parent",
+  "Progress, grades and KPI alerts in real time",
+];
 
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      <aside className="relative hidden overflow-hidden bg-primary p-12 text-primary-foreground lg:flex lg:flex-col lg:justify-between">
-        <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-accent/30 blur-3xl" />
-        <div className="absolute -bottom-32 -left-16 h-96 w-96 rounded-full bg-accent/20 blur-3xl" />
-        <Link href="/" className="relative w-fit rounded-lg bg-white p-2">
-          <Image src="/zicon-logo.png" alt="Zicon" width={150} height={86} className="h-12 w-auto" priority />
+    <div className="grid min-h-screen bg-background lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+      <aside className="hidden flex-col justify-between border-r border-border bg-primary p-12 text-primary-foreground lg:flex dark:bg-sidebar dark:text-sidebar-foreground">
+        <Link href="/" className="w-fit overflow-hidden rounded-md shadow-pop">
+          <Image src="/zicon-logo.png" alt="Zicon" width={391} height={228} className="h-24 w-auto" priority />
         </Link>
-        <div className="relative">
-          <h2 className="text-4xl font-bold leading-tight">
-            Big SMS
-            <span className="block text-accent">Learning, managed.</span>
-          </h2>
-          <p className="mt-4 max-w-md text-primary-foreground/80">
-            One platform for administrators, principals, professors, students and parents: courses, approvals, assessments and progress in one place.
-          </p>
+        <div className="max-w-md">
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">Big SMS</p>
+          <h2 className="mt-3 text-3xl font-semibold leading-tight tracking-tight">The operating system for your institution.</h2>
+          <ul className="mt-8 space-y-3 text-sm text-primary-foreground/85 dark:text-muted-foreground">
+            {POINTS.map((p) => (
+              <li key={p} className="flex items-start gap-3">
+                <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-accent" aria-hidden />
+                {p}
+              </li>
+            ))}
+          </ul>
         </div>
-        <p className="relative text-sm text-primary-foreground/60">© {new Date().getFullYear()} Zicon. Stand out from the crowd.</p>
+        <p className="text-xs text-primary-foreground/55 dark:text-muted-foreground">© {new Date().getFullYear()} Zicon. All rights reserved.</p>
       </aside>
-      <main className="flex items-center justify-center bg-secondary/40 p-4 sm:p-8">
-        <div className="w-full max-w-md">
-          <Link href="/" className="mb-6 flex justify-center lg:hidden">
-            <Image src="/zicon-logo.png" alt="Zicon" width={150} height={86} className="h-14 w-auto rounded" priority />
+      <main className="flex items-center justify-center p-4 sm:p-8">
+        <div className="w-full max-w-[400px] animate-fade-in">
+          <Link href="/" className="mb-8 flex justify-center lg:hidden">
+            <Image src="/zicon-logo.png" alt="Zicon" width={391} height={228} className="h-16 w-auto rounded-md" priority />
           </Link>
-          <div className="rounded-xl border border-border bg-background p-6 shadow-lg sm:p-8">{children}</div>
+          <div className="rounded-lg border border-border bg-surface p-6 shadow-xs sm:p-8">{children}</div>
         </div>
       </main>
     </div>

@@ -1,8 +1,11 @@
 import Link from "next/link";
 import { approveCourse, rejectCourse, reviewCourse } from "@/app/(shared)/review-actions";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Badge, Card, CardTitle, Empty, Flash, Input, PageHeader, Table, Td, type FlashParams } from "@/components/ui";
+import { Badge, buttonClass, Card, CardTitle, Empty, Filters, Flash, type FlashParams, Input, PageHeader, Table, Td } from "@/components/ui";
+import { approvalState, getCourseWorkflow, workflowSummary } from "@/lib/approvals";
+import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import type { ApprovalStep, Role } from "@/lib/types";
 import { cn, formatDate } from "@/lib/utils";
 
 const STATUSES = ["draft", "pending_approval", "published", "rejected", "archived"];
@@ -15,9 +18,23 @@ export function ReviewButtons({ id }: { id: string }) {
           typing a rejection note and pressing Enter can't approve the course. */}
       <button type="submit" disabled hidden aria-hidden="true" tabIndex={-1} />
       <Input name="review_note" placeholder="Review note (required to reject)" className="min-w-60 flex-1" aria-label="Review note" />
-      <button formAction={approveCourse} className="h-10 rounded-md bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-700">Approve</button>
-      <button formAction={rejectCourse} className="h-10 rounded-md bg-red-600 px-4 text-sm font-medium text-white hover:bg-red-700">Reject</button>
+      <button formAction={approveCourse} className={buttonClass("success")}>Approve</button>
+      <button formAction={rejectCourse} className={buttonClass("danger")}>Reject</button>
     </form>
+  );
+}
+
+/** Approve/Reject for whoever owns the course's current step; otherwise who it is waiting for. */
+export function ApprovalControls({ id, approvalStep, steps, viewer }: { id: string; approvalStep: number | null; steps: ApprovalStep[]; viewer: Role }) {
+  const { label, canAct, step } = approvalState(approvalStep, steps, viewer);
+  return (
+    <div className="mt-3">
+      <p className="text-xs font-medium text-muted-foreground">
+        {label}
+        {viewer === "super_admin" && step && step.approver_role !== viewer && " · you can decide as Super Admin (approving publishes immediately)"}
+      </p>
+      {canAct && <ReviewButtons id={id} />}
+    </div>
   );
 }
 
@@ -31,15 +48,17 @@ export async function CourseApprovalList({
   isAdmin: boolean;
   params: FlashParams & { status?: string };
 }) {
+  const viewer = await requireRole("admin", "principal");
   const supabase = await createClient();
-  const select = "id, title, description, outline, status, review_note, updated_at, course_categories(name), profiles!courses_professor_id_fkey(full_name, email)";
+  const select = "id, title, description, outline, status, review_note, approval_step, updated_at, course_categories(name), profiles!courses_professor_id_fkey(full_name, email)";
 
   let all = supabase.from("courses").select(select).order("updated_at", { ascending: false });
   if (params.status) all = all.eq("status", params.status);
 
-  const [{ data: pending }, { data: courses }] = await Promise.all([
+  const [{ data: pending }, { data: courses }, steps] = await Promise.all([
     supabase.from("courses").select(select).eq("status", "pending_approval").order("updated_at"),
     all,
+    getCourseWorkflow(supabase),
   ]);
 
   return (
@@ -51,7 +70,9 @@ export async function CourseApprovalList({
       <Flash params={params} />
 
       <Card>
-        <CardTitle>Approval queue ({pending?.length ?? 0})</CardTitle>
+        <CardTitle action={<span className="text-xs text-muted-foreground">Workflow: {workflowSummary(steps)}</span>}>
+          Approval queue ({pending?.length ?? 0})
+        </CardTitle>
         {!pending?.length ? (
           <Empty>No courses waiting for approval.</Empty>
         ) : (
@@ -69,7 +90,7 @@ export async function CourseApprovalList({
                 </div>
                 {c.description && <p className="mt-2 text-sm">{c.description}</p>}
                 {c.outline && <pre className="mt-2 whitespace-pre-wrap rounded bg-secondary p-3 font-sans text-xs">{c.outline}</pre>}
-                <ReviewButtons id={c.id} />
+                <ApprovalControls id={c.id} approvalStep={c.approval_step} steps={steps} viewer={viewer.role} />
               </div>
             ))}
           </div>
@@ -78,16 +99,8 @@ export async function CourseApprovalList({
 
       <Card className="mt-6">
         <CardTitle>All courses</CardTitle>
-        <div className="mb-4 flex flex-wrap gap-2 text-sm">
-          {[undefined, ...STATUSES].map((s) => (
-            <Link
-              key={s ?? "all"}
-              href={s ? `${base}?status=${s}` : base}
-              className={cn("rounded-full border px-3 py-1 capitalize", params.status === s && "bg-primary text-primary-foreground")}
-            >
-              {s?.replace("_", " ") ?? "All"}
-            </Link>
-          ))}
+        <div className="mb-4">
+          <Filters items={[undefined, ...STATUSES].map((s) => ({ href: s ? `${base}?status=${s}` : base, label: s?.replace("_", " ") ?? "All", active: params.status === s }))} />
         </div>
         <Table head={["Course", "Professor", "Category", "Status", "Updated", ""]} empty={!courses?.length}>
           {courses?.map((c: any) => (

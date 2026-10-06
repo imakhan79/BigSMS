@@ -1,14 +1,18 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { reviewCourse } from "@/app/(shared)/review-actions";
-import { ReviewButtons } from "@/components/CourseApprovalList";
+import { ApprovalControls } from "@/components/CourseApprovalList";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Badge, Card, CardTitle, Empty, PageHeader, Table, Td } from "@/components/ui";
+import { Badge, Card, CardTitle, Empty, PageHeader, Table, Td, TextLink } from "@/components/ui";
+import { getCourseWorkflow } from "@/lib/approvals";
+import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { ROLE_LABEL, type Role } from "@/lib/types";
 import { formatDate, pct } from "@/lib/utils";
 
 /** Read-only course view with review controls, for admins and principals. */
 export async function CourseReview({ id, base, isAdmin }: { id: string; base: "/admin/courses" | "/principal/courses"; isAdmin: boolean }) {
+  const viewer = await requireRole("admin", "principal");
   const supabase = await createClient();
   const { data: course } = await supabase
     .from("courses")
@@ -17,12 +21,18 @@ export async function CourseReview({ id, base, isAdmin }: { id: string; base: "/
     .single();
   if (!course) notFound();
 
-  const [{ data: lectures }, { data: materials }, { data: assignments }, { data: quizzes }, { data: progress }] = await Promise.all([
+  const [{ data: lectures }, { data: materials }, { data: assignments }, { data: quizzes }, { data: progress }, steps, { data: history }] = await Promise.all([
     supabase.from("lectures").select("id, title, position").eq("course_id", id).order("position"),
     supabase.from("materials").select("id, title, type").eq("course_id", id),
     supabase.from("assignments").select("id, title, due_at, published").eq("course_id", id),
     supabase.from("quizzes").select("id, title, published").eq("course_id", id),
     supabase.rpc("course_student_progress", { p_course_id: id }),
+    getCourseWorkflow(supabase),
+    supabase
+      .from("course_approvals")
+      .select("id, step_order, reviewer_role, decision, note, created_at, reviewer:profiles!course_approvals_reviewer_id_fkey(full_name)")
+      .eq("course_id", id)
+      .order("created_at", { ascending: false }),
   ]);
 
   return (
@@ -30,7 +40,7 @@ export async function CourseReview({ id, base, isAdmin }: { id: string; base: "/
       <PageHeader
         title={course.title}
         subtitle={`${course.professor?.full_name} · ${course.course_categories?.name ?? "Uncategorised"}`}
-        action={<Link href={base} className="text-sm text-primary hover:underline">← All courses</Link>}
+        action={<TextLink href={base}>← All courses</TextLink>}
       />
       <div className="mb-4 flex items-center gap-2">
         <Badge value={course.status} />
@@ -40,7 +50,7 @@ export async function CourseReview({ id, base, isAdmin }: { id: string; base: "/
       {course.status === "pending_approval" && (
         <Card className="mb-6 border-accent">
           <CardTitle>Review</CardTitle>
-          <ReviewButtons id={course.id} />
+          <ApprovalControls id={course.id} approvalStep={course.approval_step} steps={steps} viewer={viewer.role} />
         </Card>
       )}
 
@@ -84,6 +94,23 @@ export async function CourseReview({ id, base, isAdmin }: { id: string; base: "/
           </Table>
         )}
       </Card>
+
+      {!!history?.length && (
+        <Card className="mt-6">
+          <CardTitle>Approval history</CardTitle>
+          <Table head={["When", "Reviewer", "Step", "Decision", "Note"]}>
+            {history.map((h: any) => (
+              <tr key={h.id}>
+                <Td className="whitespace-nowrap">{formatDate(h.created_at)}</Td>
+                <Td>{h.reviewer?.full_name ?? "—"} <span className="text-xs text-muted-foreground">({ROLE_LABEL[h.reviewer_role as Role]})</span></Td>
+                <Td>{h.step_order}</Td>
+                <Td><Badge value={h.decision === "approved" ? "published" : "rejected"}>{h.decision}</Badge></Td>
+                <Td>{h.note ?? "—"}</Td>
+              </tr>
+            ))}
+          </Table>
+        </Card>
+      )}
 
       {isAdmin && course.status !== "archived" && (
         <form action={reviewCourse} className="mt-6">

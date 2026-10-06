@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ProgressCards } from "@/components/ProgressCards";
-import { Badge, Card, CardTitle, Empty, PageHeader, Table, Td } from "@/components/ui";
+import { Badge, Card, CardTitle, Empty, PageHeader, Table, Td, TextLink } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { StudentProgress } from "@/lib/types";
@@ -41,7 +41,7 @@ export default async function ChildPage({ params }: { params: Promise<{ id: stri
       <PageHeader
         title={child.full_name || child.email}
         subtitle="Progress overview"
-        action={<Link href="/parent" className="text-sm text-primary hover:underline">← My children</Link>}
+        action={<TextLink href="/parent">← My children</TextLink>}
       />
       <ProgressCards rows={(progress ?? []) as StudentProgress[]} />
 

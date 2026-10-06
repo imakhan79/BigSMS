@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Badge, Card, CardTitle, Empty, PageHeader, Stat, Table, Td } from "@/components/ui";
+import { Badge, Card, CardTitle, Empty, PageHeader, Stat, Table, Td, TextLink } from "@/components/ui";
 import { createClient } from "@/lib/supabase/server";
 import type { CourseStat } from "@/lib/types";
 import { formatDate, pct } from "@/lib/utils";
@@ -36,15 +36,15 @@ export default async function AdminDashboard() {
         <Stat label="Active professors" value={professors} />
         <Stat label="Active parents" value={parents} />
         <Stat label="Published courses" value={published} />
-        <Link href="/admin/users?status=pending"><Stat label="Accounts to activate" value={pendingUsers} /></Link>
-        <Link href="/admin/courses"><Stat label="Courses to approve" value={pendingCourses} /></Link>
-        <Link href="/admin/alerts"><Stat label="Open KPI alerts" value={openAlerts} /></Link>
+        <Stat label="Accounts to activate" value={pendingUsers} href="/admin/users?status=pending" />
+        <Stat label="Courses to approve" value={pendingCourses} href="/admin/courses" />
+        <Stat label="Open KPI alerts" value={openAlerts} href="/admin/alerts" />
         <Stat label="Avg completion" value={pct(avg("completion_rate"))} hint="across published courses" />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <Card>
-          <CardTitle action={<Link href="/admin/courses" className="text-sm text-primary hover:underline">Review all</Link>}>
+          <CardTitle action={<TextLink href="/admin/courses">Review all</TextLink>}>
             Awaiting approval
           </CardTitle>
           {!pendingList.data?.length ? (
@@ -61,7 +61,7 @@ export default async function AdminDashboard() {
           )}
         </Card>
         <Card>
-          <CardTitle action={<Link href="/admin/alerts" className="text-sm text-primary hover:underline">Manage</Link>}>Open alerts</CardTitle>
+          <CardTitle action={<TextLink href="/admin/alerts">Manage</TextLink>}>Open alerts</CardTitle>
           {!alerts.data?.length ? (
             <Empty>No open alerts.</Empty>
           ) : (
@@ -75,7 +75,7 @@ export default async function AdminDashboard() {
       </div>
 
       <Card className="mt-6">
-        <CardTitle action={<Link href="/admin/reports" className="text-sm text-primary hover:underline">Full report</Link>}>Course performance</CardTitle>
+        <CardTitle action={<TextLink href="/admin/reports">Full report</TextLink>}>Course performance</CardTitle>
         <Table head={["Course", "Professor", "Status", "Students", "Completion", "Quiz avg", "Submissions"]} empty={!stats.length}>
           {stats.slice(0, 8).map((s) => (
             <tr key={s.course_id}>

@@ -1,6 +1,6 @@
 import { deleteCourse, setCourseStatus, updateCourse } from "@/app/professor/actions";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Card, CardTitle, Input, Label, Select, Textarea } from "@/components/ui";
+import { Alert, Card, CardTitle, Input, Label, Select, Textarea } from "@/components/ui";
 import { createClient } from "@/lib/supabase/server";
 import type { Course } from "@/lib/types";
 
@@ -47,9 +47,7 @@ export async function OverviewTab({ course }: { course: Course }) {
           <li>3. Once the principal approves, it is published to assigned students.</li>
         </ol>
         {course.status === "rejected" && course.review_note && (
-          <p className="mb-4 rounded bg-red-50 p-3 text-sm text-red-800 dark:bg-red-950 dark:text-red-200">
-            <strong>Rejected:</strong> {course.review_note}
-          </p>
+          <Alert tone="danger" title="Rejected" className="mb-4">{course.review_note}</Alert>
         )}
         <div className="flex flex-col gap-2">
           {(course.status === "draft" || course.status === "rejected") && (

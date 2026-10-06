@@ -7,7 +7,7 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
   const params = await searchParams;
   return (
     <>
-      <h1 className="mb-1 text-xl font-bold text-primary">Create account</h1>
+      <h1 className="mb-1 text-xl font-semibold text-foreground">Create account</h1>
       <p className="mb-4 text-sm text-muted-foreground">New accounts are activated by an administrator.</p>
       <Flash params={params} />
       <form action={signUp} className="space-y-4">

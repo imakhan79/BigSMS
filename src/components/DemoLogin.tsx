@@ -1,8 +1,9 @@
-import { BookOpenCheck, GraduationCap, Landmark, ShieldCheck, Users } from "lucide-react";
+import { BookOpenCheck, Crown, GraduationCap, Landmark, ShieldCheck, Users } from "lucide-react";
 import { demoSignIn } from "@/app/(auth)/actions";
 import { SubmitButton } from "@/components/SubmitButton";
 
 export const DEMO_ROLES = [
+  { role: "super_admin", label: "Super Admin", hint: "Users, IDs, workflows", Icon: Crown },
   { role: "admin", label: "Admin", hint: "Approvals, users, KPIs", Icon: ShieldCheck },
   { role: "principal", label: "Principal", hint: "Course approvals, oversight", Icon: Landmark },
   { role: "professor", label: "Professor", hint: "Courses, grading, quizzes", Icon: BookOpenCheck },
@@ -19,10 +20,10 @@ export function DemoLogin({ compact = false }: { compact?: boolean }) {
           <input type="hidden" name="role" value={role} />
           <SubmitButton
             variant="outline"
-            className="h-auto w-full flex-col items-start gap-0.5 whitespace-normal px-3 py-3 text-left hover:border-accent"
+            className="h-auto w-full flex-col !items-start gap-0.5 !whitespace-normal px-3 py-2.5 text-left hover:border-primary/40"
           >
-            <span className="flex items-center gap-2 font-semibold text-primary">
-              <Icon size={16} className="text-accent" /> {label}
+            <span className="flex items-center gap-2 font-medium text-foreground">
+              <Icon size={15} className="text-primary" /> {label}
             </span>
             {!compact && <span className="text-xs font-normal text-muted-foreground">{hint}</span>}
           </SubmitButton>

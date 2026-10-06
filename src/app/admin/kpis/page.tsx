@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { deleteKpi, saveKpi } from "@/app/admin/actions";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Badge, Card, CardTitle, Flash, Input, Label, PageHeader, Select, Table, Td, type FlashParams } from "@/components/ui";
+import { Badge, Card, CardTitle, Flash, type FlashParams, Input, Label, PageHeader, Select, Table, Td, TextLink } from "@/components/ui";
 import { createClient } from "@/lib/supabase/server";
 
 const METRICS: Record<string, string> = {
@@ -47,7 +47,7 @@ export default async function KpisPage({ searchParams }: { searchParams: Promise
           </Table>
         </Card>
         <Card className="h-fit">
-          <CardTitle action={editing && <Link href="/admin/kpis" className="text-sm text-primary hover:underline">Cancel</Link>}>
+          <CardTitle action={editing && <TextLink href="/admin/kpis">Cancel</TextLink>}>
             {editing ? "Edit KPI" : "New KPI"}
           </CardTitle>
           <form action={saveKpi} className="space-y-3" key={editing?.id ?? "new"}>

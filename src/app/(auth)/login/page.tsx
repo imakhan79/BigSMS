@@ -10,7 +10,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-primary">Welcome back</h1>
+      <h1 className="text-xl font-semibold tracking-tight text-foreground">Welcome back</h1>
       <p className="mb-6 text-sm text-muted-foreground">Sign in to Big SMS</p>
       <Flash params={params} />
 

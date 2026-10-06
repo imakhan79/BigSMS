@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Badge, Flash, PageHeader, type FlashParams } from "@/components/ui";
+import { Badge, Flash, type FlashParams, PageHeader, Tabs } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { Course } from "@/lib/types";
-import { cn } from "@/lib/utils";
 import { AssignmentsTab } from "./_components/AssignmentsTab";
 import { LecturesTab } from "./_components/LecturesTab";
 import { OverviewTab } from "./_components/OverviewTab";
@@ -37,26 +36,13 @@ export default async function ProfessorCoursePage({
   return (
     <>
       <PageHeader
+        eyebrow={<Link href="/professor/courses" className="transition-colors hover:text-foreground">My courses</Link>}
         title={course.title}
         subtitle="Course workspace"
-        action={<Link href="/professor/courses" className="text-sm text-primary hover:underline">← My courses</Link>}
+        action={<Badge value={course.status} />}
       />
-      <div className="mb-4 flex items-center gap-2"><Badge value={course.status} /></div>
       <Flash params={sp} />
-      <nav className="mb-6 flex gap-1 overflow-x-auto border-b border-border">
-        {TABS.map((t) => (
-          <Link
-            key={t.id}
-            href={`/professor/courses/${id}?tab=${t.id}`}
-            className={cn(
-              "whitespace-nowrap border-b-2 px-4 py-2 text-sm font-medium",
-              tab === t.id ? "border-accent text-primary" : "border-transparent text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {t.label}
-          </Link>
-        ))}
-      </nav>
+      <Tabs items={TABS.map((t) => ({ href: `/professor/courses/${id}?tab=${t.id}`, label: t.label, active: tab === t.id }))} />
       {tab === "overview" && <OverviewTab course={course as Course} />}
       {tab === "lectures" && <LecturesTab courseId={id} editId={sp.edit} />}
       {tab === "assignments" && <AssignmentsTab courseId={id} />}

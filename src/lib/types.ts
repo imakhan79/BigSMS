@@ -1,5 +1,5 @@
-export type Role = "admin" | "principal" | "professor" | "student" | "parent";
-export type UserStatus = "pending" | "active" | "inactive";
+export type Role = "super_admin" | "admin" | "principal" | "professor" | "staff" | "student" | "parent";
+export type UserStatus = "pending" | "active" | "inactive" | "offboarded";
 export type CourseStatus = "draft" | "pending_approval" | "published" | "rejected" | "archived";
 export type MaterialType = "video" | "pdf" | "book" | "notes" | "worksheet";
 
@@ -9,6 +9,14 @@ export interface Profile {
   full_name: string;
   role: Role;
   status: UserStatus;
+  user_code: string | null;
+  phone: string;
+  department: string;
+  onboarded_at: string | null;
+  onboarded_by: string | null;
+  offboarded_at: string | null;
+  offboarded_by: string | null;
+  offboard_reason: string | null;
   created_at: string;
 }
 
@@ -21,8 +29,15 @@ export interface Course {
   outline: string;
   status: CourseStatus;
   review_note: string | null;
+  approval_step: number | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface ApprovalStep {
+  workflow: string;
+  step_order: number;
+  approver_role: Role;
 }
 
 export interface CourseStat {
@@ -49,9 +64,24 @@ export interface StudentProgress {
 }
 
 export const ROLE_HOME: Record<Role, string> = {
+  super_admin: "/admin",
   admin: "/admin",
   principal: "/principal",
   professor: "/professor",
+  staff: "/staff",
   student: "/student",
   parent: "/parent",
 };
+
+export const ROLE_LABEL: Record<Role, string> = {
+  super_admin: "Super Admin",
+  admin: "Admin",
+  principal: "Principal",
+  professor: "Professor",
+  staff: "Staff",
+  student: "Student",
+  parent: "Parent",
+};
+
+/** Roles only a Super Admin may assign or manage. */
+export const ADMIN_ROLES: Role[] = ["super_admin", "admin"];

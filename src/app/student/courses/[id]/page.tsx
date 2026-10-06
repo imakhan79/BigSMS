@@ -4,7 +4,7 @@ import { CheckCircle2, Circle } from "lucide-react";
 import { submitAssignment, toggleLecture } from "@/app/student/actions";
 import { MaterialLink } from "@/components/MaterialLink";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Badge, Card, CardTitle, Empty, Flash, Input, LinkButton, PageHeader, Textarea, type FlashParams } from "@/components/ui";
+import { Badge, Card, CardTitle, Empty, Flash, type FlashParams, Input, LinkButton, PageHeader, Tabs, Textarea } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { cn, formatDate } from "@/lib/utils";
@@ -48,20 +48,10 @@ export default async function StudentCoursePage({
       <PageHeader
         title={course.title}
         subtitle={course.professor?.full_name}
-        action={<Link href="/student" className="text-sm text-primary hover:underline">← My courses</Link>}
+        eyebrow={<Link href="/student" className="transition-colors hover:text-foreground">My courses</Link>}
       />
       <Flash params={sp} />
-      <nav className="mb-6 flex gap-1 overflow-x-auto border-b border-border">
-        {TABS.map((t) => (
-          <Link
-            key={t.id}
-            href={`/student/courses/${id}?tab=${t.id}`}
-            className={cn("whitespace-nowrap border-b-2 px-4 py-2 text-sm font-medium", tab === t.id ? "border-accent text-primary" : "border-transparent text-muted-foreground")}
-          >
-            {t.label}
-          </Link>
-        ))}
-      </nav>
+      <Tabs items={TABS.map((t) => ({ href: `/student/courses/${id}?tab=${t.id}`, label: t.label, active: tab === t.id }))} />
 
       {tab === "outline" && (
         <Card>
@@ -89,7 +79,7 @@ export default async function StudentCoursePage({
                     <input type="hidden" name="course_id" value={id} />
                     <input type="hidden" name="lecture_id" value={l.id} />
                     <input type="hidden" name="done" value={String(isDone)} />
-                    <button className={cn("inline-flex items-center gap-1 text-sm", isDone ? "text-green-700 dark:text-green-400" : "text-muted-foreground hover:text-foreground")}>
+                    <button className={cn("inline-flex items-center gap-1 text-sm", isDone ? "text-success" : "text-muted-foreground hover:text-foreground")}>
                       {isDone ? <CheckCircle2 size={18} /> : <Circle size={18} />} {isDone ? "Completed" : "Mark complete"}
                     </button>
                   </form>

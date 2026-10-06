@@ -1,32 +1,64 @@
-/* Zicon brand tokens (HSL, shadcn/Tailwind convention), taken from the Zicon logo
-   and the showcase-engine-hub site: maroon wordmark, orange "Z", grey swoosh, cream background. */
+/* Zicon brand tokens (HSL, shadcn/Tailwind convention), sampled from the Zicon logo:
+   maroon wordmark #7A271D, orange "Z" #F0922B, grey swoosh, warm cream background.
+   Maroon carries the brand (sidebar, headings, primary actions); orange marks what is active
+   or needs attention; cream is the canvas. Every text pairing clears WCAG AA. */
 :root {
-  --background: 40 60% 98%;
-  --foreground: 10 40% 12%;
-  --primary: 8 60% 29%;            /* Zicon maroon  #7A271D */
-  --primary-foreground: 40 60% 96%;
-  --secondary: 38 35% 90%;         /* cream */
-  --secondary-foreground: 8 60% 25%;
-  --accent: 33 88% 55%;            /* Zicon orange  #F0922B */
+  --background: 38 55% 96%;        /* logo cream */
+  --surface: 40 60% 99.5%;         /* cards, tables */
+  --foreground: 10 35% 13%;        /* maroon-brown body text */
+  --primary: 7 62% 30%;            /* Zicon maroon */
+  --primary-foreground: 40 60% 98%;
+  --secondary: 36 45% 92%;         /* hover and selected fills */
+  --secondary-foreground: 7 55% 24%;
+  --accent: 31 87% 55%;            /* Zicon orange */
   --accent-foreground: 10 40% 12%;
-  --muted: 30 10% 92%;
-  --muted-foreground: 0 0% 45%;    /* swoosh grey */
-  --border: 30 20% 86%;
-  --ring: 33 88% 55%;
+  --muted: 36 35% 93%;
+  --muted-foreground: 15 8% 38%;   /* swoosh grey, darkened for contrast */
+  --success: 152 62% 28%;
+  --warning: 30 92% 33%;
+  --danger: 0 66% 44%;
+  --info: 212 62% 40%;
+  --border: 34 30% 86%;
+  --input: 32 22% 78%;
+  --ring: 31 87% 55%;
+
+  /* Maroon sidebar */
+  --sidebar: 7 62% 24%;
+  --sidebar-foreground: 38 45% 94%;
+  --sidebar-muted: 25 35% 76%;
+  --sidebar-border: 7 45% 31%;
+  --sidebar-hover: 7 50% 29%;
+  --sidebar-active: 7 46% 34%;
+
   --radius: 0.5rem;
+  color-scheme: light;
 }
 
 .dark {
-  --background: 10 20% 8%;
-  --foreground: 38 40% 94%;
-  --primary: 8 70% 45%;
-  --primary-foreground: 40 60% 96%;
-  --secondary: 10 20% 16%;
-  --secondary-foreground: 38 40% 94%;
-  --accent: 33 90% 58%;
-  --accent-foreground: 10 40% 10%;
-  --muted: 10 15% 18%;
-  --muted-foreground: 30 10% 65%;
-  --border: 10 15% 22%;
-  --ring: 33 90% 58%;
+  --background: 10 22% 7%;
+  --surface: 10 18% 10%;
+  --foreground: 38 40% 93%;
+  --primary: 10 72% 66%;
+  --primary-foreground: 10 40% 8%;
+  --secondary: 10 15% 16%;
+  --secondary-foreground: 38 40% 93%;
+  --accent: 31 90% 58%;
+  --accent-foreground: 10 40% 8%;
+  --muted: 10 14% 14%;
+  --muted-foreground: 25 10% 66%;
+  --success: 152 50% 56%;
+  --warning: 36 90% 60%;
+  --danger: 0 78% 68%;
+  --info: 212 80% 70%;
+  --border: 10 14% 19%;
+  --input: 10 12% 26%;
+  --ring: 31 90% 58%;
+
+  --sidebar: 7 45% 12%;
+  --sidebar-foreground: 38 40% 92%;
+  --sidebar-muted: 20 18% 66%;
+  --sidebar-border: 7 30% 19%;
+  --sidebar-hover: 7 35% 17%;
+  --sidebar-active: 7 40% 22%;
+  color-scheme: dark;
 }

@@ -22,7 +22,7 @@ export default async function ParentDashboard() {
           {children.map((c: any) => (
             <Link key={c.id} href={`/parent/children/${c.id}`}>
               <Card className="transition-shadow hover:shadow-md">
-                <h3 className="font-semibold text-primary">{c.full_name || c.email}</h3>
+                <h3 className="font-semibold text-foreground">{c.full_name || c.email}</h3>
                 <p className="text-sm text-muted-foreground">{c.email}</p>
                 <p className="mt-3 text-sm text-primary">View progress →</p>
               </Card>

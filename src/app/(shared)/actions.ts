@@ -17,7 +17,10 @@ export async function markNotificationRead(form: FormData) {
 export async function updateProfile(form: FormData) {
   const profile = await requireRole();
   const supabase = await createClient();
-  const { error } = await supabase.from("profiles").update({ full_name: str(form, "full_name") }).eq("id", profile.id);
+  const { error } = await supabase
+    .from("profiles")
+    .update({ full_name: str(form, "full_name"), phone: str(form, "phone"), department: str(form, "department") })
+    .eq("id", profile.id);
   if (error) back("/profile", "error", error.message);
   revalidatePath("/", "layout");
   back("/profile", "ok", "Profile updated.");

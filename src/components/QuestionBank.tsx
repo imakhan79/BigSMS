@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { deleteQuestion, saveQuestion } from "@/app/(shared)/question-actions";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Badge, Card, CardTitle, Empty, Flash, Input, Label, PageHeader, Select, Textarea, type FlashParams } from "@/components/ui";
+import { Badge, Card, CardTitle, Empty, Flash, type FlashParams, Input, Label, PageHeader, Select, Textarea, TextLink } from "@/components/ui";
 import { createClient } from "@/lib/supabase/server";
 import type { Profile } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -74,7 +74,7 @@ export async function QuestionBank({
                 </div>
                 <ol className="mt-2 list-[upper-alpha] space-y-0.5 pl-6 text-sm">
                   {q.options.map((o, i) => (
-                    <li key={i} className={cn(i === q.correct_index && "font-semibold text-green-700 dark:text-green-400")}>{o}</li>
+                    <li key={i} className={cn(i === q.correct_index && "font-semibold text-success")}>{o}</li>
                   ))}
                 </ol>
                 <div className="mt-2 flex items-center justify-between text-xs text-muted-foreground">
@@ -96,7 +96,7 @@ export async function QuestionBank({
         </div>
 
         <Card className="h-fit lg:sticky lg:top-20">
-          <CardTitle action={editing && <Link href={base} className="text-sm text-primary hover:underline">Cancel</Link>}>
+          <CardTitle action={editing && <TextLink href={base}>Cancel</TextLink>}>
             {editing ? "Edit question" : "New question"}
           </CardTitle>
           <form action={saveQuestion} className="space-y-3" key={editing?.id ?? "new"}>

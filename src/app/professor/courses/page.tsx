@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createCourse } from "@/app/professor/actions";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Badge, Card, CardTitle, Empty, Flash, Input, Label, PageHeader, Select, Textarea, type FlashParams } from "@/components/ui";
+import { Alert, Badge, Card, CardTitle, Empty, Filters, Flash, type FlashParams, Input, Label, PageHeader, Select, Textarea } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { cn, formatDate } from "@/lib/utils";
@@ -28,16 +28,14 @@ export default async function ProfessorCourses({ searchParams }: { searchParams:
       <Flash params={params} />
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <div>
-          <div className="mb-4 flex flex-wrap gap-2 text-sm">
-            {[undefined, "draft", "pending_approval", "published", "rejected", "archived"].map((s) => (
-              <Link
-                key={s ?? "all"}
-                href={s ? `/professor/courses?status=${s}` : "/professor/courses"}
-                className={cn("rounded-full border px-3 py-1 capitalize", params.status === s && "bg-primary text-primary-foreground")}
-              >
-                {s?.replace("_", " ") ?? "All"}
-              </Link>
-            ))}
+          <div className="mb-4">
+            <Filters
+              items={[undefined, "draft", "pending_approval", "published", "rejected", "archived"].map((s) => ({
+                href: s ? `/professor/courses?status=${s}` : "/professor/courses",
+                label: s?.replace("_", " ") ?? "All",
+                active: params.status === s,
+              }))}
+            />
           </div>
           {!courses?.length ? (
             <Empty>No courses yet. Create your first course.</Empty>
@@ -45,14 +43,14 @@ export default async function ProfessorCourses({ searchParams }: { searchParams:
             <div className="grid gap-4 sm:grid-cols-2">
               {courses.map((c: any) => (
                 <Link key={c.id} href={`/professor/courses/${c.id}`}>
-                  <Card className="h-full transition-shadow hover:shadow-md">
+                  <Card className="h-full transition-colors duration-150 hover:border-foreground/20">
                     <div className="mb-2 flex items-start justify-between gap-2">
-                      <h3 className="font-semibold text-primary">{c.title}</h3>
+                      <h3 className="font-semibold text-foreground">{c.title}</h3>
                       <Badge value={c.status} />
                     </div>
                     <p className="line-clamp-2 text-sm text-muted-foreground">{c.description || "No description"}</p>
                     {c.status === "rejected" && c.review_note && (
-                      <p className="mt-2 rounded bg-red-50 p-2 text-xs text-red-800 dark:bg-red-950 dark:text-red-200">Admin: {c.review_note}</p>
+                      <Alert tone="danger" className="mt-3 px-3 py-2 text-xs">Reviewer: {c.review_note}</Alert>
                     )}
                     <p className="mt-3 text-xs text-muted-foreground">
                       {c.course_categories?.name ?? "Uncategorised"} · {c.enrollments?.[0]?.count ?? 0} students · {formatDate(c.updated_at)}

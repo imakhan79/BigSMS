@@ -18,6 +18,7 @@ begin
   -- Users ------------------------------------------------------------------
   for u in
     select * from (values
+      ('superadmin@bigsms.demo', 'Farah Qureshi',    'super_admin'),
       ('admin@bigsms.demo',      'Aisha Rahman',     'admin'),
       ('principal@bigsms.demo',  'Prof. Tariq Hussain','principal'),
       ('professor@bigsms.demo',  'Dr. Omar Siddiqui','professor'),

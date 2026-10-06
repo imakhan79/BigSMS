@@ -11,16 +11,74 @@ async function admin() {
 }
 
 // Users -----------------------------------------------------------------------
+// The guard_profile_update trigger enforces who may change what: only a Super Admin
+// manages administrator accounts and user IDs.
 export async function updateUser(form: FormData) {
   const supabase = await admin();
+  const path = str(form, "back") || "/admin/users";
+  const status = str(form, "status");
+  if (status === "offboarded") back(path, "error", "Use Offboard on the user's page so a reason is recorded.");
   const { error } = await supabase
     .from("profiles")
-    .update({ role: str(form, "role"), status: str(form, "status") })
+    .update({ role: str(form, "role"), status })
     .eq("id", str(form, "id"));
-  const path = str(form, "back") || "/admin/users";
   if (error) back(path, "error", error.message);
   revalidatePath("/admin", "layout");
-  back(path, "ok", "User updated.");
+  back(path, "ok", status === "active" ? "User saved. Activated accounts get a user ID automatically." : "User updated.");
+}
+
+export async function createUser(form: FormData) {
+  const supabase = await admin();
+  const { data, error } = await supabase.rpc("admin_create_user", {
+    p_email: str(form, "email"),
+    p_full_name: str(form, "full_name"),
+    p_role: str(form, "role"),
+    p_password: str(form, "password"),
+    p_phone: str(form, "phone"),
+    p_department: str(form, "department"),
+  });
+  if (error) back("/admin/users", "error", error.message);
+  revalidatePath("/admin", "layout");
+  back(`/admin/users/${data}`, "ok", "User created and onboarded. Share the temporary password with them securely.");
+}
+
+export async function updateUserDetails(form: FormData) {
+  const supabase = await admin();
+  const id = str(form, "id");
+  const path = `/admin/users/${id}`;
+  const changes: Record<string, string | null> = {
+    full_name: str(form, "full_name"),
+    phone: str(form, "phone"),
+    department: str(form, "department"),
+  };
+  if (form.has("user_code")) changes.user_code = str(form, "user_code").toUpperCase() || null;
+  const { error } = await supabase.from("profiles").update(changes).eq("id", id);
+  if (error) back(path, "error", error.code === "23505" ? "That user ID is already taken." : error.message);
+  revalidatePath("/admin/users");
+  back(path, "ok", "Details saved.");
+}
+
+export async function offboardUser(form: FormData) {
+  const supabase = await admin();
+  const id = str(form, "id");
+  const path = `/admin/users/${id}`;
+  const reason = str(form, "reason");
+  if (!reason) back(path, "error", "Give a reason for offboarding.");
+  const { error } = await supabase.from("profiles").update({ status: "offboarded", offboard_reason: reason }).eq("id", id);
+  if (error) back(path, "error", error.message);
+  revalidatePath("/admin", "layout");
+  back(path, "ok", "User offboarded. Their access has ended; records are kept.");
+}
+
+// Approval workflows (Super Admin) --------------------------------------------
+export async function saveCourseWorkflow(form: FormData) {
+  await requireRole("super_admin");
+  const supabase = await createClient();
+  const roles = form.getAll("step").map(String).filter(Boolean);
+  const { error } = await supabase.rpc("set_approval_workflow", { p_workflow: "course_publication", p_roles: roles });
+  if (error) back("/admin/workflows", "error", error.message);
+  revalidatePath("/", "layout");
+  back("/admin/workflows", "ok", "Course approval workflow saved.");
 }
 
 export async function linkParent(form: FormData) {

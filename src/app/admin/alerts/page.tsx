@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { evaluateKpis, updateAlert } from "@/app/admin/actions";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Badge, Card, Flash, PageHeader, Table, Td, type FlashParams } from "@/components/ui";
+import { Badge, Card, Filters, Flash, type FlashParams, PageHeader, Table, Td } from "@/components/ui";
 import { createClient } from "@/lib/supabase/server";
 import { cn, formatDate } from "@/lib/utils";
 
@@ -29,12 +29,8 @@ export default async function AlertsPage({ searchParams }: { searchParams: Promi
         }
       />
       <Flash params={params} />
-      <div className="mb-4 flex gap-2 text-sm">
-        {["open", "acknowledged", "resolved", "all"].map((s) => (
-          <Link key={s} href={`/admin/alerts?status=${s}`} className={cn("rounded-full border px-3 py-1 capitalize", status === s && "bg-primary text-primary-foreground")}>
-            {s}
-          </Link>
-        ))}
+      <div className="mb-4">
+        <Filters items={["open", "acknowledged", "resolved", "all"].map((s) => ({ href: `/admin/alerts?status=${s}`, label: s, active: status === s }))} />
       </div>
       <Card>
         <Table head={["Raised", "KPI", "Course", "Value", "Status", ""]} empty={!alerts?.length}>

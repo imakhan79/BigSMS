@@ -2,6 +2,7 @@ import { changePassword, updateProfile } from "@/app/(shared)/actions";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Badge, Card, CardTitle, Flash, Input, Label, PageHeader, type FlashParams } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
+import { ROLE_LABEL } from "@/lib/types";
 
 export default async function ProfilePage({ searchParams }: { searchParams: Promise<FlashParams> }) {
   const params = await searchParams;
@@ -21,8 +22,16 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
             <Label label="Email">
               <Input value={profile.email} disabled readOnly />
             </Label>
-            <div className="flex gap-2 text-sm">
-              Role: <Badge value={profile.role} /> Status: <Badge value={profile.status} />
+            <Label label="Phone">
+              <Input name="phone" type="tel" defaultValue={profile.phone} />
+            </Label>
+            <Label label="Department">
+              <Input name="department" defaultValue={profile.department} />
+            </Label>
+            <div className="flex flex-wrap items-center gap-2 text-sm">
+              User ID: <span className="font-mono">{profile.user_code ?? "—"}</span>
+              · Role: <Badge value={profile.role}>{ROLE_LABEL[profile.role]}</Badge>
+              Status: <Badge value={profile.status} />
             </div>
             <SubmitButton>Save</SubmitButton>
           </form>

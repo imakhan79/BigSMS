@@ -1,6 +1,6 @@
 # Big SMS
 
-Learning management system by Zicon, with five portals: **Admin**, **Principal**, **Professor**, **Student** and **Parent**.
+Learning management system by Zicon, with portals for **Super Admin**, **Admin**, **Principal**, **Professor**, **Staff**, **Student** and **Parent**.
 
 Built with Next.js 15 (App Router, TypeScript, Server Actions), Supabase (Postgres, Auth, Storage, RLS) and Tailwind CSS using the Zicon brand colours.
 
@@ -8,17 +8,20 @@ Built with Next.js 15 (App Router, TypeScript, Server Actions), Supabase (Postgr
 
 | Role | Can do |
 |---|---|
-| **Admin** | Activate/deactivate accounts, assign roles, link parents to students, approve/reject/archive courses, manage categories, question bank, KPI configuration, alert management, reports & analytics (CSV export), audit logs, system settings |
+| **Super Admin** | Everything Admin can, plus: create and manage Admin/Super Admin accounts, edit user IDs, and configure approval workflows (e.g. Admin → Principal) under **Approval Workflows**. Can decide on a course at any approval step; approving as Super Admin publishes immediately. |
+| **Admin** | Create, onboard and offboard non-administrator users, assign categories (roles), link parents to students, approve/reject/archive courses, manage categories, question bank, KPI configuration, alert management, reports & analytics (CSV export), audit logs, system settings |
 | **Principal** | Approve or reject courses submitted by professors; read-only oversight of all courses, content, student progress, reports & analytics and KPI alerts. Assigned by an admin only. |
 | **Professor** | Create/edit/categorise courses, submit for approval, archive; lectures; upload videos, PDFs, books, notes, worksheets; assignments and grading; quizzes built from the question bank; assign students; monitor progress; analytics; KPI notifications |
+| **Staff** | Staff portal with their details and notifications (staff modules to follow). |
 | **Student** | View assigned (published) courses and outlines, lectures and materials, mark lectures complete, submit assignments, take quizzes (one attempt, graded server-side) |
 | **Parent** | Read-only view of linked children: courses, progress, published assignments with grades/feedback, quiz scores |
 
 ## Approval workflows
 
 1. **Account activation**: self-registered users start as `pending` and can do nothing until an admin sets them `active`. Admin role can never be self-assigned.
-2. **Course approval**: `draft` → (professor submits) → `pending_approval` → (**principal**, or admin as override) → `published` or `rejected` (with note). A rejected course can be edited and resubmitted. Professors may withdraw a submission or archive. Principals may only approve or reject pending courses and cannot edit content. Only admins archive or restore. Enforced by the `guard_course_update` trigger, so it holds even when the API is called directly.
-3. **Grading**: students submit/resubmit until graded; only the course professor can grade; graded work is locked.
+2. **Course approval**: `draft` → (professor submits) → `pending_approval` → each configured approval step in order (default: **Principal**; the Super Admin can set e.g. Admin → Principal) → `published`, or `rejected` (with note) at any step. Decisions go through `review_course()` and are kept in `course_approvals`. A rejected course can be edited and resubmitted. Professors may withdraw a submission or archive. Admins and principals may only decide on courses at their own step; principals cannot edit content. Only admins archive or restore. Enforced by the `guard_course_update` trigger, so it holds even when the API is called directly.
+3. **Onboarding / offboarding**: activating an account onboards it and assigns a unique user ID by category (SA, ADM, PRN, FAC, STF, STU, PAR, e.g. `STU-0001`). Offboarding (with a reason) ends access and keeps all records; the user can be re-onboarded.
+4. **Grading**: students submit/resubmit until graded; only the course professor can grade; graded work is locked.
 
 Admins, professors and students are notified in-app at each step.
 
@@ -43,6 +46,7 @@ supabase/
     20261005000002_rls.sql         RLS policies and storage bucket and policies
     20261005000003_functions.sql   quiz, progress, analytics and KPI RPCs
     20261006000001/2_principal_*   principal role, approval rights and read access
+    20261007000001/2_super_admin*  super admin and staff roles, user IDs, onboarding/offboarding, approval workflows
   seed.sql                         categories, default KPIs, settings
 scripts/seed.mjs                   demo users and sample course
 public/zicon-logo.png              brand logo
@@ -71,7 +75,7 @@ src/
    # Supabase CLI (use the session pooler, port 5432; URL-encode special chars in the password)
    supabase db push --db-url "postgresql://postgres.<ref>:<password>@aws-0-<region>.pooler.supabase.com:5432/postgres"
    ```
-   Or paste the three files in `supabase/migrations/` (in order) into the dashboard SQL Editor.
+   Or paste each file in `supabase/migrations/` into the dashboard SQL Editor, in order, **one file per run** (enum migrations must commit before the next file uses them).
 
 3. **Seed**
    - Run `supabase/seed.sql` in the SQL Editor (categories, KPIs, settings).
@@ -80,6 +84,7 @@ src/
 
    | Role | Email | Password |
    |---|---|---|
+   | Super Admin | superadmin@bigsms.demo | Demo@12345 |
    | Admin | admin@bigsms.demo | Demo@12345 |
    | Principal | principal@bigsms.demo | Demo@12345 |
    | Professor | professor@bigsms.demo | Demo@12345 |
@@ -94,12 +99,12 @@ src/
    npm run build && npm start
    ```
 
-## First real admin
+## First real Super Admin
 
 Sign up normally, then in the SQL Editor:
 
 ```sql
-update public.profiles set role = 'admin', status = 'active' where email = 'you@example.com';
+update public.profiles set role = 'super_admin', status = 'active' where email = 'you@example.com';
 ```
 
 ## KPI alerts

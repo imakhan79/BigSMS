@@ -10,11 +10,15 @@ export async function getProfile(): Promise<Profile | null> {
   return data as Profile | null;
 }
 
-/** Ensures an active user with one of the given roles; redirects otherwise. */
+/**
+ * Ensures an active user with one of the given roles; redirects otherwise.
+ * A Super Admin satisfies any "admin" requirement.
+ */
 export async function requireRole(...roles: Role[]): Promise<Profile> {
   const profile = await getProfile();
   if (!profile) redirect("/login");
   if (profile.status !== "active") redirect("/pending");
-  if (roles.length && !roles.includes(profile.role)) redirect(ROLE_HOME[profile.role]);
+  const allowed = roles.includes(profile.role) || (profile.role === "super_admin" && roles.includes("admin"));
+  if (roles.length && !allowed) redirect(ROLE_HOME[profile.role]);
   return profile;
 }

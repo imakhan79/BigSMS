@@ -7,7 +7,8 @@ export function ThemeToggle() {
     <button
       type="button"
       aria-label="Toggle dark mode"
-      className="rounded-md p-2 hover:bg-secondary"
+      title="Toggle dark mode"
+      className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
       onClick={() => {
         const dark = document.documentElement.classList.toggle("dark");
         try {

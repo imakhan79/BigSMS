@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createQuiz, deleteQuiz, setQuizQuestions, toggleQuiz } from "@/app/professor/actions";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Badge, Card, CardTitle, Empty, Input, Label, Table, Td, Textarea } from "@/components/ui";
+import { Badge, Card, CardTitle, Empty, Input, Label, Table, Td, Textarea, TextLink } from "@/components/ui";
 import { createClient } from "@/lib/supabase/server";
 import { cn, formatDate } from "@/lib/utils";
 
@@ -64,7 +64,7 @@ export async function QuizzesTab({ courseId, quizId }: { courseId: string; quizI
 
         {selected && (
           <Card>
-            <CardTitle action={<Link href="/professor/question-bank" className="text-sm text-primary hover:underline">Add to bank</Link>}>
+            <CardTitle action={<TextLink href="/professor/question-bank">Add to bank</TextLink>}>
               Questions for “{selected.title}”
             </CardTitle>
             {!bank?.length ? (
