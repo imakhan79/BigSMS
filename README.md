@@ -1,6 +1,6 @@
 # Big SMS
 
-Learning management system by Zicon, with portals for **Super Admin**, **Admin**, **Principal**, **Professor**, **Staff**, **Student** and **Parent**.
+Learning management system by Zicon, with portals for **Super Admin**, **Admin**, **Admin Manager**, **Principal**, **Professor**, **Staff**, **Student** and **Parent**.
 
 Built with Next.js 15 (App Router, TypeScript, Server Actions), Supabase (Postgres, Auth, Storage, RLS) and Tailwind CSS using the Zicon brand colours.
 
@@ -10,7 +10,8 @@ Built with Next.js 15 (App Router, TypeScript, Server Actions), Supabase (Postgr
 |---|---|
 | **Super Admin** | Everything Admin can, plus: create and manage Admin/Super Admin accounts, edit user IDs, and configure approval workflows (e.g. Admin → Principal) under **Approval Workflows**. Can decide on a course at any approval step; approving as Super Admin publishes immediately. |
 | **Admin** | Create, onboard and offboard non-administrator users, assign categories (roles), link parents to students, approve/reject/archive courses, manage categories, question bank, KPI configuration, alert management, reports & analytics (CSV export), audit logs, system settings |
-| **Principal** | Approve or reject courses submitted by professors; read-only oversight of all courses, content, student progress, reports & analytics and KPI alerts. Assigned by an admin only. |
+| **Admin Manager** | Reads faculty, staff, student and student fee details. Manages student applications (online form at `/apply` and walk-ins; accepting creates the student account), student information and documents, fee invoices and payment records, and course enrollment. Compiles the list of students eligible for certificates and submits it to the Principal. Cannot change other roles, offboard students or reverse payments. |
+| **Principal** | Approve or reject certificate lists prepared by the Admin Manager. Approve or reject courses submitted by professors; read-only oversight of all courses, content, student progress, reports & analytics and KPI alerts. Assigned by an admin only. |
 | **Professor** | Create/edit/categorise courses, submit for approval, archive; lectures; upload videos, PDFs, books, notes, worksheets; assignments and grading; quizzes built from the question bank; assign students; monitor progress; analytics; KPI notifications |
 | **Staff** | Staff portal with their details and notifications (staff modules to follow). |
 | **Student** | View assigned (published) courses and outlines, lectures and materials, mark lectures complete, submit assignments, take quizzes (one attempt, graded server-side) |
@@ -21,7 +22,8 @@ Built with Next.js 15 (App Router, TypeScript, Server Actions), Supabase (Postgr
 1. **Account activation**: self-registered users start as `pending` and can do nothing until an admin sets them `active`. Admin role can never be self-assigned.
 2. **Course approval**: `draft` → (professor submits) → `pending_approval` → each configured approval step in order (default: **Principal**; the Super Admin can set e.g. Admin → Principal) → `published`, or `rejected` (with note) at any step. Decisions go through `review_course()` and are kept in `course_approvals`. A rejected course can be edited and resubmitted. Professors may withdraw a submission or archive. Admins and principals may only decide on courses at their own step; principals cannot edit content. Only admins archive or restore. Enforced by the `guard_course_update` trigger, so it holds even when the API is called directly.
 3. **Onboarding / offboarding**: activating an account onboards it and assigns a unique user ID by category (SA, ADM, PRN, FAC, STF, STU, PAR, e.g. `STU-0001`). Offboarding (with a reason) ends access and keeps all records; the user can be re-onboarded.
-4. **Grading**: students submit/resubmit until graded; only the course professor can grade; graded work is locked.
+4. **Certificates: Prepared by Admin Manager → Approved by Principal.** The Admin Manager compiles a list (optionally for one course; completion, attendance and unpaid fees are computed by the server) and submits it. The Principal approves, which issues a numbered certificate to every student on the list, or returns it with a note for changes and resubmission. The preparer cannot approve their own list. Certificates cannot be created any other way.
+5. **Grading**: students submit/resubmit until graded; only the course professor can grade; graded work is locked.
 
 Admins, professors and students are notified in-app at each step.
 
@@ -47,6 +49,8 @@ supabase/
     20261005000003_functions.sql   quiz, progress, analytics and KPI RPCs
     20261006000001/2_principal_*   principal role, approval rights and read access
     20261007000001/2_super_admin*  super admin and staff roles, user IDs, onboarding/offboarding, approval workflows
+    20261008000001_operations.sql  timetable, attendance, invoices/payments, certificates
+    20261009000001/2_admin_manager* admin manager role, applications, student records/documents, certificate lists
   seed.sql                         categories, default KPIs, settings
 scripts/seed.mjs                   demo users and sample course
 public/zicon-logo.png              brand logo
@@ -86,6 +90,7 @@ src/
    |---|---|---|
    | Super Admin | superadmin@bigsms.demo | Demo@12345 |
    | Admin | admin@bigsms.demo | Demo@12345 |
+| Admin Manager | manager@bigsms.demo | Demo@12345 |
    | Principal | principal@bigsms.demo | Demo@12345 |
    | Professor | professor@bigsms.demo | Demo@12345 |
    | Student | student@bigsms.demo / student2@bigsms.demo | Demo@12345 |

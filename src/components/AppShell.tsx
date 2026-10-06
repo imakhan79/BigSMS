@@ -14,6 +14,7 @@ import { ROLE_LABEL, type Profile, type Role } from "@/lib/types";
 const PORTAL_NAME: Record<Role, string> = {
   super_admin: "Super Admin Portal",
   admin: "Admin Portal",
+  admin_manager: "Admin Manager Portal",
   principal: "Principal Portal",
   professor: "Professor Portal",
   staff: "Staff Portal",
@@ -63,9 +64,35 @@ function adminNav(superAdmin: boolean): NavGroup[] {
 export const NAV: Record<Role, NavGroup[]> = {
   super_admin: adminNav(true),
   admin: adminNav(false),
+  admin_manager: [
+    { items: [{ href: "/manager", label: "Dashboard", icon: "dashboard" }] },
+    {
+      label: "Students",
+      items: [
+        { href: "/manager/applications", label: "Applications", icon: "applications" },
+        { href: "/manager/students", label: "Students", icon: "students" },
+        { href: "/manager/enrollment", label: "Course Enrollment", icon: "enrollment" },
+        { href: "/manager/fees", label: "Fee Records", icon: "fees" },
+        { href: "/manager/certificates", label: "Certificate Lists", icon: "certificates" },
+      ],
+    },
+    {
+      label: "Directory",
+      items: [
+        { href: "/manager/faculty", label: "Faculty", icon: "faculty" },
+        { href: "/manager/staff", label: "Staff", icon: "staff" },
+      ],
+    },
+  ],
   principal: [
     { items: [{ href: "/principal", label: "Dashboard", icon: "dashboard" }] },
-    { label: "Academics", items: [{ href: "/principal/courses", label: "Course Approvals", icon: "approvals" }] },
+    {
+      label: "Approvals",
+      items: [
+        { href: "/principal/courses", label: "Course Approvals", icon: "approvals" },
+        { href: "/principal/certificates", label: "Certificate Lists", icon: "certificates" },
+      ],
+    },
     {
       label: "Performance",
       items: [

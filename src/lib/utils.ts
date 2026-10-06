@@ -32,3 +32,18 @@ export function back(path: string, kind: "error" | "ok", message: string): never
   const sep = path.includes("?") ? "&" : "?";
   redirect(`${path}${sep}${kind}=${encodeURIComponent(message)}`);
 }
+
+export function formatDay(value: string | null | undefined) {
+  if (!value) return "—";
+  return new Date(value).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+export function formatMoney(amount: number | string | null | undefined, currency = "PKR") {
+  if (amount == null) return "—";
+  return `${currency} ${Number(amount).toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+/** Today as YYYY-MM-DD for date inputs. */
+export function today() {
+  return new Date().toISOString().slice(0, 10);
+}

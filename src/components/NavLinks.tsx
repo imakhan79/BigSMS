@@ -3,21 +3,26 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import {
+  Award,
   BarChart3,
   BellRing,
   BookOpen,
   ClipboardCheck,
   FileQuestion,
+  FileText,
   FolderTree,
   GaugeCircle,
   GitBranch,
   GraduationCap,
   LayoutDashboard,
+  Presentation,
   ScrollText,
   Settings,
   UserCog,
+  UserPlus,
   Users,
   UsersRound,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -38,6 +43,11 @@ const ICONS = {
   settings: Settings,
   workflows: GitBranch,
   students: GraduationCap,
+  applications: FileText,
+  enrollment: UserPlus,
+  fees: Wallet,
+  certificates: Award,
+  faculty: Presentation,
 } as const;
 export type NavIcon = keyof typeof ICONS;
 

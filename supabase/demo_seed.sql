@@ -20,6 +20,7 @@ begin
     select * from (values
       ('superadmin@bigsms.demo', 'Farah Qureshi',    'super_admin'),
       ('admin@bigsms.demo',      'Aisha Rahman',     'admin'),
+      ('manager@bigsms.demo',    'Usman Tariq',      'admin_manager'),
       ('principal@bigsms.demo',  'Prof. Tariq Hussain','principal'),
       ('professor@bigsms.demo',  'Dr. Omar Siddiqui','professor'),
       ('professor2@bigsms.demo', 'Dr. Lina Haddad',  'professor'),
