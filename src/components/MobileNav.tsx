@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { NavLinks, type NavGroup } from "@/components/NavLinks";
@@ -38,7 +39,10 @@ export function MobileNav({ groups, title }: { groups: NavGroup[]; title: string
           <div className="absolute inset-0 animate-overlay-in bg-black/40" onClick={() => setOpen(false)} />
           <aside className="absolute inset-y-0 left-0 flex w-72 max-w-[85vw] animate-drawer-in flex-col bg-sidebar text-sidebar-foreground shadow-pop">
             <div className="flex h-14 shrink-0 items-center justify-between border-b border-sidebar-border px-4">
-              <span className="text-sm font-semibold">{title}</span>
+              <span className="flex min-w-0 items-center gap-2.5">
+                <Image src="/zicon-logo.png" alt="Zicon" width={391} height={228} className="h-9 w-auto shrink-0 rounded" />
+                <span className="truncate text-sm font-semibold">{title}</span>
+              </span>
               <button
                 type="button"
                 aria-label="Close menu"

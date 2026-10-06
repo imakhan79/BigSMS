@@ -82,7 +82,7 @@ function SectionHeading({ eyebrow, title, text }: { eyebrow: string; title: stri
   return (
     <div className="max-w-2xl">
       <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-accent"><span className="h-px w-6 bg-accent" aria-hidden />{eyebrow}</p>
-      <h2 className="mt-2 text-2xl font-semibold tracking-tight text-primary sm:text-3xl">{title}</h2>
+      <h2 className="mt-2 font-display text-2xl font-semibold text-primary sm:text-[2.1rem]">{title}</h2>
       {text && <p className="mt-3 text-muted-foreground">{text}</p>}
     </div>
   );
@@ -116,7 +116,7 @@ export default async function Home() {
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.15fr] lg:py-24">
           <div className="animate-fade-in">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">School management by Zicon</p>
-            <h1 className="mt-4 text-4xl font-semibold leading-[1.1] tracking-tight text-primary sm:text-5xl">
+            <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.1] text-primary sm:text-[3.4rem]">
               Every course, every learner, <span className="text-accent">one system.</span>
             </h1>
             <p className="mt-5 max-w-lg text-lg text-muted-foreground">

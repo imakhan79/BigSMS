@@ -7,7 +7,7 @@ export default async function ResetPasswordPage({ searchParams }: { searchParams
   const params = await searchParams;
   return (
     <>
-      <h1 className="mb-4 text-xl font-semibold text-foreground">Reset password</h1>
+      <h1 className="mb-4 font-display text-2xl font-semibold text-primary">Reset password</h1>
       <Flash params={params} />
       <form action={requestPasswordReset} className="space-y-4">
         <Label label="Email">

@@ -13,6 +13,16 @@ export function formatDate(value: string | null | undefined) {
   return new Date(value).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
 }
 
+/** "just now", "5m ago", "3h ago", "2d ago", then a short date. */
+export function timeAgo(value: string) {
+  const s = Math.max(0, (Date.now() - new Date(value).getTime()) / 1000);
+  if (s < 60) return "just now";
+  if (s < 3600) return `${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `${Math.floor(s / 3600)}h ago`;
+  if (s < 7 * 86400) return `${Math.floor(s / 86400)}d ago`;
+  return new Date(value).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
 export function pct(value: number | null | undefined) {
   return value == null ? "—" : `${Number(value).toFixed(0)}%`;
 }

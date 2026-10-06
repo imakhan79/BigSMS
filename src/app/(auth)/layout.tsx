@@ -18,7 +18,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
         </Link>
         <div className="max-w-md">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-accent">Big SMS</p>
-          <h2 className="mt-3 text-3xl font-semibold leading-tight tracking-tight">The operating system for your institution.</h2>
+          <h2 className="mt-3 font-display text-[2.1rem] font-semibold leading-tight">The operating system for your institution.</h2>
           <ul className="mt-8 space-y-3 text-sm text-primary-foreground/85 dark:text-muted-foreground">
             {POINTS.map((p) => (
               <li key={p} className="flex items-start gap-3">

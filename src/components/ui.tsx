@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { AlertTriangle, CheckCircle2, Info, Inbox, XCircle } from "lucide-react";
+import { FlashToast } from "@/components/Toaster";
 import { cn } from "@/lib/utils";
 
 /* ─── Buttons ──────────────────────────────────────────────────────────── */
@@ -59,7 +60,7 @@ export function PageHeader({ title, subtitle, action, eyebrow }: { title: ReactN
     <div className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-border pb-5">
       <div className="min-w-0">
         {eyebrow && <p className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">{eyebrow}</p>}
-        <h1 className="text-2xl font-semibold tracking-tight text-primary">{title}</h1>
+        <h1 className="font-display text-[1.75rem] font-semibold leading-tight text-primary">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
       </div>
       {action && <div className="flex flex-wrap items-center gap-2">{action}</div>}
@@ -233,22 +234,52 @@ export function Alert({ tone = "info", title, children, className }: { tone?: ke
 
 export type FlashParams = { error?: string; ok?: string };
 
+/**
+ * Server actions redirect back with ?ok= or ?error=. Successes become a toast; errors also stay
+ * inline above the form, where the person is looking, until they navigate away.
+ */
 export function Flash({ params }: { params: FlashParams }) {
   if (!params.error && !params.ok) return null;
   return (
-    <Alert tone={params.error ? "danger" : "success"} className="mb-5">
-      {params.error ?? params.ok}
-    </Alert>
+    <>
+      <FlashToast ok={params.ok} error={params.error} />
+      {params.error && (
+        <Alert tone="danger" title="Something went wrong" className="mb-5">
+          {params.error}
+        </Alert>
+      )}
+    </>
   );
 }
 
-export function Empty({ children }: { children: ReactNode }) {
+export function Empty({
+  children,
+  title,
+  icon,
+  action,
+  compact,
+}: {
+  children?: ReactNode;
+  title?: string;
+  icon?: ReactNode;
+  action?: ReactNode;
+  compact?: boolean;
+}) {
   return (
-    <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-border px-6 py-8 text-center text-sm text-muted-foreground">
-      <Inbox size={20} className="text-muted-foreground/60" aria-hidden />
-      <p>{children}</p>
+    <div className={cn("flex flex-col items-center rounded-lg border border-dashed border-border bg-muted/30 text-center", compact ? "gap-1.5 px-4 py-6" : "gap-2 px-6 py-10")}>
+      <span className="mb-1 flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-primary/70" aria-hidden>
+        {icon ?? <Inbox size={18} />}
+      </span>
+      {title && <p className="text-sm font-semibold text-foreground">{title}</p>}
+      {children && <p className="max-w-sm text-sm text-muted-foreground">{children}</p>}
+      {action && <div className="mt-2">{action}</div>}
     </div>
   );
+}
+
+/** Skeleton block for loading states; pulses gently unless reduced motion is on. */
+export function Skeleton({ className }: { className?: string }) {
+  return <div className={cn("animate-pulse rounded-md bg-secondary/80", className)} aria-hidden />;
 }
 
 /* ─── Navigation ───────────────────────────────────────────────────────── */

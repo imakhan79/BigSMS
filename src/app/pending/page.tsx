@@ -13,7 +13,7 @@ export default async function PendingPage() {
     <div className="flex min-h-screen items-center justify-center bg-background p-4">
       <div className="w-full max-w-md animate-fade-in rounded-lg border border-border bg-surface p-8 text-center shadow-xs">
         <Image src="/zicon-logo.png" alt="Zicon" width={160} height={92} className="mx-auto mb-6 h-16 w-auto rounded-md" />
-        <h1 className="text-xl font-semibold text-foreground">
+        <h1 className="font-display text-2xl font-semibold text-primary">
           {profile.status === "offboarded" ? "Account closed" : profile.status === "inactive" ? "Account deactivated" : "Awaiting activation"}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
