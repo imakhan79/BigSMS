@@ -14,21 +14,21 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "https://bigsms-seven.vercel.app",
   ),
-  title: { default: "Big SMS | Zicon", template: "%s · Big SMS" },
+  title: { default: "LGITE | Big SMS", template: "%s · LGITE" },
   description,
   applicationName: "Big SMS",
-  // Link previews (WhatsApp, Slack, email, social) show the Zicon logo.
+  // Link previews (WhatsApp, Slack, email, social) show the LGITE crest.
   openGraph: {
     type: "website",
-    siteName: "Big SMS by Zicon",
-    title: "Big SMS | Zicon",
+    siteName: "Lahore Garrison Institute of Technical Education",
+    title: "LGITE | Big SMS",
     description,
-    images: [{ url: "/zicon-logo.png", width: 391, height: 228, alt: "Zicon — Stand Out From The Crowd" }],
+    images: [{ url: "/lgite-icon-512.png", width: 512, height: 512, alt: "Lahore Garrison Institute of Technical Education crest" }],
   },
-  twitter: { card: "summary", title: "Big SMS | Zicon", description, images: ["/zicon-logo.png"] },
+  twitter: { card: "summary", title: "LGITE | Big SMS", description, images: ["/lgite-icon-512.png"] },
 };
 
-export const viewport = { themeColor: "#7A271D" };
+export const viewport = { themeColor: "#002A64" };
 
 // Applies the saved theme before paint to avoid a flash.
 const themeScript = `try{var t=localStorage.getItem("theme");if(t==="dark"||(!t&&matchMedia("(prefers-color-scheme: dark)").matches))document.documentElement.classList.add("dark")}catch(e){}`;

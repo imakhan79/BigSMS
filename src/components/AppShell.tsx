@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { BRAND, BrandLockup, Crest } from "@/components/Brand";
 import { Bell, LogOut, UserRound } from "lucide-react";
 import { Suspense, type ReactNode } from "react";
 import { signOut } from "@/app/(auth)/actions";
@@ -103,13 +103,16 @@ export async function AppShell({ profile, children }: { profile: Profile; childr
   return (
     <div className="min-h-screen bg-background lg:pl-64">
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-sidebar text-sidebar-foreground lg:flex">
-        <div className="shrink-0 border-b border-sidebar-border px-4 pb-3.5 pt-4">
-          <Link href="/" className="mx-auto block w-48 overflow-hidden rounded-md shadow-xs ring-1 ring-black/10" aria-label="Zicon home">
-            <Image src="/zicon-logo.png" alt="Zicon — Stand Out From The Crowd" width={391} height={228} className="h-auto w-full" priority />
+        <div className="shrink-0 border-b border-sidebar-border px-4 pb-4 pt-5 text-center">
+          <Link href="/" className="mx-auto block w-fit" aria-label={`${BRAND.short} home`}>
+            <Crest className="mx-auto h-[88px] drop-shadow-[0_2px_6px_rgba(0,0,0,0.25)]" priority />
           </Link>
-          <p className="mt-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-sidebar-muted">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden />
+          <p className="mt-2.5 font-display text-lg font-bold tracking-wide text-white">{BRAND.short}</p>
+          <p className="mx-auto max-w-[200px] text-[11px] leading-snug text-sidebar-muted">{BRAND.name}</p>
+          <p className="mt-3 flex items-center justify-center gap-2 text-[11px] font-semibold uppercase tracking-wider text-gold">
+            <span className="h-px w-5 bg-gold/70" aria-hidden />
             {PORTAL_NAME[profile.role]}
+            <span className="h-px w-5 bg-gold/70" aria-hidden />
           </p>
         </div>
         <div className="flex-1 overflow-y-auto px-3 py-5">
@@ -121,7 +124,7 @@ export async function AppShell({ profile, children }: { profile: Profile; childr
           href="/profile"
           className="flex shrink-0 items-center gap-3 border-t border-sidebar-border px-4 py-3 transition-colors hover:bg-sidebar-hover"
         >
-          <Avatar name={name} className="!bg-accent !text-accent-foreground" />
+          <Avatar name={name} className="!bg-gold !text-sidebar" />
           <span className="min-w-0 text-sm">
             <span className="block truncate font-medium">{name}</span>
             <span className="block truncate text-xs text-sidebar-muted">{ROLE_LABEL[profile.role]}</span>
@@ -131,10 +134,9 @@ export async function AppShell({ profile, children }: { profile: Profile; childr
 
       <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border bg-surface/90 px-4 backdrop-blur-md sm:px-6">
         <MobileNav groups={nav} title={PORTAL_NAME[profile.role]} />
-        <Link href="/" className="lg:hidden" aria-label="Zicon home">
-          <Image src="/zicon-logo.png" alt="Zicon" width={391} height={228} className="h-11 w-auto rounded" priority />
+        <Link href="/" className="lg:hidden" aria-label={`${BRAND.short} home`}>
+          <BrandLockup sub={PORTAL_NAME[profile.role]} />
         </Link>
-        <p className="hidden text-sm font-semibold text-primary sm:block lg:hidden">{PORTAL_NAME[profile.role]}</p>
         <div className="ml-auto flex items-center gap-1">
           <ThemeToggle />
           <Tooltip label={count ? `${count} unread` : "Notifications"} side="bottom">

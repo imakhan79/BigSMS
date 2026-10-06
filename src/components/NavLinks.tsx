@@ -88,8 +88,8 @@ export function NavLinks({ groups, onNavigate }: { groups: NavGroup[]; onNavigat
                       active ? "bg-sidebar-active font-medium text-white" : "text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-foreground",
                     )}
                   >
-                    {active && <span className="absolute inset-y-1.5 -left-3 w-[3px] rounded-r bg-accent" aria-hidden />}
-                    <Icon size={16} strokeWidth={active ? 2.2 : 1.8} className={cn("shrink-0", active && "text-accent")} aria-hidden />
+                    {active && <span className="absolute inset-y-1.5 -left-3 w-[3px] rounded-r bg-gold" aria-hidden />}
+                    <Icon size={16} strokeWidth={active ? 2.2 : 1.8} className={cn("shrink-0", active && "text-gold")} aria-hidden />
                     <span className="truncate">{item.label}</span>
                   </Link>
                 </li>

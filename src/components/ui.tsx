@@ -146,7 +146,7 @@ export function Stat({ label, value, hint, icon, href }: { label: string; value:
   const body = (
     <div
       className={cn(
-        "flex h-full flex-col rounded-lg border border-border border-t-2 border-t-accent bg-surface p-4 shadow-xs",
+        "flex h-full flex-col rounded-lg border border-border border-t-2 border-t-gold bg-surface p-4 shadow-xs",
         href && "transition-colors duration-150 group-hover:border-foreground/20 group-hover:bg-secondary/40",
       )}
     >

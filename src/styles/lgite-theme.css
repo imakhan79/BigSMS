@@ -1,0 +1,66 @@
+/* LGITE brand tokens (HSL, shadcn/Tailwind convention), sampled from the Lahore Garrison
+   Institute of Technical Education crest: navy ring and ribbon #002A64, royal-blue shield #0673B8,
+   gold trim. Navy carries the brand (sidebar, headings, primary actions); royal blue marks
+   interactive and active states; gold is a thin trim, as on the crest. Text pairings clear WCAG AA. */
+:root {
+  --background: 214 33% 97%;
+  --surface: 0 0% 100%;
+  --foreground: 218 45% 12%;
+  --primary: 215 100% 20%;         /* crest navy #002A64 */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 213 45% 94%;
+  --secondary-foreground: 215 85% 22%;
+  --accent: 203 94% 37%;           /* shield royal blue #0673B8 */
+  --accent-foreground: 0 0% 100%;
+  --gold: 33 62% 52%;              /* crest trim */
+  --muted: 214 30% 95%;
+  --muted-foreground: 217 15% 38%;
+  --success: 152 62% 28%;
+  --warning: 30 92% 33%;
+  --danger: 0 66% 44%;
+  --info: 203 94% 37%;
+  --border: 214 25% 88%;
+  --input: 214 20% 80%;
+  --ring: 203 94% 37%;
+
+  /* Navy sidebar */
+  --sidebar: 215 100% 20%;
+  --sidebar-foreground: 210 40% 97%;
+  --sidebar-muted: 213 40% 80%;
+  --sidebar-border: 215 70% 27%;
+  --sidebar-hover: 215 80% 25%;
+  --sidebar-active: 210 75% 30%;
+
+  --radius: 0.5rem;
+  color-scheme: light;
+}
+
+.dark {
+  --background: 218 45% 7%;
+  --surface: 218 40% 10%;
+  --foreground: 213 30% 93%;
+  --primary: 207 85% 68%;
+  --primary-foreground: 218 60% 10%;
+  --secondary: 218 30% 16%;
+  --secondary-foreground: 213 30% 93%;
+  --accent: 203 85% 58%;
+  --accent-foreground: 218 60% 8%;
+  --gold: 35 70% 62%;
+  --muted: 218 30% 13%;
+  --muted-foreground: 214 15% 66%;
+  --success: 152 50% 56%;
+  --warning: 36 90% 60%;
+  --danger: 0 78% 68%;
+  --info: 203 85% 62%;
+  --border: 218 25% 19%;
+  --input: 218 22% 26%;
+  --ring: 203 85% 58%;
+
+  --sidebar: 218 60% 10%;
+  --sidebar-foreground: 213 30% 93%;
+  --sidebar-muted: 214 20% 68%;
+  --sidebar-border: 218 40% 17%;
+  --sidebar-hover: 218 45% 15%;
+  --sidebar-active: 213 50% 21%;
+  color-scheme: dark;
+}

@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { BRAND, BrandLockup, Crest } from "@/components/Brand";
 import { redirect } from "next/navigation";
 import {
   ArrowRight,
@@ -97,8 +97,7 @@ export default async function Home() {
       <header className="sticky top-0 z-30 border-b border-border bg-surface/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
           <Link href="/" className="flex items-center gap-2.5">
-            <Image src="/zicon-logo.png" alt="Zicon" width={391} height={228} className="h-11 w-auto rounded" priority />
-            <span className="hidden border-l border-border pl-2.5 text-sm font-semibold text-primary sm:inline">Big SMS</span>
+            <BrandLockup crestClass="h-11" />
           </Link>
           <nav className="ml-auto hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             {[["#portals", "Portals"], ["#features", "Features"], ["#workflow", "How it works"], ["#demo", "Demo"]].map(([href, label]) => (
@@ -115,7 +114,7 @@ export default async function Home() {
       <section className="border-b border-border">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.15fr] lg:py-24">
           <div className="animate-fade-in">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">School management by Zicon</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Lahore Garrison Institute of Technical Education</p>
             <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.1] text-primary sm:text-[3.4rem]">
               Every course, every learner, <span className="text-accent">one system.</span>
             </h1>
@@ -217,7 +216,7 @@ export default async function Home() {
         </ol>
       </section>
 
-      <section id="demo" className="scroll-mt-14 bg-primary text-primary-foreground [&_h2]:text-primary-foreground [&_p.text-muted-foreground]:text-primary-foreground/80">
+      <section id="demo" className="scroll-mt-14 bg-primary text-primary-foreground [&_.text-accent]:text-gold [&_.bg-accent]:bg-gold [&_h2]:text-primary-foreground [&_p.text-muted-foreground]:text-primary-foreground/80">
         <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:py-20">
           <SectionHeading
             eyebrow="Live demo"
@@ -233,8 +232,8 @@ export default async function Home() {
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-6 text-sm text-muted-foreground sm:px-6">
           <div className="flex items-center gap-3">
-            <Image src="/zicon-logo.png" alt="Zicon" width={391} height={228} className="h-10 w-auto rounded" />
-            <span>Big SMS · © {new Date().getFullYear()} Zicon</span>
+            <Crest className="h-10" />
+            <span>{BRAND.product} · © {new Date().getFullYear()} {BRAND.name}</span>
           </div>
           <div className="flex gap-5">
             <Link href="/login" className="transition-colors hover:text-foreground">Sign in</Link>

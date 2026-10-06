@@ -15,6 +15,7 @@ export default {
         secondary: { DEFAULT: color("secondary"), foreground: color("secondary-foreground") },
         accent: { DEFAULT: color("accent"), foreground: color("accent-foreground") },
         muted: { DEFAULT: color("muted"), foreground: color("muted-foreground") },
+        gold: color("gold"),
         success: color("success"),
         warning: color("warning"),
         danger: color("danger"),
