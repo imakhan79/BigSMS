@@ -12,7 +12,7 @@ export default async function CertificatePage({ params }: { params: Promise<{ id
   const supabase = await createClient();
   const { data: c } = await supabase
     .from("certificates")
-    .select("certificate_no, title, kind, description, status, issued_on, revoke_reason, student:profiles!certificates_student_id_fkey(full_name), issuer:profiles!certificates_issued_by_fkey(full_name)")
+    .select("certificate_no, title, kind, description, status, issued_on, revoke_reason, student:profiles!certificates_student_id_fkey(full_name), issuer:profiles!certificates_issued_by_fkey(full_name, role), preparer:profiles!certificates_prepared_by_fkey(full_name)")
     .eq("id", id)
     .maybeSingle();
   if (!c) notFound();
@@ -32,7 +32,8 @@ export default async function CertificatePage({ params }: { params: Promise<{ id
         {cert.description && <p className="mx-auto mt-3 max-w-lg text-sm text-muted-foreground">{cert.description}</p>}
         <div className="mt-10 flex flex-wrap justify-between gap-4 text-left text-sm">
           <div><p className="text-muted-foreground">Issued</p><p className="font-medium">{formatDay(cert.issued_on)}</p></div>
-          <div><p className="text-muted-foreground">Approved by</p><p className="font-medium">{cert.issuer?.full_name ?? "—"}, Principal</p></div>
+          <div><p className="text-muted-foreground">Prepared by</p><p className="font-medium">{cert.preparer?.full_name ?? "—"}, Admin Manager</p></div>
+          <div><p className="text-muted-foreground">Approved by</p><p className="font-medium">{cert.issuer?.full_name ?? "—"}, {cert.issuer?.role === "super_admin" ? "Super Admin" : "Principal"}</p></div>
           <div><p className="text-muted-foreground">Certificate no.</p><p className="font-mono font-medium">{cert.certificate_no}</p></div>
         </div>
       </div>
