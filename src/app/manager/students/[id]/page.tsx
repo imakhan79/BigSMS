@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { deleteDocument, enrollStudents, issueInvoice, reviewDocument, saveStudentDetails, unenrollStudent, uploadDocument } from "@/app/manager/actions";
-import { PersonFields } from "@/app/manager/_components";
+import { FeeModeFields, PersonFields } from "@/app/manager/_components";
 import { INVOICE_SELECT, InvoiceTable, type InvoiceRow } from "@/app/manager/_fees";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Badge, Card, CardTitle, Empty, Flash, type FlashParams, Input, Label, PageHeader, Select, Table, Tabs, Td, TextLink } from "@/components/ui";
@@ -55,7 +55,7 @@ export default async function StudentPage({
         eyebrow={<TextLink href="/manager/students">← Students</TextLink>}
         title={s.full_name || s.email}
         subtitle={<>{s.user_code ?? "No ID yet"} · {s.email}{balance > 0 && <> · <span className="text-warning">{formatMoney(balance, currency)} outstanding</span></>}</>}
-        action={<Badge value={s.status} />}
+        action={<div className="flex items-center gap-2"><TextLink href={`/manager/students/${s.id}/id-card`}>ID card</TextLink><Badge value={s.status} /></div>}
       />
       <Flash params={flash} />
       <Tabs
@@ -77,6 +77,7 @@ export default async function StudentPage({
               <Label label="Phone"><Input name="phone" defaultValue={s.phone} /></Label>
               <Label label="Class / section"><Input name="department" defaultValue={s.department} /></Label>
               <PersonFields values={record ?? {}} />
+              <FeeModeFields values={record ?? {}} />
               <Label label="Admitted on"><Input name="admitted_on" type="date" defaultValue={record?.admitted_on ?? ""} /></Label>
               {s.status !== "offboarded" && (
                 <Label label="Account status" hint="Offboarding is done by an Admin.">

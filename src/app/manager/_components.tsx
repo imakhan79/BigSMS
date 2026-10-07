@@ -1,4 +1,5 @@
 import { Input, Label, Select, Textarea } from "@/components/ui";
+import { FEE_PLANS, PAYMENT_METHOD_CHOICES } from "@/lib/types";
 
 type Values = Partial<Record<string, string | null>>;
 
@@ -25,6 +26,26 @@ export function PersonFields({ values = {}, withStatement = false }: { values?: 
       {withStatement && (
         <Label label="Statement / remarks" className="sm:col-span-2 lg:col-span-3"><Textarea name="statement" defaultValue={v("statement")} maxLength={2000} /></Label>
       )}
+    </>
+  );
+}
+
+/** Fee payment mode, set by the Admin Manager only (never on the public apply form). */
+export function FeeModeFields({ values = {}, required = false }: { values?: Values; required?: boolean }) {
+  return (
+    <>
+      <Label label="Fee plan">
+        <Select name="fee_plan" defaultValue={values.fee_plan ?? ""} required={required}>
+          <option value="">Not chosen yet</option>
+          {Object.entries(FEE_PLANS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+        </Select>
+      </Label>
+      <Label label="Payment method">
+        <Select name="payment_method" defaultValue={values.payment_method ?? ""} required={required}>
+          <option value="">Not chosen yet</option>
+          {Object.entries(PAYMENT_METHOD_CHOICES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+        </Select>
+      </Label>
     </>
   );
 }

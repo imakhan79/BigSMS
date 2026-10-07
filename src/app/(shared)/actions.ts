@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth";
+import { PROFILE_FIELDS } from "@/lib/profileRequests";
 import { createClient } from "@/lib/supabase/server";
 import { back, str } from "@/lib/utils";
 
@@ -16,6 +17,7 @@ export async function markNotificationRead(form: FormData) {
 
 export async function updateProfile(form: FormData) {
   const profile = await requireRole();
+  if (profile.role === "student") back("/profile", "error", "Students cannot edit their profile directly. Submit a change request instead.");
   const supabase = await createClient();
   const { error } = await supabase
     .from("profiles")
@@ -24,6 +26,26 @@ export async function updateProfile(form: FormData) {
   if (error) back("/profile", "error", error.message);
   revalidatePath("/", "layout");
   back("/profile", "ok", "Profile updated.");
+}
+
+/** Student profile changes go to the Admin Manager, then need the Principal's approval. */
+export async function requestProfileChange(form: FormData) {
+  await requireRole("student");
+  const changes = Object.fromEntries(PROFILE_FIELDS.map((f) => [f.key, str(form, f.key)]));
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("request_profile_change", { p_changes: changes, p_reason: str(form, "reason") || null });
+  if (error) back("/profile", "error", error.message);
+  revalidatePath("/profile");
+  back("/profile", "ok", "Request sent to the Admin Manager. Your profile changes once the Principal approves it.");
+}
+
+export async function withdrawProfileChange(form: FormData) {
+  await requireRole("student");
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("withdraw_profile_change", { p_request_id: str(form, "id") });
+  if (error) back("/profile", "error", error.message);
+  revalidatePath("/profile");
+  back("/profile", "ok", "Request withdrawn.");
 }
 
 export async function changePassword(form: FormData) {

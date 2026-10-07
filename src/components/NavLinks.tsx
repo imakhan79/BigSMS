@@ -7,7 +7,10 @@ import {
   BarChart3,
   BellRing,
   BookOpen,
+  CalendarDays,
   ClipboardCheck,
+  ClipboardPen,
+  IdCard,
   FileQuestion,
   FileText,
   FolderTree,
@@ -19,6 +22,7 @@ import {
   ScrollText,
   Settings,
   UserCog,
+  UserPen,
   UserPlus,
   Users,
   UsersRound,
@@ -48,6 +52,10 @@ const ICONS = {
   fees: Wallet,
   certificates: Award,
   faculty: Presentation,
+  timetable: CalendarDays,
+  results: ClipboardPen,
+  profileChanges: UserPen,
+  idCard: IdCard,
 } as const;
 export type NavIcon = keyof typeof ICONS;
 

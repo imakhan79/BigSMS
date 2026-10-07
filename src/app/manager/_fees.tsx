@@ -2,7 +2,7 @@ import Link from "next/link";
 import { cancelInvoice, recordPayment } from "@/app/manager/actions";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Badge, Input, Select, Table, Td } from "@/components/ui";
-import { PAYMENT_METHODS } from "@/lib/types";
+import { PAYMENT_METHOD_CHOICES, PAYMENT_METHODS } from "@/lib/types";
 import { formatDay, formatMoney, today } from "@/lib/utils";
 
 export interface InvoiceRow {
@@ -69,7 +69,7 @@ export function InvoiceTable({ invoices, currency, back, showStudent = true }: {
                     <input type="hidden" name="back" value={back} />
                     <Input name="amount" type="number" step="0.01" min="0.01" max={balance} defaultValue={balance} className="h-8 w-28 text-xs" aria-label="Amount" required />
                     <Select name="method" className="h-8 w-32 text-xs" aria-label="Method">
-                      {Object.entries(PAYMENT_METHODS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                      {Object.entries(PAYMENT_METHOD_CHOICES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                     </Select>
                     <Input name="paid_on" type="date" max={today()} defaultValue={today()} className="h-8 w-36 text-xs" aria-label="Paid on" />
                     <Input name="reference" placeholder="Reference" className="h-8 w-28 text-xs" aria-label="Reference" />

@@ -1,17 +1,23 @@
 import Link from "next/link";
 import { createQuiz, deleteQuiz, setQuizQuestions, toggleQuiz } from "@/app/professor/actions";
+import { StudentCell } from "@/app/professor/_components";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Badge, Card, CardTitle, Empty, Input, Label, Table, Td, Textarea, TextLink } from "@/components/ui";
+import { getRoster } from "@/lib/faculty";
 import { createClient } from "@/lib/supabase/server";
 import { cn, formatDate } from "@/lib/utils";
 
 export async function QuizzesTab({ courseId, quizId }: { courseId: string; quizId?: string }) {
   const supabase = await createClient();
-  const { data: quizzes } = await supabase
-    .from("quizzes")
-    .select("*, quiz_questions(question_id), quiz_attempts(id, score, total, submitted_at, student:profiles(full_name))")
-    .eq("course_id", courseId)
-    .order("created_at");
+  const [{ data: quizzes }, roster] = await Promise.all([
+    supabase
+      .from("quizzes")
+      .select("*, quiz_questions(question_id), quiz_attempts(id, student_id, score, total, submitted_at)")
+      .eq("course_id", courseId)
+      .order("created_at"),
+    getRoster(supabase, courseId),
+  ]);
+  const students = new Map(roster.map((s) => [s.student_id, s]));
   const selected = quizzes?.find((q) => q.id === quizId);
   const { data: bank } = selected
     ? await supabase.from("questions").select("id, prompt, difficulty, course_categories(name)").order("created_at", { ascending: false })
@@ -51,7 +57,7 @@ export async function QuizzesTab({ courseId, quizId }: { courseId: string; quizI
                 <Table head={["Student", "Score", "Submitted"]}>
                   {q.quiz_attempts.map((a: any) => (
                     <tr key={a.id}>
-                      <Td>{a.student?.full_name}</Td>
+                      <Td><StudentCell name={students.get(a.student_id)?.full_name} code={students.get(a.student_id)?.user_code} /></Td>
                       <Td>{a.score}/{a.total}</Td>
                       <Td>{formatDate(a.submitted_at)}</Td>
                     </tr>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { recordApplication } from "@/app/manager/actions";
-import { PersonFields } from "@/app/manager/_components";
+import { FeeModeFields, PersonFields } from "@/app/manager/_components";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Badge, Card, Filters, Flash, type FlashParams, Input, Label, PageHeader, Table, Td } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
@@ -30,6 +30,7 @@ export default async function ApplicationsPage({ searchParams }: { searchParams:
             <Label label="Email"><Input name="email" type="email" required /></Label>
             <Label label="Phone"><Input name="phone" type="tel" /></Label>
             <PersonFields withStatement />
+            <FeeModeFields />
             <div className="sm:col-span-2 lg:col-span-3"><SubmitButton>Record application</SubmitButton></div>
           </form>
         </details>

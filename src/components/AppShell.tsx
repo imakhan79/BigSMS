@@ -71,6 +71,7 @@ export const NAV: Record<Role, NavGroup[]> = {
       items: [
         { href: "/manager/applications", label: "Applications", icon: "applications" },
         { href: "/manager/students", label: "Students", icon: "students" },
+        { href: "/manager/profile-requests", label: "Profile Changes", icon: "profileChanges" },
         { href: "/manager/enrollment", label: "Course Enrollment", icon: "enrollment" },
         { href: "/manager/fees", label: "Fee Records", icon: "fees" },
         { href: "/manager/certificates", label: "Certificate Lists", icon: "certificates" },
@@ -91,6 +92,8 @@ export const NAV: Record<Role, NavGroup[]> = {
       items: [
         { href: "/principal/courses", label: "Course Approvals", icon: "approvals" },
         { href: "/principal/certificates", label: "Certificate Lists", icon: "certificates" },
+        { href: "/principal/changes", label: "Result Changes", icon: "results" },
+        { href: "/principal/profile-requests", label: "Profile Changes", icon: "profileChanges" },
       ],
     },
     {
@@ -107,13 +110,23 @@ export const NAV: Record<Role, NavGroup[]> = {
       label: "Teaching",
       items: [
         { href: "/professor/courses", label: "My Courses", icon: "courses" },
+        { href: "/professor/timetable", label: "Timetable", icon: "timetable" },
         { href: "/professor/question-bank", label: "Question Bank", icon: "questions" },
       ],
     },
+    { label: "Results", items: [{ href: "/professor/changes", label: "Change Requests", icon: "approvals" }] },
     { label: "Performance", items: [{ href: "/professor/analytics", label: "Analytics", icon: "reports" }] },
   ],
   staff: [{ items: [{ href: "/staff", label: "Dashboard", icon: "dashboard" }] }],
-  student: [{ items: [{ href: "/student", label: "My Courses", icon: "courses" }] }],
+  student: [
+    {
+      items: [
+        { href: "/student", label: "My Courses", icon: "courses" },
+        { href: "/student/id-card", label: "My ID Card", icon: "idCard" },
+        { href: "/profile", label: "My Profile", icon: "profileChanges" },
+      ],
+    },
+  ],
   parent: [{ items: [{ href: "/parent", label: "My Children", icon: "students" }] }],
 };
 

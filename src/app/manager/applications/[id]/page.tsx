@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { acceptApplication, markUnderReview, rejectApplication, updateApplication } from "@/app/manager/actions";
-import { PersonFields } from "@/app/manager/_components";
+import { FeeModeFields, PersonFields } from "@/app/manager/_components";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Alert, Badge, Card, CardTitle, Flash, type FlashParams, Input, Label, PageHeader, Textarea, TextLink } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
@@ -44,6 +44,7 @@ export default async function ApplicationPage({ params, searchParams }: { params
               <Label label="Email"><Input name="email" type="email" defaultValue={app.email} required /></Label>
               <Label label="Phone"><Input name="phone" defaultValue={app.phone} /></Label>
               <PersonFields values={app} withStatement />
+              <FeeModeFields values={app} />
               {open && <div className="sm:col-span-2 lg:col-span-3"><SubmitButton variant="outline">Save changes</SubmitButton></div>}
             </fieldset>
           </form>
@@ -57,7 +58,10 @@ export default async function ApplicationPage({ params, searchParams }: { params
               </Card>
             )}
             <Card>
-              <CardTitle description="Creates an active student account with this email and copies the details into the student record.">Accept</CardTitle>
+              <CardTitle description="Creates an active student account with this email and copies the details, fee plan and payment method into the student record.">Accept</CardTitle>
+              {(!app.fee_plan || !app.payment_method) && (
+                <Alert tone="warning" className="mb-3">Choose the fee plan and payment method in the application details and save before accepting.</Alert>
+              )}
               <form action={acceptApplication} className="space-y-3">
                 <input type="hidden" name="id" value={app.id} />
                 <Label label="Temporary password"><Input name="password" minLength={8} autoComplete="off" required /></Label>

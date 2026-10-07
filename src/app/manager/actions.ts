@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { requireRole } from "@/lib/auth";
+import { PROFILE_FIELDS } from "@/lib/profileRequests";
 import { createClient } from "@/lib/supabase/server";
 import { back, str } from "@/lib/utils";
 
@@ -30,6 +31,8 @@ const applicationFields = (form: FormData) => ({
   previous_school: str(form, "previous_school"),
   program: str(form, "program"),
   statement: str(form, "statement"),
+  fee_plan: optional(form, "fee_plan"),
+  payment_method: optional(form, "payment_method"),
 });
 
 export async function recordApplication(form: FormData) {
@@ -122,6 +125,8 @@ export async function saveStudentDetails(form: FormData) {
     previous_school: str(form, "previous_school"),
     program: str(form, "program"),
     admitted_on: optional(form, "admitted_on"),
+    fee_plan: optional(form, "fee_plan"),
+    payment_method: optional(form, "payment_method"),
   });
   if (error) back(path, "error", error.message);
   revalidatePath("/manager/students");
@@ -336,4 +341,34 @@ export async function withdrawCertificateList(form: FormData) {
   if (error) back(`/manager/certificates/${id}`, "error", error.message);
   revalidatePath("/manager", "layout");
   back(`/manager/certificates/${id}`, "ok", "Withdrawn. The list is a draft again.");
+}
+
+// Student profile change requests: forward to the Principal or return to the student ----
+export async function forwardProfileChange(form: FormData) {
+  const { supabase } = await office();
+  const id = str(form, "id");
+  const path = `/manager/profile-requests/${id}`;
+  // Only the fields the student asked to change are on the form; the Admin Manager may correct them.
+  const changes = Object.fromEntries(PROFILE_FIELDS.filter((f) => form.has(f.key)).map((f) => [f.key, str(form, f.key)]));
+  const { error } = await supabase.rpc("process_profile_change", {
+    p_request_id: id,
+    p_decision: "forward",
+    p_note: optional(form, "manager_note"),
+    p_changes: changes,
+  });
+  if (error) back(path, "error", error.message);
+  revalidatePath("/manager", "layout");
+  back(path, "ok", "Forwarded to the Principal for approval.");
+}
+
+export async function returnProfileChange(form: FormData) {
+  const { supabase } = await office();
+  const id = str(form, "id");
+  const path = `/manager/profile-requests/${id}`;
+  const note = str(form, "manager_note");
+  if (!note) back(path, "error", "Tell the student why the request is being returned.");
+  const { error } = await supabase.rpc("process_profile_change", { p_request_id: id, p_decision: "return", p_note: note });
+  if (error) back(path, "error", error.message);
+  revalidatePath("/manager", "layout");
+  back(path, "ok", "Request returned to the student.");
 }

@@ -104,10 +104,25 @@ export const DOCUMENT_TYPES: Record<string, string> = {
   other: "Other",
 };
 
+/** Labels for every stored payment method, including older ones. */
 export const PAYMENT_METHODS: Record<string, string> = {
   cash: "Cash",
-  bank_transfer: "Bank transfer",
+  bank_transfer: "IBFT",
   card: "Card",
   cheque: "Cheque",
   online: "Online",
+};
+
+/** Payment methods that can be selected: Cash, IBFT (inter-bank funds transfer) and Cheque. */
+export const PAYMENT_METHOD_CHOICES: Record<string, string> = {
+  cash: "Cash",
+  bank_transfer: "IBFT",
+  cheque: "Cheque",
+};
+
+/** Fee payment mode, chosen by the Admin Manager on the application. */
+export const FEE_PLANS: Record<string, string> = {
+  full: "Full",
+  partial: "Partial",
+  installment: "Installment",
 };
