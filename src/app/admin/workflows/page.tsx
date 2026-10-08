@@ -25,7 +25,7 @@ export default async function WorkflowsPage({ searchParams }: { searchParams: Pr
       <Card>
         <CardTitle>Course publication</CardTitle>
         <p className="mb-4 text-sm text-muted-foreground">
-          A course a professor submits is approved step by step in this order and is published after the last step. Rejecting at any step sends it back to the professor.
+          A course Faculty submit is approved step by step in this order and is published after the last step. Rejecting at any step sends it back to the Faculty member.
           As Super Admin you can decide at any step; approving as Super Admin publishes immediately.
         </p>
         <p className="mb-4 text-sm">

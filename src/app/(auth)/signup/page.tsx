@@ -23,7 +23,7 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
         <Label label="I am a">
           <Select name="role" defaultValue="student">
             <option value="student">Student</option>
-            <option value="professor">Professor</option>
+            <option value="professor">Faculty</option>
             <option value="parent">Parent</option>
           </Select>
         </Label>

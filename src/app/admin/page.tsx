@@ -66,7 +66,7 @@ export default async function AdminDashboard() {
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <Stat label="Active students" value={students} icon={<GraduationCap size={16} />} href="/admin/users?role=student" />
-        <Stat label="Active professors" value={professors} icon={<Users size={16} />} href="/admin/users?role=professor" />
+        <Stat label="Active Faculty" value={professors} icon={<Users size={16} />} href="/admin/users?role=professor" />
         <Stat label="Active parents" value={parents} icon={<UsersRound size={16} />} href="/admin/users?role=parent" />
         <Stat label="Published courses" value={published} icon={<BookOpen size={16} />} href="/admin/courses?status=published" />
       </div>
@@ -144,7 +144,7 @@ export default async function AdminDashboard() {
 
       <Card className="mt-6">
         <CardTitle action={<TextLink href="/admin/reports">Full report</TextLink>}>Course performance</CardTitle>
-        <Table head={["Course", "Professor", "Status", "Students", "Completion", "Quiz avg", "Submissions"]} empty={!stats.length}>
+        <Table head={["Course", "Faculty", "Status", "Students", "Completion", "Quiz avg", "Submissions"]} empty={!stats.length}>
           {stats.slice(0, 8).map((s) => (
             <tr key={s.course_id}>
               <Td className="font-medium">{s.title}</Td>

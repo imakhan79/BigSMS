@@ -16,7 +16,7 @@ const PORTAL_NAME: Record<Role, string> = {
   admin: "Admin Portal",
   admin_manager: "Admin Manager Portal",
   principal: "Principal Portal",
-  professor: "Professor Portal",
+  professor: "Faculty Portal",
   staff: "Staff Portal",
   student: "Student Portal",
   parent: "Parent Portal",

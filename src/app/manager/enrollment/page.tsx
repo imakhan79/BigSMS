@@ -39,7 +39,7 @@ export default async function EnrollmentPage({ searchParams }: { searchParams: P
         <SubmitButton variant="outline">Show</SubmitButton>
       </form>
       {!courseId ? (
-        <Empty title="No courses yet">Courses appear here once professors create them.</Empty>
+        <Empty title="No courses yet">Courses appear here once Faculty create them.</Empty>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <Card>
