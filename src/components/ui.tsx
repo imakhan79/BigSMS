@@ -127,6 +127,19 @@ const statusTones: Record<string, Tone> = {
   inactive: "danger",
   open: "danger",
   overdue: "danger",
+  under_review: "info",
+  accepted: "success",
+  verified: "success",
+  issued: "success",
+  revoked: "danger",
+  unpaid: "warning",
+  partial: "info",
+  paid: "success",
+  cancelled: "neutral",
+  missing: "danger",
+  excused: "neutral",
+  forwarded: "info",
+  withdrawn: "neutral",
 };
 
 export function Badge({ value, children, tone }: { value: string; children?: ReactNode; tone?: Tone }) {

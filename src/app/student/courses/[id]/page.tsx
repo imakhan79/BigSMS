@@ -28,10 +28,12 @@ export default async function StudentCoursePage({
   const supabase = await createClient();
   const { data: course } = await supabase
     .from("courses")
-    .select("*, professor:profiles!courses_professor_id_fkey(full_name)")
+    .select("*")
     .eq("id", id)
     .single();
   if (!course) notFound();
+  // Students see their teacher's name only, not the Faculty profile.
+  const { data: teacher } = await supabase.rpc("person_name", { p_id: course.professor_id });
   const tab = TABS.some((t) => t.id === sp.tab) ? sp.tab! : "outline";
 
   const [{ data: lectures }, { data: materials }, { data: done }, { data: assignments }, { data: quizzes }] = await Promise.all([
@@ -47,7 +49,7 @@ export default async function StudentCoursePage({
     <>
       <PageHeader
         title={course.title}
-        subtitle={course.professor?.full_name}
+        subtitle={teacher ?? undefined}
         eyebrow={<Link href="/student" className="transition-colors hover:text-foreground">My courses</Link>}
       />
       <Flash params={sp} />

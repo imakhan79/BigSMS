@@ -3,6 +3,7 @@ import { BarChart3, Bell, BellRing, BookOpen, BookPlus, ClipboardCheck, Clock, F
 import { QuickActions } from "@/components/DashboardWidgets";
 import { Badge, Card, CardTitle, Empty, LinkButton, PageHeader, Stat, Table, Td } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
+import { getRoster } from "@/lib/faculty";
 import { createClient } from "@/lib/supabase/server";
 import type { CourseStat } from "@/lib/types";
 import { pct, timeAgo } from "@/lib/utils";
@@ -11,17 +12,19 @@ export default async function ProfessorDashboard() {
   const profile = await requireRole("professor");
   const supabase = await createClient();
 
-  const [{ data: statsData }, { data: alerts }, { data: toGrade }] = await Promise.all([
+  const [{ data: statsData }, { data: alerts }, { data: toGrade }, roster] = await Promise.all([
     supabase.rpc("course_stats"),
     supabase.from("alerts").select("id, message, created_at, course_id").neq("status", "resolved").order("created_at", { ascending: false }).limit(5),
     supabase
       .from("submissions")
       // RLS limits this to submissions in the professor's own courses.
-      .select("id, submitted_at, student:profiles!submissions_student_id_fkey(full_name), assignments(title, course_id)")
+      .select("id, student_id, submitted_at, assignments(title, course_id)")
       .eq("status", "submitted")
       .order("submitted_at")
       .limit(8),
+    getRoster(supabase),
   ]);
+  const names = new Map(roster.map((s) => [s.student_id, s.full_name]));
   const stats = (statsData ?? []) as CourseStat[];
   const count = (s: string) => stats.filter((c) => c.status === s).length;
 
@@ -64,7 +67,7 @@ export default async function ProfessorDashboard() {
               {toGrade.map((s: any) => (
                 <li key={s.id} className="flex justify-between gap-2 py-2">
                   <Link href={`/professor/courses/${s.assignments.course_id}?tab=assignments`} className="hover:underline">
-                    {s.student?.full_name} · {s.assignments.title}
+                    {names.get(s.student_id) ?? "Student"} · {s.assignments.title}
                   </Link>
                   <span className="whitespace-nowrap text-xs text-muted-foreground">{timeAgo(s.submitted_at)}</span>
                 </li>

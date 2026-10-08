@@ -3,6 +3,7 @@ import { SubmitButton } from "@/components/SubmitButton";
 import { Badge, Card, CardTitle, Flash, Input, Label, PageHeader, type FlashParams } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { ROLE_LABEL } from "@/lib/types";
+import { StudentProfile } from "./StudentProfile";
 
 export default async function ProfilePage({ searchParams }: { searchParams: Promise<FlashParams> }) {
   const params = await searchParams;
@@ -12,7 +13,9 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
     <>
       <PageHeader title="My profile" />
       <Flash params={params} />
+      {profile.role === "student" && <div className="mb-6"><StudentProfile profile={profile} /></div>}
       <div className="grid gap-6 md:grid-cols-2">
+        {profile.role !== "student" && (
         <Card>
           <CardTitle>Details</CardTitle>
           <form action={updateProfile} className="space-y-4">
@@ -36,6 +39,7 @@ export default async function ProfilePage({ searchParams }: { searchParams: Prom
             <SubmitButton>Save</SubmitButton>
           </form>
         </Card>
+        )}
         <Card>
           <CardTitle>Change password</CardTitle>
           <form action={changePassword} className="space-y-4">

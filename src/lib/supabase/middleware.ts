@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login", "/signup", "/reset-password", "/auth"];
+const PUBLIC_PATHS = ["/login", "/signup", "/reset-password", "/auth", "/apply"];
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });

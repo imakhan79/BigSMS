@@ -24,6 +24,7 @@ export async function signIn(form: FormData) {
 const DEMO_ACCOUNTS: Record<string, string> = {
   super_admin: "superadmin@bigsms.demo",
   admin: "admin@bigsms.demo",
+  admin_manager: "manager@bigsms.demo",
   principal: "principal@bigsms.demo",
   professor: "professor@bigsms.demo",
   student: "student@bigsms.demo",
