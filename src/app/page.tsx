@@ -34,24 +34,24 @@ const PORTALS = [
     text: "Activate accounts, approve courses, configure KPIs, manage alerts and review the full audit trail.",
   },
   {
+    Icon: Users,
+    title: "Admin Manager",
+    text: "Run admissions, student records and ID cards, fees and payments, enrollment, and certificate lists for the Principal.",
+  },
+  {
     Icon: Landmark,
     title: "Principal",
     text: "Approve courses before they go live and oversee every course, student result and KPI across the institution.",
   },
   {
     Icon: BookOpenCheck,
-    title: "Professor",
+    title: "Faculty",
     text: "Build courses with lectures, videos, PDFs and worksheets. Create assignments and quizzes, grade and track progress.",
   },
   {
     Icon: GraduationCap,
     title: "Student",
     text: "Follow assigned courses, mark lectures complete, submit assignments and take quizzes with instant scores.",
-  },
-  {
-    Icon: Users,
-    title: "Parent",
-    text: "See exactly what your child sees: courses, progress, grades and teacher feedback. Read-only and private.",
   },
 ];
 
@@ -60,15 +60,15 @@ const FEATURES = [
   { Icon: FileStack, title: "Rich course content", text: "Lectures with videos, PDFs, books, notes and worksheets, all stored securely." },
   { Icon: ClipboardCheck, title: "Question bank & quizzes", text: "Shared bank of questions with automatic, tamper-proof grading." },
   { Icon: BarChart3, title: "Analytics & reports", text: "Completion, quiz and submission rates per course, exportable to CSV." },
-  { Icon: BellRing, title: "KPI alerts", text: "Set thresholds and alert professors automatically when a course falls behind." },
+  { Icon: BellRing, title: "KPI alerts", text: "Set thresholds and alert Faculty automatically when a course falls behind." },
   { Icon: Lock, title: "Secure by design", text: "Row-level security in the database: every role sees only what it should." },
 ];
 
 const STEPS = [
-  { title: "Professor builds", text: "Create a course, add lectures and materials, then submit it for approval." },
+  { title: "Faculty build", text: "Create a course, add lectures and materials, then submit it for approval." },
   { title: "Principal approves", text: "Review the outline and content, then publish it or send it back with notes." },
   { title: "Students learn", text: "Assigned students get notified, study, submit work and take quizzes." },
-  { title: "Everyone tracks", text: "Professors grade, parents follow along, the principal and admins watch the KPIs." },
+  { title: "Everyone tracks", text: "Faculty grade, students follow their progress, the principal and admins watch the KPIs." },
 ];
 
 const PREVIEW_ROWS = [
@@ -119,7 +119,7 @@ export default async function Home() {
               Every course, every learner, <span className="text-accent">one system.</span>
             </h1>
             <p className="mt-5 max-w-lg text-lg text-muted-foreground">
-              Big SMS connects administrators, principals, professors, students and parents, from course approval to the final grade.
+              Big SMS connects administrators, principals, Faculty and students, from course approval to the final grade.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <LinkButton href="/login#demo" className="h-10 px-5">
@@ -149,7 +149,7 @@ export default async function Home() {
               <thead className="bg-muted/60 text-muted-foreground">
                 <tr>
                   <th className="px-4 py-2 font-medium">Course</th>
-                  <th className="hidden px-4 py-2 font-medium sm:table-cell">Professor</th>
+                  <th className="hidden px-4 py-2 font-medium sm:table-cell">Faculty</th>
                   <th className="px-4 py-2 font-medium">Status</th>
                   <th className="w-28 px-4 py-2 font-medium">Completion</th>
                 </tr>

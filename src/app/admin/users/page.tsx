@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createUser, linkParent, unlinkParent, updateUser } from "@/app/admin/actions";
+import { createUser, updateUser } from "@/app/admin/actions";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Badge, Card, CardTitle, Filters, Flash, type FlashParams, Input, Label, PageHeader, Select, Table, Td, TextLink } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ADMIN_ROLES, ROLE_LABEL, type Profile, type Role } from "@/lib/types";
 import { cn, formatDate } from "@/lib/utils";
 
-const ROLES: Role[] = ["super_admin", "admin", "admin_manager", "principal", "professor", "staff", "student", "parent"];
+const ROLES: Role[] = ["super_admin", "admin", "admin_manager", "principal", "professor", "staff", "student"];
 // Offboarding is done from the user's page so a reason is recorded.
 const STATUSES = ["pending", "active", "inactive"] as const;
 const FILTER_STATUSES = [...STATUSES, "offboarded"] as const;
@@ -29,17 +29,7 @@ export default async function UsersPage({
   if (params.role) query = query.eq("role", params.role);
   if (params.status) query = query.eq("status", params.status);
 
-  const [{ data: users }, { data: allProfiles }, { data: links }] = await Promise.all([
-    query,
-    supabase.from("profiles").select("id, full_name, email, role").in("role", ["parent", "student"]).order("full_name"),
-    supabase.from("parent_students").select("parent_id, student_id"),
-  ]);
-
-  const people = (allProfiles ?? []) as Pick<Profile, "id" | "full_name" | "email" | "role">[];
-  const name = (id: string) => {
-    const p = people.find((x) => x.id === id);
-    return p ? p.full_name || p.email : id;
-  };
+  const { data: users } = await query;
   const backPath = `/admin/users?${new URLSearchParams({ ...(params.role && { role: params.role }), ...(params.status && { status: params.status }) })}`;
 
   const filterLink = (key: "role" | "status", value?: string) => {
@@ -51,7 +41,7 @@ export default async function UsersPage({
 
   return (
     <>
-      <PageHeader title="User management" subtitle="Create and onboard users, assign categories and IDs, offboard leavers, link parents to students" />
+      <PageHeader title="User management" subtitle="Create and onboard users, assign categories and IDs, and offboard leavers" />
       <Flash params={params} />
 
       <Card className="mb-6">
@@ -125,41 +115,6 @@ export default async function UsersPage({
         </Table>
       </Card>
 
-      <Card className="mt-6">
-        <CardTitle>Parent ↔ student links</CardTitle>
-        <form action={linkParent} className="mb-4 grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-          <Label label="Parent">
-            <Select name="parent_id" required>
-              {people.filter((p) => p.role === "parent").map((p) => (
-                <option key={p.id} value={p.id}>{p.full_name || p.email}</option>
-              ))}
-            </Select>
-          </Label>
-          <Label label="Student">
-            <Select name="student_id" required>
-              {people.filter((p) => p.role === "student").map((p) => (
-                <option key={p.id} value={p.id}>{p.full_name || p.email}</option>
-              ))}
-            </Select>
-          </Label>
-          <SubmitButton>Link</SubmitButton>
-        </form>
-        <Table head={["Parent", "Student", ""]} empty={!links?.length}>
-          {links?.map((l) => (
-            <tr key={`${l.parent_id}-${l.student_id}`}>
-              <Td>{name(l.parent_id)}</Td>
-              <Td>{name(l.student_id)}</Td>
-              <Td className="text-right">
-                <form action={unlinkParent}>
-                  <input type="hidden" name="parent_id" value={l.parent_id} />
-                  <input type="hidden" name="student_id" value={l.student_id} />
-                  <SubmitButton size="sm" variant="outline" confirm="Remove this link?">Unlink</SubmitButton>
-                </form>
-              </Td>
-            </tr>
-          ))}
-        </Table>
-      </Card>
     </>
   );
 }

@@ -65,7 +65,7 @@ export async function CourseApprovalList({
     <>
       <PageHeader
         title={isAdmin ? "Course management" : "Course approvals"}
-        subtitle={isAdmin ? "Approve, reject, archive and monitor courses" : "Review courses submitted by professors and monitor all courses"}
+        subtitle={isAdmin ? "Approve, reject, archive and monitor courses" : "Review courses submitted by Faculty and monitor all courses"}
       />
       <Flash params={params} />
 
@@ -102,7 +102,7 @@ export async function CourseApprovalList({
         <div className="mb-4">
           <Filters items={[undefined, ...STATUSES].map((s) => ({ href: s ? `${base}?status=${s}` : base, label: s?.replace("_", " ") ?? "All", active: params.status === s }))} />
         </div>
-        <Table head={["Course", "Professor", "Category", "Status", "Updated", ""]} empty={!courses?.length}>
+        <Table head={["Course", "Faculty", "Category", "Status", "Updated", ""]} empty={!courses?.length}>
           {courses?.map((c: any) => (
             <tr key={c.id}>
               <Td className="font-medium">

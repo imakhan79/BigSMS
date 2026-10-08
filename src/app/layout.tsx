@@ -7,7 +7,7 @@ const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap
 // Serif display face for page titles and marketing headings: academic, not template-generic.
 const display = Source_Serif_4({ subsets: ["latin"], variable: "--font-display", weight: ["600", "700"], display: "swap" });
 
-const description = "School management system with admin, principal, professor, student and parent portals.";
+const description = "School management system with admin, principal, Faculty and student portals.";
 
 export const metadata: Metadata = {
   // Absolute base for preview images; Vercel provides the production domain at build time.

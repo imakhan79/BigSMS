@@ -1,6 +1,6 @@
 # Big SMS
 
-Learning management system by Zicon, with portals for **Super Admin**, **Admin**, **Admin Manager**, **Principal**, **Professor**, **Staff**, **Student** and **Parent**.
+Learning management system by Zicon, with portals for **Super Admin**, **Admin**, **Admin Manager**, **Principal**, **Faculty**, **Staff** and **Student**. (The former Parent role has been removed: existing parent accounts can sign in but have no access.)
 
 Built with Next.js 15 (App Router, TypeScript, Server Actions), Supabase (Postgres, Auth, Storage, RLS) and Tailwind CSS using the Zicon brand colours.
 
@@ -9,25 +9,24 @@ Built with Next.js 15 (App Router, TypeScript, Server Actions), Supabase (Postgr
 | Role | Can do |
 |---|---|
 | **Super Admin** | Everything Admin can, plus: create and manage Admin/Super Admin accounts, edit user IDs, and configure approval workflows (e.g. Admin → Principal) under **Approval Workflows**. Can decide on a course at any approval step; approving as Super Admin publishes immediately. |
-| **Admin** | Create, onboard and offboard non-administrator users, assign categories (roles), link parents to students, approve/reject/archive courses, manage categories, question bank, KPI configuration, alert management, reports & analytics (CSV export), audit logs, system settings |
+| **Admin** | Create, onboard and offboard non-administrator users, assign categories (roles), approve/reject/archive courses, manage categories, question bank, KPI configuration, alert management, reports & analytics (CSV export), audit logs, system settings |
 | **Admin Manager** | Reads faculty, staff, student and student fee details. Manages student applications (online form at `/apply` and walk-ins; accepting creates the student account), records each application's fee payment mode (fee plan Full / Partial / Installment and payment method Cash / IBFT / Cheque, no Principal approval needed), student information, ID cards and documents, fee invoices and payment records, and course enrollment. Compiles the list of students eligible for certificates and submits it to the Principal. Checks students' profile change requests and forwards them to the Principal. Cannot change other roles, offboard students or reverse payments. |
-| **Principal** | Approve or reject certificate lists prepared by the Admin Manager, changes Faculty request to submitted results, and student profile changes forwarded by the Admin Manager. Approve or reject courses submitted by professors; read-only oversight of all courses, content, student progress, reports & analytics and KPI alerts. Assigned by an admin only. |
-| **Professor** (Faculty) | Sees only students enrolled in their own courses (assigned classes), and of them only name, System ID, attendance, marks, progress, assignments and submission status, class timetable, exam results and final report. No student contact details, student records or financial data, and cannot enrol students or edit profiles. Enters attendance, exam marks, assignment grades and submission status, and final reports. Also: create/edit/categorise courses, submit for approval, archive; lectures and materials; quizzes from the question bank; analytics; KPI notifications |
+| **Principal** | Approve or reject certificate lists prepared by the Admin Manager, changes Faculty request to submitted results, and student profile changes forwarded by the Admin Manager. Approve or reject courses submitted by Faculty; read-only oversight of all courses, content, student progress, reports & analytics and KPI alerts. Assigned by an admin only. |
+| **Faculty** (role key `professor`) | Sees only students enrolled in their own courses (assigned classes), and of them only name, System ID, attendance, marks, progress, assignments and submission status, class timetable, exam results and final report. No student contact details, student records or financial data, and cannot enrol students or edit profiles. Enters attendance, exam marks, assignment grades and submission status, and final reports. Also: create/edit/categorise courses, submit for approval, archive; lectures and materials; quizzes from the question bank; analytics; KPI notifications |
 | **Staff** | Staff portal with their details and notifications (staff modules to follow). |
 | **Student** | Sees only their own information: no other students, Faculty, staff, administrative or other students' financial data (teachers' and signatories' names only). Cannot edit their own profile; requests changes instead. Own ID card. View assigned (published) courses and outlines, lectures and materials, mark lectures complete, submit assignments, take quizzes (one attempt, graded server-side) |
-| **Parent** | Read-only view of linked children: courses, progress, published assignments with grades/feedback, quiz scores |
 
 ## Approval workflows
 
 1. **Account activation**: self-registered users start as `pending` and can do nothing until an admin sets them `active`. Admin role can never be self-assigned.
-2. **Course approval**: `draft` → (professor submits) → `pending_approval` → each configured approval step in order (default: **Principal**; the Super Admin can set e.g. Admin → Principal) → `published`, or `rejected` (with note) at any step. Decisions go through `review_course()` and are kept in `course_approvals`. A rejected course can be edited and resubmitted. Professors may withdraw a submission or archive. Admins and principals may only decide on courses at their own step; principals cannot edit content. Only admins archive or restore. Enforced by the `guard_course_update` trigger, so it holds even when the API is called directly.
+2. **Course approval**: `draft` → (Faculty submit) → `pending_approval` → each configured approval step in order (default: **Principal**; the Super Admin can set e.g. Admin → Principal) → `published`, or `rejected` (with note) at any step. Decisions go through `review_course()` and are kept in `course_approvals`. A rejected course can be edited and resubmitted. Faculty may withdraw a submission or archive. Admins and principals may only decide on courses at their own step; principals cannot edit content. Only admins archive or restore. Enforced by the `guard_course_update` trigger, so it holds even when the API is called directly.
 3. **Onboarding / offboarding**: activating an account onboards it and assigns a unique user ID by category (SA, ADM, PRN, FAC, STF, STU, PAR, e.g. `STU-0001`). Offboarding (with a reason) ends access and keeps all records; the user can be re-onboarded.
 4. **Certificates: Prepared by Admin Manager → Approved by Principal.** The Admin Manager compiles a list (optionally for one course; completion, attendance and unpaid fees are computed by the server) and submits it. The Principal approves, which issues a numbered certificate to every student on the list, or returns it with a note for changes and resubmission. The preparer cannot approve their own list. Certificates cannot be created any other way.
-5. **Results: entered by Faculty → changes approved by Principal.** Attendance registers, exam marks and final reports are drafts until Faculty submit them; an assignment grade is submitted when saved. Submitted results are locked. Faculty may request a change with a reason; it takes effect only when the Principal approves it (`request_result_change()` / `review_result_change()`, kept in `result_changes`). Students and parents see exam results and final reports once submitted, and absences once the register is submitted.
+5. **Results: entered by Faculty → changes approved by Principal.** Attendance registers, exam marks and final reports are drafts until Faculty submit them; an assignment grade is submitted when saved. Submitted results are locked. Faculty may request a change with a reason; it takes effect only when the Principal approves it (`request_result_change()` / `review_result_change()`, kept in `result_changes`). Students see exam results and final reports once submitted, and absences once the register is submitted.
 6. **Student profile changes: Student → Admin Manager → Principal.** Students cannot edit their profile. They request a change; the Admin Manager checks it (and may correct it) and forwards it, or returns it with a note; the change takes effect only when the Principal approves it (`profile_change_requests`).
 7. **Grading**: students submit/resubmit until graded; Faculty can also record a status for work not submitted online (handed in, missing, excused).
 
-Admins, professors and students are notified in-app at each step.
+Admins, Faculty and students are notified in-app at each step.
 
 ## Security model
 
@@ -35,8 +34,7 @@ Every table has Row Level Security. Key rules:
 
 - Inactive or pending accounts match no policy except their own profile.
 - Students only see **published** courses they are enrolled in, and only **published** assignments/quizzes.
-- Quiz answers (`questions.correct_index`) are never readable by students or parents. Quizzes are served by `get_quiz_questions()` and scored by `submit_quiz()`.
-- Parents see only what their linked child sees (`is_parent_of`, `parent_sees_course`). They get no materials, no question bank and no other students.
+- Quiz answers (`questions.correct_index`) are never readable by students. Quizzes are served by `get_quiz_questions()` and scored by `submit_quiz()`.
 - Course files live in a private `course-materials` bucket at `<course_id>/…` and are served via short-lived signed URLs.
 - Role, status and email changes are blocked for non-admins by trigger.
 - Changes to users, links, courses, enrolments, KPIs, alerts and settings are written to `audit_logs`.
@@ -64,7 +62,7 @@ src/
   app/
     (auth)/                        login, signup, reset-password
     (shared)/                      notifications, profile
-    admin/  principal/  professor/  student/  parent/
+    admin/  manager/  principal/  professor/  staff/  student/
 ```
 
 ## Setup
@@ -94,9 +92,8 @@ src/
    | Admin | admin@bigsms.demo | Demo@12345 |
 | Admin Manager | manager@bigsms.demo | Demo@12345 |
    | Principal | principal@bigsms.demo | Demo@12345 |
-   | Professor | professor@bigsms.demo | Demo@12345 |
+   | Faculty | professor@bigsms.demo | Demo@12345 |
    | Student | student@bigsms.demo / student2@bigsms.demo | Demo@12345 |
-   | Parent | parent@bigsms.demo (linked to student1) | Demo@12345 |
 
 4. **Auth settings.** In Supabase → Authentication → URL Configuration, add `http://localhost:3000/auth/callback` (and your production URL) to the redirect URLs for email confirmation and password reset.
 
@@ -116,7 +113,7 @@ update public.profiles set role = 'super_admin', status = 'active' where email =
 
 ## KPI alerts
 
-Admins define thresholds under **KPIs** (completion rate, average quiz score, submission rate, enrolled students). **Alerts → Run KPI check now** evaluates every published course, opens alerts for breaches and notifies the course professor. To run it on a schedule, call `select public.evaluate_kpis();` from a `pg_cron` job running as an admin context, or trigger it from an Edge Function.
+Admins define thresholds under **KPIs** (completion rate, average quiz score, submission rate, enrolled students). **Alerts → Run KPI check now** evaluates every published course, opens alerts for breaches and notifies the course Faculty. To run it on a schedule, call `select public.evaluate_kpis();` from a `pg_cron` job running as an admin context, or trigger it from an Edge Function.
 
 ## Principal approval scope
 

@@ -3,7 +3,7 @@ import { Card, Empty, Progress } from "@/components/ui";
 import type { StudentProgress } from "@/lib/types";
 import { pct } from "@/lib/utils";
 
-/** Course cards built from student_progress(); used by the student and parent portals. */
+/** Course cards built from student_progress(); used by the student portal. */
 export function ProgressCards({ rows, hrefBase }: { rows: StudentProgress[]; hrefBase?: string }) {
   if (!rows.length) return <Empty>No assigned courses yet.</Empty>;
   return (

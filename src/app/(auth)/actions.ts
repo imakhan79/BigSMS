@@ -28,7 +28,6 @@ const DEMO_ACCOUNTS: Record<string, string> = {
   principal: "principal@bigsms.demo",
   professor: "professor@bigsms.demo",
   student: "student@bigsms.demo",
-  parent: "parent@bigsms.demo",
 };
 
 export async function demoSignIn(form: FormData) {
@@ -46,7 +45,7 @@ export async function demoSignIn(form: FormData) {
 
 export async function signUp(form: FormData) {
   const role = str(form, "role");
-  if (!["student", "professor", "parent"].includes(role)) back("/signup", "error", "Choose a valid role.");
+  if (!["student", "professor"].includes(role)) back("/signup", "error", "Choose a valid role.");
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signUp({

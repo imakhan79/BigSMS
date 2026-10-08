@@ -6,7 +6,7 @@ import { requireRole } from "@/lib/auth";
 import { getRoster } from "@/lib/faculty";
 import { createClient } from "@/lib/supabase/server";
 import type { CourseStat } from "@/lib/types";
-import { pct, timeAgo } from "@/lib/utils";
+import { firstName, pct, timeAgo } from "@/lib/utils";
 
 export default async function ProfessorDashboard() {
   const profile = await requireRole("professor");
@@ -29,14 +29,14 @@ export default async function ProfessorDashboard() {
   const count = (s: string) => stats.filter((c) => c.status === s).length;
 
   const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  const firstName = (profile.full_name || "").split(" ").slice(0, 2).join(" ");
+  const name = firstName(profile.full_name);
   const waiting = toGrade?.length ?? 0;
 
   return (
     <>
       <PageHeader
         eyebrow={today}
-        title={firstName ? `Welcome back, ${firstName}` : "Your dashboard"}
+        title={name ? `Welcome back, ${name}` : "Your dashboard"}
         subtitle={waiting ? `${waiting} ${waiting === 1 ? "submission is" : "submissions are"} waiting to be graded.` : "You are all caught up on grading."}
         action={<LinkButton href="/professor/courses">Manage courses</LinkButton>}
       />

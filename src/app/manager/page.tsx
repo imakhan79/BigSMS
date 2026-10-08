@@ -4,7 +4,7 @@ import { PageHeader, Stat } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { getCurrency } from "@/lib/office";
 import { createClient } from "@/lib/supabase/server";
-import { formatMoney } from "@/lib/utils";
+import { firstName, formatMoney } from "@/lib/utils";
 
 export default async function ManagerDashboard() {
   const profile = await requireRole("admin_manager");
@@ -22,11 +22,11 @@ export default async function ManagerDashboard() {
       getCurrency(supabase),
     ]);
   const outstanding = (open ?? []).reduce((t, i) => t + Number(i.amount) - Number(i.amount_paid), 0);
-  const firstName = (profile.full_name || "").split(" ")[0];
+  const name = firstName(profile.full_name);
 
   return (
     <>
-      <PageHeader title={firstName ? `Welcome back, ${firstName}` : "Admin Manager"} subtitle="Admissions, student records, fees, enrollment and certificate lists" />
+      <PageHeader title={name ? `Welcome back, ${name}` : "Admin Manager"} subtitle="Admissions, student records, fees, enrollment and certificate lists" />
       <QuickActions
         actions={[
           { href: "/manager/applications", label: "Applications", description: `${openApps ?? 0} open`, icon: <FileText size={17} /> },

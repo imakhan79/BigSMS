@@ -47,3 +47,11 @@ export function formatMoney(amount: number | string | null | undefined, currency
 export function today() {
   return new Date().toISOString().slice(0, 10);
 }
+
+const TITLES = new Set(["prof", "professor", "dr", "mr", "mrs", "ms", "miss", "sir", "madam", "engr", "eng", "hafiz", "syed"]);
+
+/** First name for greetings, skipping titles such as "Prof." or "Dr.". */
+export function firstName(fullName: string | null | undefined) {
+  const words = (fullName || "").trim().split(/\s+/).filter(Boolean);
+  return words.find((w) => !TITLES.has(w.toLowerCase().replace(/\.$/, ""))) ?? words[0] ?? "";
+}

@@ -21,7 +21,7 @@ export default async function KpisPage({ searchParams }: { searchParams: Promise
     <>
       <PageHeader
         title="KPI configuration"
-        subtitle="Thresholds checked against every published course. Breaches raise alerts and notify the professor."
+        subtitle="Thresholds checked against every published course. Breaches raise alerts and notify the course Faculty."
       />
       <Flash params={params} />
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">

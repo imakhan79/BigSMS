@@ -7,7 +7,7 @@ import { approvalState, getCourseWorkflow } from "@/lib/approvals";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { CourseStat } from "@/lib/types";
-import { pct, timeAgo } from "@/lib/utils";
+import { firstName, pct, timeAgo } from "@/lib/utils";
 
 export default async function PrincipalDashboard() {
   const profile = await requireRole("principal");
@@ -32,13 +32,13 @@ export default async function PrincipalDashboard() {
   const avg = (key: keyof CourseStat) => (live.length ? live.reduce((t, s) => t + Number(s[key]), 0) / live.length : null);
 
   const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  const firstName = (profile.full_name || "").split(" ")[0];
+  const name = firstName(profile.full_name);
 
   return (
     <>
       <PageHeader
         eyebrow={today}
-        title={firstName ? `Welcome back, ${firstName}` : "Principal dashboard"}
+        title={name ? `Welcome back, ${name}` : "Principal dashboard"}
         subtitle={pending.length ? `${pending.length} ${pending.length === 1 ? "course is" : "courses are"} waiting for your approval.` : "No approvals waiting. Here is how the institution is doing."}
       />
 
@@ -53,7 +53,7 @@ export default async function PrincipalDashboard() {
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <Stat label="Active students" value={students ?? 0} icon={<GraduationCap size={16} />} />
-        <Stat label="Active professors" value={professors ?? 0} icon={<Users size={16} />} />
+        <Stat label="Active Faculty" value={professors ?? 0} icon={<Users size={16} />} />
         <Stat label="Published courses" value={live.length} icon={<BookOpen size={16} />} />
         <Stat label="Open KPI alerts" value={alerts?.length ?? 0} icon={<BellRing size={16} />} href="/principal/alerts" />
         <Stat label="Avg completion" value={pct(avg("completion_rate"))} hint="published courses" />
@@ -90,7 +90,7 @@ export default async function PrincipalDashboard() {
 
       <Card className="mt-6">
         <CardTitle action={<TextLink href="/principal/reports">Full report</TextLink>}>Course performance</CardTitle>
-        <Table head={["Course", "Professor", "Status", "Students", "Completion", "Quiz avg", "Submissions"]} empty={!stats.length}>
+        <Table head={["Course", "Faculty", "Status", "Students", "Completion", "Quiz avg", "Submissions"]} empty={!stats.length}>
           {stats.map((s) => (
             <tr key={s.course_id}>
               <Td className="font-medium"><Link href={`/principal/courses/${s.course_id}`} className="hover:underline">{s.title}</Link></Td>

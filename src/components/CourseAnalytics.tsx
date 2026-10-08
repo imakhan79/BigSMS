@@ -24,7 +24,7 @@ export async function CourseAnalytics({ title, subtitle }: { title: string; subt
             filename={`course-report-${new Date().toISOString().slice(0, 10)}.csv`}
             rows={stats.map((s) => ({
               course: s.title,
-              professor: s.professor_name,
+              faculty: s.professor_name,
               status: s.status,
               enrolled: s.enrolled,
               lectures: s.lectures,
@@ -61,7 +61,7 @@ export async function CourseAnalytics({ title, subtitle }: { title: string; subt
 
       <Card className="mt-6">
         <CardTitle>Course report</CardTitle>
-        <Table head={["Course", "Professor", "Status", "Students", "Lectures", "Completion", "Quiz avg", "Submission rate"]} empty={!stats.length}>
+        <Table head={["Course", "Faculty", "Status", "Students", "Lectures", "Completion", "Quiz avg", "Submission rate"]} empty={!stats.length}>
           {stats.map((s) => (
             <tr key={s.course_id}>
               <Td className="font-medium">{s.title}</Td>
