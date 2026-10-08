@@ -17,7 +17,7 @@ import { Badge, Card, CardTitle, Empty, PageHeader, Stat, Table, Td, TextLink } 
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { CourseStat } from "@/lib/types";
-import { pct, timeAgo } from "@/lib/utils";
+import { firstName, pct, timeAgo } from "@/lib/utils";
 
 export default async function AdminDashboard() {
   const profile = await requireRole("admin");
@@ -44,14 +44,14 @@ export default async function AdminDashboard() {
   const live = stats.filter((s) => s.status === "published");
   const avg = (key: keyof CourseStat) => (live.length ? live.reduce((t, s) => t + Number(s[key]), 0) / live.length : null);
   const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  const firstName = (profile.full_name || "").split(" ")[0];
+  const name = firstName(profile.full_name);
   const attention = pendingUsers + pendingCourses + openAlerts;
 
   return (
     <>
       <PageHeader
         eyebrow={today}
-        title={firstName ? `Welcome back, ${firstName}` : "Admin dashboard"}
+        title={name ? `Welcome back, ${name}` : "Admin dashboard"}
         subtitle={attention ? `${attention} ${attention === 1 ? "item needs" : "items need"} your attention today.` : "Everything is up to date."}
       />
 

@@ -7,7 +7,7 @@ import { approvalState, getCourseWorkflow } from "@/lib/approvals";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { CourseStat } from "@/lib/types";
-import { pct, timeAgo } from "@/lib/utils";
+import { firstName, pct, timeAgo } from "@/lib/utils";
 
 export default async function PrincipalDashboard() {
   const profile = await requireRole("principal");
@@ -32,13 +32,13 @@ export default async function PrincipalDashboard() {
   const avg = (key: keyof CourseStat) => (live.length ? live.reduce((t, s) => t + Number(s[key]), 0) / live.length : null);
 
   const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-  const firstName = (profile.full_name || "").split(" ")[0];
+  const name = firstName(profile.full_name);
 
   return (
     <>
       <PageHeader
         eyebrow={today}
-        title={firstName ? `Welcome back, ${firstName}` : "Principal dashboard"}
+        title={name ? `Welcome back, ${name}` : "Principal dashboard"}
         subtitle={pending.length ? `${pending.length} ${pending.length === 1 ? "course is" : "courses are"} waiting for your approval.` : "No approvals waiting. Here is how the institution is doing."}
       />
 
