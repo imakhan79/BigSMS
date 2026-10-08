@@ -9,7 +9,6 @@ export const DEMO_ROLES = [
   { role: "principal", label: "Principal", hint: "Course and certificate approvals", Icon: Landmark },
   { role: "professor", label: "Faculty", hint: "Courses, grading, quizzes", Icon: BookOpenCheck },
   { role: "student", label: "Student", hint: "Lectures, assignments", Icon: GraduationCap },
-  { role: "parent", label: "Parent", hint: "Child's progress", Icon: Users },
 ] as const;
 
 /** One-click sign-in buttons for the seeded demo accounts. */

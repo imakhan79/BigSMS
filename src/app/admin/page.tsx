@@ -28,10 +28,9 @@ export default async function AdminDashboard() {
     return q.then((r: { count: number | null }) => r.count ?? 0);
   };
 
-  const [students, professors, parents, pendingUsers, published, pendingCourses, openAlerts, stats, pendingList, alerts] = await Promise.all([
+  const [students, professors, pendingUsers, published, pendingCourses, openAlerts, stats, pendingList, alerts] = await Promise.all([
     count("profiles", (q) => q.eq("role", "student").eq("status", "active")),
     count("profiles", (q) => q.eq("role", "professor").eq("status", "active")),
-    count("profiles", (q) => q.eq("role", "parent").eq("status", "active")),
     count("profiles", (q) => q.eq("status", "pending")),
     count("courses", (q) => q.eq("status", "published")),
     count("courses", (q) => q.eq("status", "pending_approval")),
@@ -57,7 +56,7 @@ export default async function AdminDashboard() {
 
       <QuickActions
         actions={[
-          { href: "/admin/users", label: "Add a user", description: "Onboard staff, students or parents", icon: <UserPlus size={17} /> },
+          { href: "/admin/users", label: "Add a user", description: "Onboard Faculty, staff or students", icon: <UserPlus size={17} /> },
           { href: "/admin/courses", label: "Review courses", description: `${pendingCourses} waiting for approval`, icon: <BookOpenCheck size={17} /> },
           { href: "/admin/reports", label: "View reports", description: "Completion, scores, submissions", icon: <BarChart3 size={17} /> },
           { href: "/admin/settings", label: "System settings", description: "Configure Big SMS", icon: <Settings size={17} /> },
@@ -67,7 +66,7 @@ export default async function AdminDashboard() {
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <Stat label="Active students" value={students} icon={<GraduationCap size={16} />} href="/admin/users?role=student" />
         <Stat label="Active Faculty" value={professors} icon={<Users size={16} />} href="/admin/users?role=professor" />
-        <Stat label="Active parents" value={parents} icon={<UsersRound size={16} />} href="/admin/users?role=parent" />
+        <Stat label="Awaiting activation" value={pendingUsers} icon={<UsersRound size={16} />} href="/admin/users?status=pending" />
         <Stat label="Published courses" value={published} icon={<BookOpen size={16} />} href="/admin/courses?status=published" />
       </div>
 

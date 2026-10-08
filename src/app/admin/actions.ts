@@ -81,28 +81,6 @@ export async function saveCourseWorkflow(form: FormData) {
   back("/admin/workflows", "ok", "Course approval workflow saved.");
 }
 
-export async function linkParent(form: FormData) {
-  const supabase = await admin();
-  const { error } = await supabase
-    .from("parent_students")
-    .insert({ parent_id: str(form, "parent_id"), student_id: str(form, "student_id") });
-  if (error) back("/admin/users", "error", error.code === "23505" ? "That parent is already linked to this student." : error.message);
-  revalidatePath("/admin/users");
-  back("/admin/users", "ok", "Parent linked to student.");
-}
-
-export async function unlinkParent(form: FormData) {
-  const supabase = await admin();
-  const { error } = await supabase
-    .from("parent_students")
-    .delete()
-    .eq("parent_id", str(form, "parent_id"))
-    .eq("student_id", str(form, "student_id"));
-  if (error) back("/admin/users", "error", error.message);
-  revalidatePath("/admin/users");
-  back("/admin/users", "ok", "Link removed.");
-}
-
 // Categories ------------------------------------------------------------------
 export async function createCategory(form: FormData) {
   const supabase = await admin();

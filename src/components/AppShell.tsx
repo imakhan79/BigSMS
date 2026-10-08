@@ -9,9 +9,9 @@ import { MobileNav } from "@/components/MobileNav";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Avatar, Tooltip } from "@/components/ui";
 import { createClient } from "@/lib/supabase/server";
-import { ROLE_LABEL, type Profile, type Role } from "@/lib/types";
+import { ROLE_LABEL, type PortalRole, type Profile } from "@/lib/types";
 
-const PORTAL_NAME: Record<Role, string> = {
+const PORTAL_NAME: Record<PortalRole, string> = {
   super_admin: "Super Admin Portal",
   admin: "Admin Portal",
   admin_manager: "Admin Manager Portal",
@@ -19,7 +19,6 @@ const PORTAL_NAME: Record<Role, string> = {
   professor: "Faculty Portal",
   staff: "Staff Portal",
   student: "Student Portal",
-  parent: "Parent Portal",
 };
 
 function adminNav(superAdmin: boolean): NavGroup[] {
@@ -39,7 +38,6 @@ function adminNav(superAdmin: boolean): NavGroup[] {
         { href: "/admin/users", label: "All Users", icon: "users" },
         { href: "/admin/users?role=student", label: "Students", icon: "students" },
         { href: "/admin/users?role=staff", label: "Staff", icon: "staff" },
-        { href: "/admin/users?role=parent", label: "Parents", icon: "parents" },
         ...(superAdmin ? [{ href: "/admin/workflows", label: "Approval Workflows", icon: "workflows" } as const] : []),
       ],
     },
@@ -61,7 +59,7 @@ function adminNav(superAdmin: boolean): NavGroup[] {
   ];
 }
 
-export const NAV: Record<Role, NavGroup[]> = {
+export const NAV: Record<PortalRole, NavGroup[]> = {
   super_admin: adminNav(true),
   admin: adminNav(false),
   admin_manager: [
@@ -127,10 +125,9 @@ export const NAV: Record<Role, NavGroup[]> = {
       ],
     },
   ],
-  parent: [{ items: [{ href: "/parent", label: "My Children", icon: "students" }] }],
 };
 
-export async function AppShell({ profile, children }: { profile: Profile; children: ReactNode }) {
+export async function AppShell({ profile, children }: { profile: Profile & { role: PortalRole }; children: ReactNode }) {
   const nav = NAV[profile.role];
   const name = profile.full_name || profile.email;
   const supabase = await createClient();

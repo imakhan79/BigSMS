@@ -24,7 +24,6 @@ export default async function SignupPage({ searchParams }: { searchParams: Promi
           <Select name="role" defaultValue="student">
             <option value="student">Student</option>
             <option value="professor">Faculty</option>
-            <option value="parent">Parent</option>
           </Select>
         </Label>
         <SubmitButton className="w-full">Create account</SubmitButton>

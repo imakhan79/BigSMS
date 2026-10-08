@@ -30,14 +30,13 @@ export default async function StudentPage({
   const s = student as Profile;
   const base = `/manager/students/${id}`;
 
-  const [{ data: record }, { data: docs }, { data: invoices }, { data: enrollments }, { data: courses }, { data: certs }, { data: parents }, currency] = await Promise.all([
+  const [{ data: record }, { data: docs }, { data: invoices }, { data: enrollments }, { data: courses }, { data: certs }, currency] = await Promise.all([
     supabase.from("student_records").select("*").eq("student_id", id).maybeSingle(),
     supabase.from("student_documents").select("*").eq("student_id", id).order("created_at", { ascending: false }),
     supabase.from("invoices").select(INVOICE_SELECT).eq("student_id", id).order("created_at", { ascending: false }),
     supabase.from("enrollments").select("course_id, enrolled_at, course:courses(title, status)").eq("student_id", id),
     supabase.from("courses").select("id, title").eq("status", "published").order("title"),
     supabase.from("certificates").select("id, certificate_no, title, kind, status, issued_on").eq("student_id", id).order("issued_on", { ascending: false }),
-    supabase.from("parent_students").select("parent:profiles!parent_students_parent_id_fkey(full_name, email, phone)").eq("student_id", id),
     getCurrency(supabase),
   ]);
   const invoiceRows = (invoices ?? []) as unknown as InvoiceRow[];
@@ -68,7 +67,7 @@ export default async function StudentPage({
       />
 
       {tab === "details" && (
-        <div className="grid gap-6 lg:grid-cols-[1fr_300px]">
+        <div>
           <Card>
             <CardTitle>Student information</CardTitle>
             <form action={saveStudentDetails} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -88,18 +87,6 @@ export default async function StudentPage({
               )}
               <div className="sm:col-span-2 lg:col-span-3"><SubmitButton>Save details</SubmitButton></div>
             </form>
-          </Card>
-          <Card>
-            <CardTitle>Parents / guardians with accounts</CardTitle>
-            {!parents?.length ? (
-              <Empty compact>No parent account linked. An Admin links parent accounts.</Empty>
-            ) : (
-              <ul className="space-y-2 text-sm">
-                {parents.map((p: any, i) => (
-                  <li key={i}><p className="font-medium">{p.parent?.full_name}</p><p className="text-muted-foreground">{p.parent?.email} {p.parent?.phone && `· ${p.parent.phone}`}</p></li>
-                ))}
-              </ul>
-            )}
           </Card>
         </div>
       )}

@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 
 const POINTS = [
   "Course approval workflows with a full audit trail",
-  "Dedicated portals for every role, from principal to parent",
+  "Dedicated portals for every role, from principal to student",
   "Progress, grades and KPI alerts in real time",
 ];
 

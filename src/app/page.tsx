@@ -34,6 +34,11 @@ const PORTALS = [
     text: "Activate accounts, approve courses, configure KPIs, manage alerts and review the full audit trail.",
   },
   {
+    Icon: Users,
+    title: "Admin Manager",
+    text: "Run admissions, student records and ID cards, fees and payments, enrollment, and certificate lists for the Principal.",
+  },
+  {
     Icon: Landmark,
     title: "Principal",
     text: "Approve courses before they go live and oversee every course, student result and KPI across the institution.",
@@ -47,11 +52,6 @@ const PORTALS = [
     Icon: GraduationCap,
     title: "Student",
     text: "Follow assigned courses, mark lectures complete, submit assignments and take quizzes with instant scores.",
-  },
-  {
-    Icon: Users,
-    title: "Parent",
-    text: "See exactly what your child sees: courses, progress, grades and teacher feedback. Read-only and private.",
   },
 ];
 
@@ -68,7 +68,7 @@ const STEPS = [
   { title: "Faculty build", text: "Create a course, add lectures and materials, then submit it for approval." },
   { title: "Principal approves", text: "Review the outline and content, then publish it or send it back with notes." },
   { title: "Students learn", text: "Assigned students get notified, study, submit work and take quizzes." },
-  { title: "Everyone tracks", text: "Faculty grade, parents follow along, the principal and admins watch the KPIs." },
+  { title: "Everyone tracks", text: "Faculty grade, students follow their progress, the principal and admins watch the KPIs." },
 ];
 
 const PREVIEW_ROWS = [
@@ -119,7 +119,7 @@ export default async function Home() {
               Every course, every learner, <span className="text-accent">one system.</span>
             </h1>
             <p className="mt-5 max-w-lg text-lg text-muted-foreground">
-              Big SMS connects administrators, principals, Faculty, students and parents, from course approval to the final grade.
+              Big SMS connects administrators, principals, Faculty and students, from course approval to the final grade.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <LinkButton href="/login#demo" className="h-10 px-5">
