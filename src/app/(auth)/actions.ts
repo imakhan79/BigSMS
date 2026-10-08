@@ -17,6 +17,8 @@ export async function signIn(form: FormData) {
     email: str(form, "email"),
     password: str(form, "password"),
   });
+  // Offboarding bans the account in Supabase Auth.
+  if (error?.code === "user_banned") back("/login", "error", "This account has been offboarded and no longer has access. Contact an administrator if this is a mistake.");
   if (error) back("/login", "error", error.message);
   redirect("/");
 }

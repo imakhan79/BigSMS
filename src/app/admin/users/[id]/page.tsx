@@ -115,7 +115,7 @@ export default async function UserDetailPage({
         <Card className="mt-6 border-danger/30">
           <CardTitle>Offboard</CardTitle>
           <p className="mb-3 text-sm text-muted-foreground">
-            Ends this person&apos;s access immediately. Their records (courses, grades, submissions, audit history) are kept, and they can be re-onboarded later.
+            Revokes this person&apos;s access immediately: they are signed out everywhere and can no longer sign in. Their records (courses, grades, submissions, audit history) are kept, and they can be re-onboarded later.
           </p>
           <form action={offboardUser} className="space-y-3">
             <input type="hidden" name="id" value={user.id} />
