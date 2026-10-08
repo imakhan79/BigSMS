@@ -127,6 +127,8 @@ const statusTones: Record<string, Tone> = {
   inactive: "danger",
   open: "danger",
   overdue: "danger",
+  due: "danger",
+  on_hold: "neutral",
   under_review: "info",
   accepted: "success",
   verified: "success",

@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { cancelInvoice, recordPayment } from "@/app/manager/actions";
+import { cancelInvoice, recordPayment } from "@/app/finance/actions";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Badge, Input, Select, Table, Td } from "@/components/ui";
-import { PAYMENT_METHOD_CHOICES, PAYMENT_METHODS } from "@/lib/types";
+import { FEE_PLANS, PAYMENT_METHOD_CHOICES, PAYMENT_METHODS } from "@/lib/types";
 import { formatDay, formatMoney, today } from "@/lib/utils";
 
 export interface InvoiceRow {
@@ -16,15 +16,18 @@ export interface InvoiceRow {
   status: string;
   cancelled_reason: string | null;
   student?: { full_name: string; user_code: string | null } | null;
-  payments: { id: string; receipt_no: string; amount: number; paid_on: string; method: string; reference: string }[];
+  payments: { id: string; receipt_no: string; amount: number; paid_on: string; method: string; payment_type: string; reference: string }[];
 }
 
 export const INVOICE_SELECT =
   "id, invoice_no, student_id, title, amount, amount_paid, due_on, status, cancelled_reason, " +
-  "student:profiles!invoices_student_id_fkey(full_name, user_code), payments(id, receipt_no, amount, paid_on, method, reference)";
+  "student:profiles!invoices_student_id_fkey(full_name, user_code), payments(id, receipt_no, amount, paid_on, method, payment_type, reference)";
 
-/** Invoices with their payment history, a record-payment form, and cancel for unpaid invoices. */
-export function InvoiceTable({ invoices, currency, back, showStudent = true }: { invoices: InvoiceRow[]; currency: string; back: string; showStudent?: boolean }) {
+/**
+ * Invoices with their payment history, a record-payment form, and cancel for unpaid invoices.
+ * `studentHref` links each student to their record (the Admin Manager's student pages).
+ */
+export function InvoiceTable({ invoices, currency, back, showStudent = true, studentHref }: { invoices: InvoiceRow[]; currency: string; back: string; showStudent?: boolean; studentHref?: (id: string) => string }) {
   const overdue = (i: InvoiceRow) => (i.status === "unpaid" || i.status === "partial") && i.due_on < today();
   return (
     <Table head={["Invoice", ...(showStudent ? ["Student"] : []), "Amount", "Paid", "Due", "Status", "Record payment"]} empty={!invoices.length}>
@@ -42,7 +45,7 @@ export function InvoiceTable({ invoices, currency, back, showStudent = true }: {
                   <ul className="mt-1 space-y-0.5 text-muted-foreground">
                     {i.payments.map((p) => (
                       <li key={p.id}>
-                        {p.receipt_no}: {formatMoney(p.amount, currency)} · {PAYMENT_METHODS[p.method]} · {formatDay(p.paid_on)}
+                        {p.receipt_no}: {formatMoney(p.amount, currency)} · {FEE_PLANS[p.payment_type] ?? p.payment_type} · {PAYMENT_METHODS[p.method]} · {formatDay(p.paid_on)}
                         {p.reference ? ` · ${p.reference}` : ""}
                       </li>
                     ))}
@@ -53,7 +56,11 @@ export function InvoiceTable({ invoices, currency, back, showStudent = true }: {
             </Td>
             {showStudent && (
               <Td>
-                <Link href={`/manager/students/${i.student_id}?tab=fees`} className="hover:underline">{i.student?.full_name ?? "—"}</Link>
+                {studentHref ? (
+                  <Link href={studentHref(i.student_id)} className="hover:underline">{i.student?.full_name ?? "—"}</Link>
+                ) : (
+                  <span>{i.student?.full_name ?? "—"}</span>
+                )}
                 <p className="font-mono text-xs text-muted-foreground">{i.student?.user_code}</p>
               </Td>
             )}
@@ -68,11 +75,14 @@ export function InvoiceTable({ invoices, currency, back, showStudent = true }: {
                     <input type="hidden" name="invoice_id" value={i.id} />
                     <input type="hidden" name="back" value={back} />
                     <Input name="amount" type="number" step="0.01" min="0.01" max={balance} defaultValue={balance} className="h-8 w-28 text-xs" aria-label="Amount" required />
-                    <Select name="method" className="h-8 w-32 text-xs" aria-label="Method">
+                    <Select name="payment_type" className="h-8 w-32 text-xs" aria-label="Payment type">
+                      {Object.entries(FEE_PLANS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
+                    </Select>
+                    <Select name="method" className="h-8 w-32 text-xs" aria-label="Payment mode">
                       {Object.entries(PAYMENT_METHOD_CHOICES).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                     </Select>
                     <Input name="paid_on" type="date" max={today()} defaultValue={today()} className="h-8 w-36 text-xs" aria-label="Paid on" />
-                    <Input name="reference" placeholder="Reference" className="h-8 w-28 text-xs" aria-label="Reference" />
+                    <Input name="reference" placeholder="Cheque no. / IBFT ref." className="h-8 w-40 text-xs" aria-label="Cheque number or IBFT reference" />
                     <SubmitButton size="sm">Record</SubmitButton>
                   </form>
                   {Number(i.amount_paid) === 0 && (

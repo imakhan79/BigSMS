@@ -129,3 +129,14 @@ export const FEE_PLANS: Record<string, string> = {
   partial: "Partial",
   installment: "Installment",
 };
+
+/** Staff salary payment status. "Due" means pending with the due date reached. */
+export const SALARY_STATUSES: Record<string, string> = {
+  pending: "Pending",
+  due: "Due",
+  paid: "Paid",
+  on_hold: "On hold",
+};
+
+/** Roles that can be on the payroll. */
+export const EMPLOYEE_ROLES = ["super_admin", "admin", "admin_manager", "principal", "professor", "staff"] as const;

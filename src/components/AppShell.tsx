@@ -71,8 +71,14 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
         { href: "/manager/students", label: "Students", icon: "students" },
         { href: "/manager/profile-requests", label: "Profile Changes", icon: "profileChanges" },
         { href: "/manager/enrollment", label: "Course Enrollment", icon: "enrollment" },
-        { href: "/manager/fees", label: "Fee Records", icon: "fees" },
         { href: "/manager/certificates", label: "Certificate Lists", icon: "certificates" },
+      ],
+    },
+    {
+      label: "Finance",
+      items: [
+        { href: "/finance/fees", label: "Fee Records", icon: "fees" },
+        { href: "/finance/salaries", label: "Staff Salaries", icon: "salaries" },
       ],
     },
     {
@@ -92,6 +98,13 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
         { href: "/principal/certificates", label: "Certificate Lists", icon: "certificates" },
         { href: "/principal/changes", label: "Result Changes", icon: "results" },
         { href: "/principal/profile-requests", label: "Profile Changes", icon: "profileChanges" },
+      ],
+    },
+    {
+      label: "Finance",
+      items: [
+        { href: "/finance/fees", label: "Fee Records", icon: "fees" },
+        { href: "/finance/salaries", label: "Staff Salaries", icon: "salaries" },
       ],
     },
     {
