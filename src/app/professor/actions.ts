@@ -19,64 +19,6 @@ function done(path: string, message: string): never {
   back(path, "ok", message);
 }
 
-// Courses ---------------------------------------------------------------------
-export async function createCourse(form: FormData) {
-  const { profile, supabase } = await professor();
-  const { data, error } = await supabase
-    .from("courses")
-    .insert({
-      professor_id: profile.id,
-      title: str(form, "title"),
-      description: str(form, "description"),
-      category_id: str(form, "category_id") || null,
-    })
-    .select("id")
-    .single();
-  if (error) back("/professor/courses", "error", error.message);
-  revalidatePath("/professor", "layout");
-  redirect(coursePath(data.id));
-}
-
-export async function updateCourse(form: FormData) {
-  const { supabase } = await professor();
-  const id = str(form, "id");
-  const { error } = await supabase
-    .from("courses")
-    .update({
-      title: str(form, "title"),
-      description: str(form, "description"),
-      outline: str(form, "outline"),
-      category_id: str(form, "category_id") || null,
-    })
-    .eq("id", id);
-  if (error) back(coursePath(id), "error", error.message);
-  done(coursePath(id), "Course saved.");
-}
-
-/** Workflow transitions; the database trigger enforces which ones a professor may make. */
-export async function setCourseStatus(form: FormData) {
-  const { supabase } = await professor();
-  const id = str(form, "id");
-  const status = str(form, "status");
-  const { error } = await supabase.from("courses").update({ status }).eq("id", id);
-  if (error) back(coursePath(id), "error", error.message);
-  const messages: Record<string, string> = {
-    pending_approval: "Submitted to the principal for approval.",
-    draft: "Moved back to draft.",
-    archived: "Course archived.",
-  };
-  done(coursePath(id), messages[status] ?? "Status updated.");
-}
-
-export async function deleteCourse(form: FormData) {
-  const { supabase } = await professor();
-  const id = str(form, "id");
-  const { error, count } = await supabase.from("courses").delete({ count: "exact" }).eq("id", id);
-  if (error || !count) back(coursePath(id), "error", error?.message ?? "Only draft courses can be deleted.");
-  revalidatePath("/professor", "layout");
-  back("/professor/courses", "ok", "Course deleted.");
-}
-
 // Lectures and materials ------------------------------------------------------
 export async function saveLecture(form: FormData) {
   const { supabase } = await professor();

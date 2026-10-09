@@ -21,7 +21,7 @@ export default async function PrincipalAlertsPage() {
             <tr key={a.id}>
               <Td className="whitespace-nowrap">{formatDate(a.created_at)}</Td>
               <Td>{a.kpi_definitions?.name}</Td>
-              <Td><Link href={`/principal/courses/${a.courses?.id}`} className="hover:underline">{a.courses?.title}</Link></Td>
+              <Td><Link href={`/courses/${a.courses?.id}`} className="hover:underline">{a.courses?.title}</Link></Td>
               <Td>{Number(a.value).toFixed(1)}</Td>
               <Td><Badge value={a.status} /></Td>
             </tr>

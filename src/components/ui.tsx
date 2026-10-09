@@ -118,6 +118,7 @@ const statusTones: Record<string, Tone> = {
   pending: "warning",
   acknowledged: "info",
   published: "success",
+  edit: "info",
   active: "success",
   graded: "success",
   approved: "success",

@@ -1,6 +1,6 @@
 export type Role = "super_admin" | "admin" | "admin_manager" | "principal" | "professor" | "staff" | "student" | "parent";
 export type UserStatus = "pending" | "active" | "inactive" | "offboarded";
-export type CourseStatus = "draft" | "pending_approval" | "published" | "rejected" | "archived";
+export type CourseStatus = "draft" | "published" | "archived";
 export type MaterialType = "video" | "pdf" | "book" | "notes" | "worksheet";
 
 export interface Profile {
@@ -25,19 +25,24 @@ export interface Course {
   professor_id: string;
   category_id: string | null;
   title: string;
+  /** Course ID shown to people, e.g. CS-101. */
+  code: string;
   description: string;
   outline: string;
+  curriculum: string;
+  duration_value: number | null;
+  duration_unit: string;
+  fee: number | null;
   status: CourseStatus;
-  review_note: string | null;
-  approval_step: number | null;
+  /** A published course with unpublished changes in course_edits (the Edit stage). */
+  editing: boolean;
+  ready_at: string | null;
+  ready_by: string | null;
+  published_at: string | null;
+  published_by: string | null;
+  created_by: string | null;
   created_at: string;
   updated_at: string;
-}
-
-export interface ApprovalStep {
-  workflow: string;
-  step_order: number;
-  approver_role: Role;
 }
 
 export interface CourseStat {

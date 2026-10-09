@@ -1,77 +1,50 @@
-import { deleteCourse, setCourseStatus, updateCourse } from "@/app/professor/actions";
+import { updateCourse } from "@/app/courses/actions";
+import { CourseFields, CourseInfo, CourseWorkflow } from "@/components/CourseManagement";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Alert, Card, CardTitle, Input, Label, Select, Textarea } from "@/components/ui";
+import { Card, CardTitle } from "@/components/ui";
+import { courseChanges, courseFormOptions, courseStage, workingCopy } from "@/lib/courses";
 import { createClient } from "@/lib/supabase/server";
 import type { Course } from "@/lib/types";
 
-function StatusForm({ id, status, label, variant, confirm }: { id: string; status: string; label: string; variant?: "primary" | "accent" | "outline"; confirm?: string }) {
-  return (
-    <form action={setCourseStatus}>
-      <input type="hidden" name="id" value={id} />
-      <input type="hidden" name="status" value={status} />
-      <SubmitButton variant={variant} confirm={confirm}>{label}</SubmitButton>
-    </form>
-  );
-}
-
 export async function OverviewTab({ course }: { course: Course }) {
   const supabase = await createClient();
-  const { data: categories } = await supabase.from("course_categories").select("id, name").order("name");
+  const [{ categories, currency }, changes, { data: category }, { data: faculty }] = await Promise.all([
+    courseFormOptions(supabase),
+    courseChanges(supabase, course),
+    course.category_id ? supabase.from("course_categories").select("name").eq("id", course.category_id).single() : Promise.resolve({ data: null }),
+    supabase.from("profiles").select("full_name").eq("id", course.professor_id).single(),
+  ]);
+  const stage = courseStage(course);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
-      <Card>
-        <CardTitle>Course details</CardTitle>
-        <form action={updateCourse} className="space-y-4">
-          <input type="hidden" name="id" value={course.id} />
-          <Label label="Title"><Input name="title" defaultValue={course.title} required /></Label>
-          <Label label="Description"><Textarea name="description" defaultValue={course.description} /></Label>
-          <Label label="Course outline (shown to students)">
-            <Textarea name="outline" defaultValue={course.outline} className="min-h-48" placeholder={"Week 1: ...\nWeek 2: ..."} />
-          </Label>
-          <Label label="Category">
-            <Select name="category_id" defaultValue={course.category_id ?? ""}>
-              <option value="">Uncategorised</option>
-              {categories?.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </Select>
-          </Label>
-          <SubmitButton>Save changes</SubmitButton>
-        </form>
-      </Card>
-
-      <Card className="h-fit">
-        <CardTitle>Approval workflow</CardTitle>
-        <ol className="mb-4 space-y-1 text-sm text-muted-foreground">
-          <li>1. Build the course as a draft.</li>
-          <li>2. Submit it to the principal for approval.</li>
-          <li>3. Once the principal approves, it is published to assigned students.</li>
-        </ol>
-        {course.status === "rejected" && course.review_note && (
-          <Alert tone="danger" title="Rejected" className="mb-4">{course.review_note}</Alert>
-        )}
-        <div className="flex flex-col gap-2">
-          {(course.status === "draft" || course.status === "rejected") && (
-            <StatusForm id={course.id} status="pending_approval" label="Submit for approval" variant="accent" />
-          )}
-          {course.status === "pending_approval" && (
-            <>
-              <p className="text-sm">Waiting for the principal to review.</p>
-              <StatusForm id={course.id} status="draft" label="Withdraw submission" variant="outline" />
-            </>
-          )}
-          {course.status === "published" && <p className="text-sm">Published and visible to assigned students.</p>}
-          {course.status !== "archived" && (
-            <StatusForm id={course.id} status="archived" label="Archive course" variant="outline" confirm="Archive this course? Students will lose access." />
-          )}
-          {course.status === "archived" && <p className="text-sm">Archived. Ask an administrator to restore it.</p>}
-          {course.status === "draft" && (
-            <form action={deleteCourse}>
+      <div className="space-y-6">
+        {stage === "archived" ? (
+          <Card>
+            <CardTitle>Course information</CardTitle>
+            <CourseInfo course={course} facultyName={faculty?.full_name} categoryName={category?.name} currency={currency} />
+          </Card>
+        ) : (
+          <Card>
+            <CardTitle description={stage === "draft" ? undefined : "Changes are held in Edit until the Principal or Admin Manager publishes them."}>
+              {stage === "edit" ? "Course information (unpublished changes)" : "Course information"}
+            </CardTitle>
+            <form action={updateCourse} className="space-y-5">
               <input type="hidden" name="id" value={course.id} />
-              <SubmitButton variant="danger" confirm="Permanently delete this draft course?">Delete draft</SubmitButton>
+              <CourseFields course={workingCopy(course, changes)} categories={categories} currency={currency} />
+              <p className="text-xs text-muted-foreground">Course faculty: {faculty?.full_name ?? "you"}. Only the Principal or Admin Manager can reassign it.</p>
+              <SubmitButton>{stage === "draft" ? "Save draft" : "Save changes"}</SubmitButton>
             </form>
-          )}
-        </div>
-      </Card>
+          </Card>
+        )}
+        {stage === "edit" && (
+          <Card>
+            <CardTitle description="What students see until the changes are published">Published version</CardTitle>
+            <CourseInfo course={course} facultyName={faculty?.full_name} categoryName={category?.name} currency={currency} />
+          </Card>
+        )}
+      </div>
+      <CourseWorkflow course={course} changes={changes} viewer="professor" />
     </div>
   );
 }
