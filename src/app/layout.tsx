@@ -15,18 +15,18 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "https://bigsms-seven.vercel.app",
   ),
-  title: { default: "LGITE | Big SMS", template: "%s · LGITE" },
+  title: { default: "LGITE Portal", template: "%s · LGITE Portal" },
   description,
-  applicationName: "Big SMS",
+  applicationName: "LGITE Portal",
   // Link previews (WhatsApp, Slack, email, social) show the LGITE crest.
   openGraph: {
     type: "website",
     siteName: "Lahore Garrison Institute of Technical Education",
-    title: "LGITE | Big SMS",
+    title: "LGITE Portal",
     description,
     images: [{ url: "/lgite-icon-512.png", width: 512, height: 512, alt: "Lahore Garrison Institute of Technical Education crest" }],
   },
-  twitter: { card: "summary", title: "LGITE | Big SMS", description, images: ["/lgite-icon-512.png"] },
+  twitter: { card: "summary", title: "LGITE Portal", description, images: ["/lgite-icon-512.png"] },
 };
 
 export const viewport = { themeColor: "#002A64" };

@@ -130,7 +130,7 @@ export default async function Home() {
               </h1>
             </MotionItem>
             <MotionItem as="p" className="mt-5 max-w-lg text-pretty text-lg text-muted-foreground">
-              Big SMS connects administrators, principals, Faculty and students, from course approval to the final grade.
+              The LGITE Portal connects administrators, principals, Faculty and students, from course approval to the final grade.
             </MotionItem>
             <MotionItem className="mt-8 flex flex-wrap gap-3">
               <LinkButton href="/login#demo" className="h-10 px-5">

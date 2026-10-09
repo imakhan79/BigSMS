@@ -19,7 +19,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           <span className="leading-tight"><span className="block font-display text-2xl font-bold tracking-wide">{BRAND.short}</span><span className="block max-w-[220px] text-xs text-primary-foreground/70 dark:text-sidebar-muted">{BRAND.name}</span></span>
         </Link>
         <Entrance className="max-w-md">
-          <MotionItem as="p" className="text-xs font-semibold uppercase tracking-[0.16em] text-gold">Big SMS</MotionItem>
+          <MotionItem as="p" className="text-xs font-semibold uppercase tracking-[0.16em] text-gold">LGITE Portal</MotionItem>
           <MotionItem>
             <h2 className="mt-3 text-balance font-display text-[2.1rem] font-semibold leading-tight">The operating system for your institution.</h2>
           </MotionItem>

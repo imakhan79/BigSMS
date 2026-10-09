@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 export const BRAND = {
   short: "LGITE",
   name: "Lahore Garrison Institute of Technical Education",
-  product: "Big SMS",
+  product: "LGITE Portal",
   logo: "/lgite-logo.png",
 } as const;
 
@@ -30,7 +30,7 @@ export function BrandLockup({ className, crestClass = "h-10", inverse, sub }: { 
       <Crest className={cn("shrink-0", crestClass)} priority />
       <span className="min-w-0 leading-tight">
         <span className={cn("block font-display text-[17px] font-bold tracking-wide", inverse ? "text-white" : "text-primary")}>{BRAND.short}</span>
-        <span className={cn("block truncate text-[11px] font-medium", inverse ? "text-sidebar-muted" : "text-muted-foreground")}>{sub ?? BRAND.product}</span>
+        <span className={cn("block truncate text-[11px] font-medium", inverse ? "text-sidebar-muted" : "text-muted-foreground")}>{sub ?? "Portal"}</span>
       </span>
     </span>
   );

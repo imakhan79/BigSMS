@@ -59,7 +59,7 @@ export default async function AdminDashboard() {
           { href: "/admin/users", label: "Add a user", description: "Onboard Faculty, staff or students", icon: <UserPlus size={17} /> },
           { href: "/courses", label: "Courses", description: `${pendingCourses} ready to publish`, icon: <BookOpenCheck size={17} /> },
           { href: "/admin/reports", label: "View reports", description: "Completion, scores, submissions", icon: <BarChart3 size={17} /> },
-          { href: "/admin/settings", label: "System settings", description: "Configure Big SMS", icon: <Settings size={17} /> },
+          { href: "/admin/settings", label: "System settings", description: "Configure the LGITE Portal", icon: <Settings size={17} /> },
         ]}
       />
 

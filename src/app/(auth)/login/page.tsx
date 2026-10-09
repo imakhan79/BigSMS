@@ -11,7 +11,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
   return (
     <>
       <h1 className="font-display text-2xl font-semibold text-primary">Welcome back</h1>
-      <p className="mb-6 text-sm text-muted-foreground">Sign in to Big SMS</p>
+      <p className="mb-6 text-sm text-muted-foreground">Sign in to the LGITE Portal</p>
       <Flash params={params} />
 
       {demoEnabled && (

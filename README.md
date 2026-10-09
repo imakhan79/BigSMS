@@ -1,4 +1,4 @@
-# Big SMS
+# LGITE Portal
 
 Learning management system by Zicon, with portals for **Super Admin**, **Admin**, **Admin Manager**, **Principal**, **Faculty**, **Staff**, **Student** and **Parent**.
 
