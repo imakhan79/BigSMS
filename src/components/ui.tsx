@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ComponentProps, ReactNode } from "react";
 import { AlertTriangle, CheckCircle2, Info, Inbox, XCircle } from "lucide-react";
+import { Appear, MotionButton, MotionItem, MotionLink } from "@/components/motion";
 import { FlashToast } from "@/components/Toaster";
 import { cn } from "@/lib/utils";
 
@@ -24,12 +25,13 @@ export function buttonClass(variant: ButtonVariant = "primary", size: "sm" | "md
   );
 }
 
+/** Presses in with a spring (motion); disabled buttons stay still. */
 export function Button({ variant, size, className, ...props }: ComponentProps<"button"> & { variant?: ButtonVariant; size?: "sm" | "md" }) {
-  return <button className={cn(buttonClass(variant, size), className)} {...props} />;
+  return <MotionButton className={cn(buttonClass(variant, size), "cursor-pointer", className)} {...props} />;
 }
 
 export function LinkButton({ variant, size, className, ...props }: ComponentProps<typeof Link> & { variant?: ButtonVariant; size?: "sm" | "md" }) {
-  return <Link className={cn(buttonClass(variant, size), className)} {...props} />;
+  return <MotionLink className={cn(buttonClass(variant, size), className)} {...props} />;
 }
 
 /** Inline text link used for secondary navigation inside cards and headers. */
@@ -39,8 +41,9 @@ export function TextLink({ className, ...props }: ComponentProps<typeof Link>) {
 
 /* ─── Surfaces ─────────────────────────────────────────────────────────── */
 
+/** Cards reveal in turn as a page opens (see PageMotion). */
 export function Card({ className, ...props }: ComponentProps<"div">) {
-  return <div className={cn("ui-card rounded-lg border border-border bg-surface p-5 shadow-xs", className)} {...props} />;
+  return <MotionItem className={cn("ui-card rounded-lg border border-border bg-surface p-5 shadow-xs", className)} {...props} />;
 }
 
 export function CardTitle({ children, action, description }: { children: ReactNode; action?: ReactNode; description?: ReactNode }) {
@@ -57,14 +60,14 @@ export function CardTitle({ children, action, description }: { children: ReactNo
 
 export function PageHeader({ title, subtitle, action, eyebrow }: { title: ReactNode; subtitle?: ReactNode; action?: ReactNode; eyebrow?: ReactNode }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-border pb-5">
+    <MotionItem className="mb-6 flex flex-wrap items-end justify-between gap-x-6 gap-y-3 border-b border-border pb-5">
       <div className="min-w-0">
         {eyebrow && <p className="mb-1 text-xs font-medium uppercase tracking-wider text-muted-foreground">{eyebrow}</p>}
         <h1 className="font-display text-[1.75rem] font-semibold leading-tight text-primary">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>}
       </div>
       {action && <div className="flex flex-wrap items-center gap-2">{action}</div>}
-    </div>
+    </MotionItem>
   );
 }
 
@@ -165,7 +168,8 @@ export function Badge({ value, children, tone }: { value: string; children?: Rea
 
 export function Stat({ label, value, hint, icon, href }: { label: string; value: ReactNode; hint?: string; icon?: ReactNode; href?: string }) {
   const body = (
-    <div
+    <MotionItem
+      lift={!!href}
       className={cn(
         "flex h-full flex-col rounded-lg border border-border border-t-2 border-t-gold bg-surface p-4 shadow-xs",
         href && "transition-colors duration-150 group-hover:border-foreground/20 group-hover:bg-secondary/40",
@@ -177,7 +181,7 @@ export function Stat({ label, value, hint, icon, href }: { label: string; value:
       </div>
       <p className="mt-2 text-2xl font-semibold tabular-nums tracking-tight text-primary">{value}</p>
       {hint && <p className="mt-0.5 text-xs text-muted-foreground">{hint}</p>}
-    </div>
+    </MotionItem>
   );
   return href ? <Link href={href} className="group block rounded-lg">{body}</Link> : body;
 }
@@ -240,16 +244,16 @@ const alertStyles = {
 export function Alert({ tone = "info", title, children, className }: { tone?: keyof typeof alertIcons; title?: ReactNode; children?: ReactNode; className?: string }) {
   const Icon = alertIcons[tone];
   return (
-    <div
+    <Appear
       role={tone === "danger" ? "alert" : "status"}
-      className={cn("flex animate-fade-in gap-3 rounded-lg border px-4 py-3 text-sm", alertStyles[tone], className)}
+      className={cn("flex gap-3 rounded-lg border px-4 py-3 text-sm", alertStyles[tone], className)}
     >
       <Icon size={16} className="mt-0.5 shrink-0" aria-hidden />
       <div className="min-w-0 space-y-0.5 text-foreground">
         {title && <p className="font-medium">{title}</p>}
         {children && <div className={title ? "text-muted-foreground" : undefined}>{children}</div>}
       </div>
-    </div>
+    </Appear>
   );
 }
 
@@ -351,20 +355,4 @@ export function Filters({ label, items }: { label?: string; items: { href: strin
   );
 }
 
-/** CSS-only tooltip: shows on hover and keyboard focus after a short delay, no JS. */
-export function Tooltip({ label, children, side = "top" }: { label: string; children: ReactNode; side?: "top" | "bottom" }) {
-  return (
-    <span className="group/tip relative inline-flex">
-      {children}
-      <span
-        role="tooltip"
-        className={cn(
-          "pointer-events-none absolute left-1/2 z-50 -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs font-medium text-background opacity-0 shadow-pop transition-opacity duration-100 group-focus-within/tip:opacity-100 group-hover/tip:opacity-100 group-hover/tip:delay-300",
-          side === "top" ? "bottom-full mb-1.5" : "top-full mt-1.5",
-        )}
-      >
-        {label}
-      </span>
-    </span>
-  );
-}
+export { Tooltip } from "@/components/motion";

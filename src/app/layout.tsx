@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Source_Serif_4 } from "next/font/google";
+import { MotionProvider } from "@/components/motion";
 import { Toaster } from "@/components/Toaster";
 import "./globals.css";
 
@@ -40,8 +41,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className="font-sans">
-        {children}
-        <Toaster />
+        <MotionProvider>
+          {children}
+          <Toaster />
+        </MotionProvider>
       </body>
     </html>
   );

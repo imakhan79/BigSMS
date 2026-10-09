@@ -3,6 +3,8 @@
 import { useRef, useState, type ReactNode } from "react";
 import { useFormStatus } from "react-dom";
 import { AlertTriangle, Loader2 } from "lucide-react";
+import { m } from "motion/react";
+import { EASE_OUT } from "@/lib/motion";
 import { Button, buttonClass, type ButtonVariant } from "@/components/ui";
 import { cn } from "@/lib/utils";
 
@@ -66,10 +68,14 @@ export function SubmitButton({
           onClose={() => setOpen(false)}
           onClick={(e) => e.target === dialog.current && close()}
           aria-labelledby="confirm-title"
-          className="w-[calc(100%-2rem)] max-w-md rounded-lg border border-border bg-surface p-0 text-left font-normal text-foreground shadow-pop backdrop:bg-black/45 backdrop:backdrop-blur-[2px] open:animate-dialog-in"
+          className="w-[calc(100%-2rem)] max-w-md rounded-lg border border-border bg-surface p-0 text-left font-normal text-foreground shadow-pop backdrop:bg-black/45 backdrop:backdrop-blur-[2px]"
         >
           {open && (
-            <div className="p-6">
+            <m.div
+              className="p-6"
+              initial={{ opacity: 0, y: 8, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1, transition: { duration: 0.22, ease: EASE_OUT } }}
+            >
               <div className="flex gap-4">
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-danger/10 text-danger" aria-hidden>
                   <AlertTriangle size={18} />
@@ -95,7 +101,7 @@ export function SubmitButton({
                   {typeof children === "string" ? children : "Confirm"}
                 </button>
               </div>
-            </div>
+            </m.div>
           )}
         </dialog>
       )}

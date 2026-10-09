@@ -1,6 +1,7 @@
 import { Crest } from "@/components/Brand";
 import { redirect } from "next/navigation";
 import { signOut } from "@/app/(auth)/actions";
+import { Appear } from "@/components/motion";
 import { Button } from "@/components/ui";
 import { getProfile } from "@/lib/auth";
 
@@ -10,8 +11,8 @@ export default async function PendingPage() {
   if (profile.status === "active") redirect("/");
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
-      <div className="w-full max-w-md animate-fade-in rounded-lg border border-border bg-surface p-8 text-center shadow-xs">
+    <div className="flex min-h-dvh items-center justify-center bg-background p-4">
+      <Appear className="w-full max-w-md rounded-lg border border-border bg-surface p-8 text-center shadow-xs">
         <Crest className="mx-auto mb-5 h-24" priority />
         <h1 className="font-display text-2xl font-semibold text-primary">
           {profile.status === "offboarded" ? "Account closed" : profile.status === "inactive" ? "Account deactivated" : "Awaiting activation"}
@@ -26,7 +27,7 @@ export default async function PendingPage() {
         <form action={signOut} className="mt-6">
           <Button variant="outline">Sign out</Button>
         </form>
-      </div>
+      </Appear>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { signOut } from "@/app/(auth)/actions";
 import { Dropdown, menuItemClass } from "@/components/Dropdown";
 import { NavLinks, type NavGroup } from "@/components/NavLinks";
 import { MobileNav } from "@/components/MobileNav";
+import { RouteFocus } from "@/components/motion";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Avatar, Tooltip } from "@/components/ui";
 import { createClient } from "@/lib/supabase/server";
@@ -198,7 +199,13 @@ export async function AppShell({ profile, children }: { profile: Profile & { rol
     .is("read_at", null);
 
   return (
-    <div className="min-h-screen bg-background lg:pl-64">
+    <div className="min-h-dvh bg-background lg:pl-64">
+      <a
+        href="#main"
+        className="sr-only z-[70] rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground focus:not-sr-only focus:fixed focus:left-3 focus:top-3"
+      >
+        Skip to content
+      </a>
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-sidebar text-sidebar-foreground lg:flex">
         <div className="shrink-0 border-b border-sidebar-border px-4 pb-4 pt-5 text-center">
           <Link href="/" className="mx-auto block w-fit" aria-label={`${BRAND.short} home`}>
@@ -279,7 +286,10 @@ export async function AppShell({ profile, children }: { profile: Profile & { rol
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-[1400px] px-4 py-6 sm:px-6 lg:px-8">{children}</main>
+      <main id="main" tabIndex={-1} className="mx-auto w-full max-w-[1400px] px-4 py-6 outline-none sm:px-6 lg:px-8 2xl:py-8">
+        {children}
+      </main>
+      <RouteFocus />
     </div>
   );
 }

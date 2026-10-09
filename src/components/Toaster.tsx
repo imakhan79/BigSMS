@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AlertTriangle, CheckCircle2, Info, X, XCircle } from "lucide-react";
+import { AnimatePresence, m } from "motion/react";
+import { EASE_IN, EASE_OUT } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 type Tone = "success" | "danger" | "warning" | "info";
@@ -11,7 +13,6 @@ interface Toast {
   title: string;
   description?: string;
   duration: number;
-  leaving?: boolean;
 }
 
 /* A tiny module-level store: any client code can call toast(), the single <Toaster /> renders. */
@@ -28,13 +29,10 @@ export function toast(t: { tone?: Tone; title: string; description?: string; dur
   return item.id;
 }
 
+/** Removing a toast lets AnimatePresence play its exit; the rest of the stack glides into place. */
 function dismiss(id: number) {
-  toasts = toasts.map((t) => (t.id === id ? { ...t, leaving: true } : t));
+  toasts = toasts.filter((t) => t.id !== id);
   emit();
-  setTimeout(() => {
-    toasts = toasts.filter((t) => t.id !== id);
-    emit();
-  }, 150);
 }
 
 const ICONS = { success: CheckCircle2, danger: XCircle, warning: AlertTriangle, info: Info };
@@ -49,14 +47,17 @@ function ToastItem({ t }: { t: Toast }) {
   }, [paused, t.id, t.duration]);
   const Icon = ICONS[t.tone];
   return (
-    <li
+    <m.li
+      layout
       role={t.tone === "danger" ? "alert" : "status"}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      className={cn(
-        "pointer-events-auto flex w-full items-start gap-3 rounded-lg border border-border bg-surface p-3.5 pr-2.5 shadow-pop",
-        t.leaving ? "animate-toast-out" : "animate-toast-in",
-      )}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
+      initial={{ opacity: 0, y: 12, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1, transition: { duration: 0.28, ease: EASE_OUT } }}
+      exit={{ opacity: 0, x: 24, transition: { duration: 0.16, ease: EASE_IN } }}
+      className="pointer-events-auto flex w-full items-start gap-3 rounded-lg border border-border bg-surface p-3.5 pr-2.5 shadow-pop"
     >
       <Icon size={18} className={cn("mt-px shrink-0", ACCENT[t.tone])} aria-hidden />
       <div className="min-w-0 flex-1 text-sm">
@@ -67,11 +68,11 @@ function ToastItem({ t }: { t: Toast }) {
         type="button"
         onClick={() => dismiss(t.id)}
         aria-label="Dismiss notification"
-        className="rounded p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
       >
-        <X size={14} />
+        <X size={14} aria-hidden />
       </button>
-    </li>
+    </m.li>
   );
 }
 
@@ -86,9 +87,11 @@ export function Toaster() {
       aria-label="Notifications"
       className="pointer-events-none fixed inset-x-4 bottom-4 z-[60] flex flex-col items-end gap-2 sm:inset-x-auto sm:right-6 sm:w-[360px]"
     >
-      {items.map((t) => (
-        <ToastItem key={t.id} t={t} />
-      ))}
+      <AnimatePresence initial={false}>
+        {items.map((t) => (
+          <ToastItem key={t.id} t={t} />
+        ))}
+      </AnimatePresence>
     </ol>
   );
 }
