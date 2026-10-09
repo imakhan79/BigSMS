@@ -58,7 +58,8 @@ function adminNav(): NavGroup[] {
     {
       label: "Performance",
       items: [
-        { href: "/admin/reports", label: "Reports & Analytics", icon: "reports" },
+        { href: "/analytics", label: "Analytics", icon: "reports" },
+        { href: "/admin/reports", label: "Course Reports", icon: "reports" },
         { href: "/admin/kpis", label: "KPIs", icon: "kpis" },
         { href: "/admin/alerts", label: "Alerts", icon: "alerts" },
       ],
@@ -129,7 +130,8 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
     {
       label: "Performance",
       items: [
-        { href: "/principal/reports", label: "Reports & Analytics", icon: "reports" },
+        { href: "/analytics", label: "Analytics", icon: "reports" },
+        { href: "/principal/reports", label: "Course Reports", icon: "reports" },
         { href: "/principal/alerts", label: "KPI Alerts", icon: "alerts" },
       ],
     },
@@ -152,7 +154,13 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
       ],
     },
     { label: "Results", items: [{ href: "/professor/changes", label: "Change Requests", icon: "approvals" }] },
-    { label: "Performance", items: [{ href: "/professor/analytics", label: "Analytics", icon: "reports" }] },
+    {
+      label: "Performance",
+      items: [
+        { href: "/analytics", label: "Analytics", icon: "reports" },
+        { href: "/professor/analytics", label: "Course Reports", icon: "reports" },
+      ],
+    },
   ],
   staff: [
     {
@@ -169,6 +177,7 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
         { href: "/student/timetable", label: "My Timetable", icon: "timetable" },
         { href: "/student/exams", label: "My Exams", icon: "exams" },
         { href: "/student/attendance", label: "My Attendance", icon: "attendance" },
+        { href: "/analytics", label: "My Analytics", icon: "reports" },
         { href: "/student/id-card", label: "My ID Card", icon: "idCard" },
         { href: "/profile", label: "My Profile", icon: "profileChanges" },
       ],
