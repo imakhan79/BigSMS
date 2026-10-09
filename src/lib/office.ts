@@ -34,6 +34,9 @@ export interface CertificateEntryRow {
   completion_rate: number | null;
   attendance_rate: number | null;
   outstanding_fees: number | null;
+  exam_average: number | null;
+  final_percentage: number | null;
+  final_grade: string | null;
   note: string;
   certificate_id: string | null;
   student: { full_name: string; user_code: string | null; email: string } | null;
@@ -41,6 +44,6 @@ export interface CertificateEntryRow {
 }
 
 export const CERTIFICATE_ENTRY_SELECT =
-  "student_id, completion_rate, attendance_rate, outstanding_fees, note, certificate_id, " +
+  "student_id, completion_rate, attendance_rate, outstanding_fees, exam_average, final_percentage, final_grade, note, certificate_id, " +
   "student:profiles!certificate_list_entries_student_id_fkey(full_name, user_code, email), " +
   "certificate:certificates!certificate_list_entries_certificate_id_fkey(certificate_no, status)";

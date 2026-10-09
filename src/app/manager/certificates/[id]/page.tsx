@@ -25,6 +25,10 @@ interface Candidate {
   assignment_avg: number | null;
   attendance_rate: number | null;
   outstanding_fees: number;
+  exam_average: number | null;
+  final_percentage: number | null;
+  final_grade: string | null;
+  final_submitted: boolean;
   has_certificate: boolean;
 }
 
@@ -68,7 +72,7 @@ export default async function CertificateListPage({ params, searchParams }: { pa
         <div className="space-y-6">
           <Card>
             <CardTitle description={`${entries.length} student${entries.length === 1 ? "" : "s"}. Figures are recalculated when the list is submitted.`}>Eligible students</CardTitle>
-            <Table head={["Student", "Completion", "Attendance", "Fees", "Note", editable ? "" : "Certificate"]} empty={!entries.length}>
+            <Table head={["Student", "Final report", "Exam avg", "Completion", "Attendance", "Fees", "Note", editable ? "" : "Certificate"]} empty={!entries.length}>
               {entries.map((e) => (
                 <tr key={e.student_id}>
                   <Td><p className="font-medium">{e.student?.full_name}</p><p className="font-mono text-xs text-muted-foreground">{e.student?.user_code}</p></Td>
@@ -94,19 +98,26 @@ export default async function CertificateListPage({ params, searchParams }: { pa
 
           {editable && list.course_id && (
             <Card>
-              <CardTitle description="Students enrolled in the course who do not already hold this certificate.">Add from the course</CardTitle>
+              <CardTitle description="Students enrolled in the course who do not already hold this certificate. Only students whose final report Faculty have submitted are eligible.">Add from the course</CardTitle>
               {!addable.length ? (
                 <Empty compact>No more students to add.</Empty>
               ) : (
                 <form action={addListStudents} className="space-y-3">
                   <input type="hidden" name="list_id" value={list.id} />
-                  <Table head={["", "Student", "Completion", "Quiz avg", "Assignments", "Attendance", "Fees due"]}>
+                  <Table head={["", "Student", "Final report", "Exam avg", "Completion", "Assignments", "Attendance", "Fees due"]}>
                     {addable.map((c) => (
                       <tr key={c.student_id}>
-                        <Td><input type="checkbox" name="student_id" value={c.student_id} aria-label={`Add ${c.full_name}`} className="accent-primary" /></Td>
+                        <Td><input type="checkbox" name="student_id" value={c.student_id} aria-label={`Add ${c.full_name}`} className="accent-primary" disabled={!c.final_submitted} /></Td>
                         <Td><p className="font-medium">{c.full_name}</p><p className="font-mono text-xs text-muted-foreground">{c.user_code}</p></Td>
+                        <Td className="whitespace-nowrap">
+                          {c.final_submitted ? (
+                            <>{pct(c.final_percentage)}{c.final_grade && <span className="ml-1 font-medium">· {c.final_grade}</span>}</>
+                          ) : (
+                            <Badge value="pending">Final report not submitted</Badge>
+                          )}
+                        </Td>
+                        <Td>{pct(c.exam_average)}</Td>
                         <Td>{pct(c.completion_rate)}</Td>
-                        <Td>{pct(c.quiz_avg)}</Td>
                         <Td>{pct(c.assignment_avg)}</Td>
                         <Td>{pct(c.attendance_rate)}</Td>
                         <Td className={Number(c.outstanding_fees) > 0 ? "font-medium text-warning" : ""}>{Number(c.outstanding_fees) > 0 ? formatMoney(c.outstanding_fees, currency) : "Cleared"}</Td>

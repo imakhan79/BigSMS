@@ -36,7 +36,7 @@ export default async function PrincipalCertificateListPage({ params, searchParam
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <Card>
           <CardTitle description={`${entries.length} student${entries.length === 1 ? "" : "s"}${owing ? `, ${owing} with fees outstanding` : ""}`}>Students on the list</CardTitle>
-          <Table head={["Student", "Completion", "Attendance", "Fees", "Note", "Certificate"]} empty={!entries.length}>
+          <Table head={["Student", "Final report", "Exam avg", "Completion", "Attendance", "Fees", "Note", "Certificate"]} empty={!entries.length}>
             {entries.map((e) => (
               <tr key={e.student_id}>
                 <Td><p className="font-medium">{e.student?.full_name}</p><p className="font-mono text-xs text-muted-foreground">{e.student?.user_code}</p></Td>
