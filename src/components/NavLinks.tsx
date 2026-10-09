@@ -13,6 +13,7 @@ import {
   IdCard,
   FileQuestion,
   FileText,
+  NotebookPen,
   FolderTree,
   GaugeCircle,
   GitBranch,
@@ -60,6 +61,7 @@ const ICONS = {
   profileChanges: UserPen,
   idCard: IdCard,
   attendance: UserCheck,
+  exams: NotebookPen,
 } as const;
 export type NavIcon = keyof typeof ICONS;
 

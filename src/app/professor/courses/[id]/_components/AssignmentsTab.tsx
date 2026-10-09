@@ -7,9 +7,9 @@ import {
   updateAssignment,
   withdrawAssignment,
 } from "@/app/professor/actions";
-import { RequestChange, StudentCell } from "@/app/professor/_components";
+import { AudienceFields, audienceStudents, RequestChange, rosterClasses, StudentCell } from "@/app/professor/_components";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Alert, Badge, Card, CardTitle, Empty, Input, Label, Select, Textarea } from "@/components/ui";
+import { Alert, Badge, Card, CardTitle, Empty, Input, Label, Textarea } from "@/components/ui";
 import { getPendingChanges, getRoster, pendingKey, type RosterStudent, SUBMISSION_STATUS_LABEL } from "@/lib/faculty";
 import { createClient } from "@/lib/supabase/server";
 import { cn, formatDate, toLocalInput } from "@/lib/utils";
@@ -53,8 +53,6 @@ interface StatusCounts {
   pending: number;
 }
 
-type Classes = [string, string][];
-
 /**
  * Assignment management (BRD 10): formulate a draft, assign it to the course, a class or chosen
  * students, take submissions (late ones are marked), grade them and follow each student's status.
@@ -69,17 +67,10 @@ export async function AssignmentsTab({ courseId }: { courseId: string }) {
   ]);
   const assignments = (data ?? []) as Assignment[];
   const counts = new Map(((statusRows ?? []) as StatusCounts[]).map((r) => [r.assignment_id, r]));
-  const classes: Classes = [...new Map(roster.filter((s) => s.batch_id).map((s) => [s.batch_id!, s.batch_name ?? ""])).entries()];
+  const classes = rosterClasses(roster);
   const returnTo = `/professor/courses/${courseId}?tab=assignments`;
 
-  const studentsOf = (a: Assignment) => {
-    if (a.audience === "batch") return roster.filter((s) => s.batch_id === a.batch_id);
-    if (a.audience === "students") {
-      const chosen = new Set(a.assignment_students.map((x) => x.student_id));
-      return roster.filter((s) => chosen.has(s.student_id));
-    }
-    return roster;
-  };
+  const studentsOf = (a: Assignment) => audienceStudents(roster, a.audience, a.batch_id, a.assignment_students.map((x) => x.student_id));
   const audienceLabel = (a: Assignment) =>
     a.audience === "batch"
       ? `Class: ${classes.find(([id]) => id === a.batch_id)?.[1] ?? "—"}`
@@ -145,7 +136,7 @@ export async function AssignmentsTab({ courseId }: { courseId: string }) {
                 <form action={updateAssignment} className="mt-3 space-y-3">
                   <input type="hidden" name="id" value={a.id} />
                   <input type="hidden" name="course_id" value={courseId} />
-                  <AssignmentFields a={a} roster={roster} classes={classes} audienceLocked={a.submissions.length > 0} />
+                  <AssignmentFields a={a} roster={roster} audienceLocked={a.submissions.length > 0} />
                   <SubmitButton size="sm">Save changes</SubmitButton>
                 </form>
               </details>
@@ -248,7 +239,7 @@ export async function AssignmentsTab({ courseId }: { courseId: string }) {
         ) : (
           <form action={saveAssignment} className="space-y-3">
             <input type="hidden" name="course_id" value={courseId} />
-            <AssignmentFields roster={roster} classes={classes} />
+            <AssignmentFields roster={roster} />
             <label className="flex items-center gap-2 text-sm"><input type="checkbox" name="assign_now" /> Assign to students now</label>
             <SubmitButton className="w-full">Save assignment</SubmitButton>
           </form>
@@ -258,23 +249,8 @@ export async function AssignmentsTab({ courseId }: { courseId: string }) {
   );
 }
 
-/**
- * Title, instructions, due date, maximum score and who the assignment is for. The class picker and
- * student list show only for the matching choice (CSS :has, no client script).
- */
-function AssignmentFields({
-  a,
-  roster,
-  classes,
-  audienceLocked,
-}: {
-  a?: Assignment;
-  roster: RosterStudent[];
-  classes: Classes;
-  audienceLocked?: boolean;
-}) {
-  const audience = a?.audience ?? "course";
-  const chosen = new Set(a?.assignment_students.map((x) => x.student_id));
+/** Title, instructions, due date, maximum score and who the assignment is for. */
+function AssignmentFields({ a, roster, audienceLocked }: { a?: Assignment; roster: RosterStudent[]; audienceLocked?: boolean }) {
   return (
     <>
       <Label label="Title"><Input name="title" defaultValue={a?.title} required /></Label>
@@ -286,34 +262,7 @@ function AssignmentFields({
       {audienceLocked ? (
         <p className="text-xs text-muted-foreground">Students have handed in work, so who this assignment is for can no longer change.</p>
       ) : (
-        <fieldset className="group space-y-2">
-          <legend className="mb-1.5 text-sm font-medium">Assign to</legend>
-          <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            <label className="flex items-center gap-1.5"><input type="radio" name="audience" value="course" defaultChecked={audience === "course"} /> Whole course</label>
-            {!!classes.length && (
-              <label className="flex items-center gap-1.5"><input type="radio" name="audience" value="batch" defaultChecked={audience === "batch"} /> One class</label>
-            )}
-            <label className="flex items-center gap-1.5"><input type="radio" name="audience" value="students" defaultChecked={audience === "students"} /> Chosen students</label>
-          </div>
-          {!!classes.length && (
-            <div className="hidden group-has-[input[value=batch]:checked]:block">
-              <Select name="batch_id" defaultValue={a?.batch_id ?? ""} aria-label="Class">
-                <option value="">Choose a class</option>
-                {classes.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
-              </Select>
-            </div>
-          )}
-          <div className="hidden max-h-48 space-y-1 overflow-y-auto rounded-md border border-border p-2 group-has-[input[value=students]:checked]:block">
-            {roster.map((s) => (
-              <label key={s.student_id} className="flex items-center gap-2 text-sm">
-                <input type="checkbox" name="student_ids" value={s.student_id} defaultChecked={chosen.has(s.student_id)} />
-                <span>{s.full_name}</span>
-                <span className="font-mono text-xs text-muted-foreground">{s.user_code}</span>
-                {s.batch_name && <span className="text-xs text-muted-foreground">· {s.batch_name}</span>}
-              </label>
-            ))}
-          </div>
-        </fieldset>
+        <AudienceFields roster={roster} audience={a?.audience} batchId={a?.batch_id} chosen={a?.assignment_students.map((x) => x.student_id)} />
       )}
     </>
   );

@@ -309,23 +309,104 @@ export async function submitAttendance(form: FormData) {
 // Exams and marks ---------------------------------------------------------------
 const examPath = (courseId: string, examId?: string) => `${coursePath(courseId, "exams")}${examId ? `&exam=${examId}` : ""}`;
 
+function examFields(form: FormData) {
+  const audience = ["course", "batch", "students"].includes(str(form, "audience")) ? str(form, "audience") : "course";
+  const mode = str(form, "mode") === "online" ? "online" : "offline";
+  return {
+    title: str(form, "title"),
+    kind: str(form, "kind") || "class_test",
+    held_on: str(form, "held_on") || undefined,
+    max_marks: Number(str(form, "max_marks")) || 100,
+    instructions: str(form, "instructions"),
+    mode,
+    starts_at: mode === "online" ? fromLocalInput(str(form, "starts_at")) : null,
+    duration_minutes: mode === "online" ? Number(str(form, "duration_minutes")) || null : null,
+    audience,
+    batch_id: audience === "batch" ? str(form, "batch_id") || null : null,
+  };
+}
+
+/** Replaces the chosen students of a 'students' exam. */
+async function setExamStudents(supabase: Awaited<ReturnType<typeof createClient>>, examId: string, form: FormData, path: string) {
+  const chosen = new Set(form.getAll("student_ids").map(String));
+  if (!chosen.size) back(path, "error", "Choose at least one student.");
+  const { data: current } = await supabase.from("exam_students").select("student_id").eq("exam_id", examId);
+  const had = new Set((current ?? []).map((r) => r.student_id));
+  const removed = [...had].filter((id) => !chosen.has(id));
+  const added = [...chosen].filter((id) => !had.has(id));
+  if (removed.length) {
+    const { error } = await supabase.from("exam_students").delete().eq("exam_id", examId).in("student_id", removed);
+    if (error) back(path, "error", error.message);
+  }
+  if (added.length) {
+    const { error } = await supabase.from("exam_students").insert(added.map((student_id) => ({ exam_id: examId, student_id })));
+    if (error) back(path, "error", error.message);
+  }
+}
+
+function checkExamFields(fields: ReturnType<typeof examFields>, form: FormData, path: string) {
+  if (fields.audience === "batch" && !fields.batch_id) back(path, "error", "Choose the class.");
+  if (fields.audience === "students" && !form.getAll("student_ids").length) back(path, "error", "Choose at least one student.");
+  if (fields.mode === "online" && (!fields.starts_at || !fields.duration_minutes)) back(path, "error", "An online exam needs a start time and a duration.");
+}
+
+/** Exam formulation: saved as a draft until it is assigned. */
 export async function createExam(form: FormData) {
   const { supabase } = await professor();
   const courseId = str(form, "course_id");
-  const { data, error } = await supabase
-    .from("exams")
-    .insert({
-      course_id: courseId,
-      title: str(form, "title"),
-      kind: str(form, "kind") || "class_test",
-      held_on: str(form, "held_on"),
-      max_marks: Number(str(form, "max_marks")) || 100,
-    })
-    .select("id")
-    .single();
+  const fields = examFields(form);
+  checkExamFields(fields, form, examPath(courseId));
+  const { data, error } = await supabase.from("exams").insert({ ...fields, course_id: courseId }).select("id").single();
   if (error) back(examPath(courseId), "error", error.message);
-  revalidatePath("/professor", "layout");
-  redirect(examPath(courseId, data.id));
+  const path = examPath(courseId, data.id);
+  if (fields.audience === "students") await setExamStudents(supabase, data.id, form, path);
+  const paper = str(form, "paper");
+  if (paper) {
+    const { error: paperError } = await supabase.from("exam_papers").insert({ exam_id: data.id, paper });
+    if (paperError) back(path, "error", paperError.message);
+  }
+  done(path, "Exam saved as a draft. Assign it to students when it is ready.");
+}
+
+export async function updateExam(form: FormData) {
+  const { supabase } = await professor();
+  const courseId = str(form, "course_id");
+  const id = str(form, "exam_id");
+  const path = examPath(courseId, id);
+  const fields = examFields(form);
+  // Who sits the exam and how are fixed once there are answers or marks; the form then omits them.
+  const locked = !form.has("audience");
+  if (!locked) checkExamFields(fields, form, path);
+  const { title, kind, held_on, max_marks, instructions, starts_at, duration_minutes, audience } = fields;
+  // A locked online exam can still be rescheduled.
+  const row = locked ? { title, kind, held_on, max_marks, instructions, ...(form.has("starts_at") ? { starts_at, duration_minutes } : {}) } : fields;
+  if (!locked && audience === "students") await setExamStudents(supabase, id, form, path);
+  const { error } = await supabase.from("exams").update(row).eq("id", id);
+  if (error) back(path, "error", error.message);
+  if (!locked && audience !== "students") await supabase.from("exam_students").delete().eq("exam_id", id);
+  if (form.has("paper")) {
+    const { error: paperError } = await supabase.from("exam_papers").upsert({ exam_id: id, paper: str(form, "paper") });
+    if (paperError) back(path, "error", paperError.message);
+  }
+  done(path, "Exam updated.");
+}
+
+export async function assignExam(form: FormData) {
+  const { supabase } = await professor();
+  const courseId = str(form, "course_id");
+  const id = str(form, "exam_id");
+  const { data, error } = await supabase.rpc("assign_exam", { p_exam_id: id });
+  if (error) back(examPath(courseId, id), "error", error.message);
+  done(examPath(courseId, id), `Exam assigned to ${data} student${data === 1 ? "" : "s"}. They have been notified.`);
+}
+
+export async function unassignExam(form: FormData) {
+  const { supabase } = await professor();
+  const courseId = str(form, "course_id");
+  const id = str(form, "exam_id");
+  const { error } = await supabase.rpc("unassign_exam", { p_exam_id: id });
+  if (error) back(examPath(courseId, id), "error", error.message);
+  done(examPath(courseId, id), "Exam withdrawn. It is a draft again.");
 }
 
 export async function deleteExam(form: FormData) {
@@ -366,7 +447,7 @@ export async function submitExamResults(form: FormData) {
   const { supabase, examId, path } = await writeExamResults(form);
   const { error } = await supabase.rpc("submit_exam", { p_exam_id: examId });
   if (error) back(path, "error", error.message);
-  done(path, "Exam results submitted. Further changes need the Principal's approval.");
+  done(path, "Exam results submitted to the Principal. They are published to students once approved.");
 }
 
 // Final report ------------------------------------------------------------------
