@@ -1,9 +1,9 @@
 import type { MetadataRoute } from "next";
 
-/** Lets Big SMS be installed as an app, with the LGITE crest as its icon. */
+/** Lets the LGITE Portal be installed as an app, with the LGITE crest as its icon. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "LGITE · Big SMS",
+    name: "LGITE Portal",
     short_name: "LGITE",
     description: "Lahore Garrison Institute of Technical Education: school management system.",
     start_url: "/",
