@@ -38,6 +38,7 @@ function adminNav(): NavGroup[] {
         { href: "/admin/users", label: "All Users", icon: "users" },
         { href: "/admin/users?role=student", label: "Students", icon: "students" },
         { href: "/admin/users?role=staff", label: "Staff", icon: "staff" },
+        { href: "/enrollment", label: "Student Enrollment", icon: "enrollment" },
       ],
     },
     {
@@ -70,7 +71,7 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
         { href: "/manager/applications", label: "Applications", icon: "applications" },
         { href: "/manager/students", label: "Students", icon: "students" },
         { href: "/manager/profile-requests", label: "Profile Changes", icon: "profileChanges" },
-        { href: "/manager/enrollment", label: "Course Enrollment", icon: "enrollment" },
+        { href: "/enrollment", label: "Student Enrollment", icon: "enrollment" },
         { href: "/manager/certificates", label: "Certificate Lists", icon: "certificates" },
       ],
     },
@@ -95,6 +96,7 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
     {
       label: "Approvals",
       items: [
+        { href: "/enrollment", label: "Enrollments", icon: "enrollment" },
         { href: "/principal/certificates", label: "Certificate Lists", icon: "certificates" },
         { href: "/principal/changes", label: "Result Changes", icon: "results" },
         { href: "/principal/profile-requests", label: "Profile Changes", icon: "profileChanges" },
