@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { issueInvoice } from "@/app/finance/actions";
-import { deleteDocument, enrollStudents, reviewDocument, saveStudentDetails, unenrollStudent, uploadDocument } from "@/app/manager/actions";
+import { submitEnrollment, unenrollStudent } from "@/app/enrollment/actions";
+import { deleteDocument, reviewDocument, saveStudentDetails, uploadDocument } from "@/app/manager/actions";
 import { FeeModeFields, PersonFields } from "@/app/manager/_components";
 import { INVOICE_SELECT, InvoiceTable, type InvoiceRow } from "@/app/finance/_fees";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -35,7 +36,7 @@ export default async function StudentPage({
     supabase.from("student_records").select("*").eq("student_id", id).maybeSingle(),
     supabase.from("student_documents").select("*").eq("student_id", id).order("created_at", { ascending: false }),
     supabase.from("invoices").select(INVOICE_SELECT).eq("student_id", id).order("created_at", { ascending: false }),
-    supabase.from("enrollments").select("course_id, enrolled_at, course:courses(title, status)").eq("student_id", id),
+    supabase.from("enrollments").select("course_id, enrolled_at, course:courses(title, status), batch:course_batches(name)").eq("student_id", id),
     supabase.from("courses").select("id, title").eq("status", "published").order("title"),
     supabase.from("certificates").select("id, certificate_no, title, kind, status, issued_on").eq("student_id", id).order("issued_on", { ascending: false }),
     getCurrency(supabase),
@@ -164,8 +165,8 @@ export default async function StudentPage({
 
       {tab === "courses" && (
         <Card>
-          <CardTitle>Enrolled courses</CardTitle>
-          <form action={enrollStudents} className="mb-4 flex flex-wrap items-end gap-3">
+          <CardTitle description="New enrollments take effect when the Principal approves them." action={<TextLink href="/enrollment">All enrollment requests</TextLink>}>Enrolled courses</CardTitle>
+          <form action={submitEnrollment} className="mb-4 flex flex-wrap items-end gap-3">
             <input type="hidden" name="student_id" value={s.id} />
             <input type="hidden" name="back" value={`${base}?tab=courses`} />
             <Label label="Enrol in" className="min-w-64">
@@ -173,12 +174,13 @@ export default async function StudentPage({
                 {courses?.filter((c) => !enrolledIds.has(c.id)).map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
               </Select>
             </Label>
-            <SubmitButton>Enrol</SubmitButton>
+            <SubmitButton>Send for approval</SubmitButton>
           </form>
-          <Table head={["Course", "Status", "Enrolled", ""]} empty={!enrollments?.length}>
+          <Table head={["Course", "Batch", "Status", "Enrolled", ""]} empty={!enrollments?.length}>
             {enrollments?.map((e: any) => (
               <tr key={e.course_id}>
                 <Td className="font-medium">{e.course?.title}</Td>
+                <Td>{e.batch?.name ?? "—"}</Td>
                 <Td><Badge value={e.course?.status ?? "—"} /></Td>
                 <Td className="whitespace-nowrap">{formatDay(e.enrolled_at)}</Td>
                 <Td className="text-right">

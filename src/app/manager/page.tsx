@@ -30,7 +30,7 @@ export default async function ManagerDashboard() {
       <QuickActions
         actions={[
           { href: "/manager/applications", label: "Applications", description: `${openApps ?? 0} open`, icon: <FileText size={17} /> },
-          { href: "/manager/enrollment", label: "Course enrollment", description: "Enrol students in courses", icon: <UserPlus size={17} /> },
+          { href: "/enrollment", label: "Student enrollment", description: "Enrol students, approved by the Principal", icon: <UserPlus size={17} /> },
           { href: "/finance/fees", label: "Fee records", description: `${formatMoney(outstanding, currency)} outstanding`, icon: <Wallet size={17} /> },
           { href: "/manager/certificates", label: "Certificate lists", description: `${awaiting ?? 0} awaiting the Principal`, icon: <Award size={17} /> },
         ]}

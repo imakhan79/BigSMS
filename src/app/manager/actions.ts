@@ -187,33 +187,6 @@ export async function deleteDocument(form: FormData) {
   back(path, "ok", "Document deleted.");
 }
 
-// Enrollment ----------------------------------------------------------------------
-export async function enrollStudents(form: FormData) {
-  const { supabase } = await office();
-  const path = str(form, "back") || "/manager/enrollment";
-  const courseIds = form.getAll("course_id").map(String).filter(Boolean);
-  const studentIds = form.getAll("student_id").map(String).filter(Boolean);
-  if (!courseIds.length || !studentIds.length) back(path, "error", "Choose a course and at least one student.");
-  const rows = courseIds.flatMap((course_id) => studentIds.map((student_id) => ({ course_id, student_id })));
-  const { error } = await supabase.from("enrollments").upsert(rows, { onConflict: "course_id,student_id", ignoreDuplicates: true });
-  if (error) back(path, "error", error.message);
-  revalidatePath("/manager", "layout");
-  back(path, "ok", rows.length === 1 ? "Student enrolled." : `${rows.length} enrollments saved.`);
-}
-
-export async function unenrollStudent(form: FormData) {
-  const { supabase } = await office();
-  const path = str(form, "back") || "/manager/enrollment";
-  const { error } = await supabase
-    .from("enrollments")
-    .delete()
-    .eq("course_id", str(form, "course_id"))
-    .eq("student_id", str(form, "student_id"));
-  if (error) back(path, "error", error.message);
-  revalidatePath("/manager", "layout");
-  back(path, "ok", "Student removed from the course.");
-}
-
 // Certificate lists: Prepared by Admin Manager -> Approved by Principal ------------
 export async function createCertificateList(form: FormData) {
   const { supabase } = await office();
