@@ -110,6 +110,7 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
       items: [
         { href: "/enrollment", label: "Enrollments", icon: "enrollment" },
         { href: "/principal/certificates", label: "Certificate Lists", icon: "certificates" },
+        { href: "/principal/exams", label: "Exam Results", icon: "exams" },
         { href: "/principal/changes", label: "Result Changes", icon: "results" },
         { href: "/principal/profile-requests", label: "Profile Changes", icon: "profileChanges" },
       ],
@@ -162,6 +163,7 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
     {
       items: [
         { href: "/student", label: "My Courses", icon: "courses" },
+        { href: "/student/exams", label: "My Exams", icon: "exams" },
         { href: "/student/attendance", label: "My Attendance", icon: "attendance" },
         { href: "/student/id-card", label: "My ID Card", icon: "idCard" },
         { href: "/profile", label: "My Profile", icon: "profileChanges" },

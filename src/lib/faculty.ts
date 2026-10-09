@@ -104,3 +104,20 @@ export async function getPendingChanges(supabase: Supabase, courseId: string): P
   const { data } = await supabase.from("result_changes").select("kind, target_id, student_id").eq("course_id", courseId).eq("status", "pending");
   return new Set((data ?? []).map((c) => pendingKey(c.kind as ResultChangeKind, c.target_id, c.student_id)));
 }
+
+/** Exam results workflow: Faculty submit, the Principal approves (publishes) or returns. */
+export const EXAM_RESULT_STATUS: Record<string, string> = {
+  draft: "Draft (being marked)",
+  pending: "Awaiting the Principal's approval",
+  approved: "Published to students",
+  returned: "Returned for correction",
+};
+
+/** One label for where an exam is in Formulation -> Assigned -> Results -> Published. */
+export function examStage(exam: { assigned_at: string | null; results_status: string }): { label: string; tone: string } {
+  if (exam.results_status === "approved") return { label: "Results published", tone: "published" };
+  if (exam.results_status === "pending") return { label: "Awaiting approval", tone: "pending_approval" };
+  if (exam.results_status === "returned") return { label: "Returned", tone: "rejected" };
+  if (exam.assigned_at) return { label: "Assigned", tone: "active" };
+  return { label: "Draft", tone: "draft" };
+}
