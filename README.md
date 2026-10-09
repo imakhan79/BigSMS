@@ -32,6 +32,8 @@ Built with Next.js 15 (App Router, TypeScript, Server Actions), Supabase (Postgr
 
 11. **Examinations: Exam formulation → Exam assigned to students → Student submission → Exam grading → Exam results.** Faculty formulate an exam as a draft (type, total marks, instructions, and sat either in class on a date or online with a start time, duration and question paper that students can open only once it starts). They **assign** it to the whole course, one class (batch) or chosen students, who are notified (`assign_exam()`). In an online exam students submit answers during the exam window and can resubmit until it closes. Faculty enter marks only for the exam's students (their own course and class) and **submit the results to the Principal**. **Results are published to students only when the Principal approves them** (`review_exam_results()`, under **Exam Results**); the Principal can instead return them with a note for correction and resubmission. Changes to published results need the Principal's approval (workflow 5). Students see their exams and published results under **My Exams**.
 
+12. **Timetable: class schedule and calendar.** The **Principal and the Admin Manager** keep a draft timetable under **Timetable** (`/timetable`): weekly classes per course or per class (batch), with room, Faculty and class clashes refused, and calendar events (holidays, exams, term dates, events). **Publishing** copies the draft to the live timetable: the **Principal publishes directly**; the **Admin Manager's publication waits for the Principal**, who approves it (the system then publishes or updates the live timetable from that snapshot) or rejects it with a reason (`publish_timetable()` / `review_timetable()`, kept in `timetable_publications`). Faculty and students are notified. **Faculty see the timetable of their assigned classes and subjects; students see their own** (their courses and class), each as a weekly schedule and a month calendar with holidays and exams. Admins read.
+
 Admins, Faculty and students are notified in-app at each step.
 
 ## Security model
@@ -63,6 +65,7 @@ supabase/
     20261016000001_attendance.sql  staff and Faculty attendance, student registers by class
     20261017000001_assignment_management.sql  assigning to course/class/students, late submissions, submission status
     20261018000001_examination_management.sql  exam formulation, assigning, online answers, results approved by the Principal
+    20261019000001_timetable.sql   draft and published class schedule and calendar; Admin Manager publications approved by the Principal
   seed.sql                         categories, default KPIs, settings
 scripts/seed.mjs                   demo users and sample course
 public/zicon-logo.png              brand logo
