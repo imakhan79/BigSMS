@@ -157,8 +157,6 @@ alter table public.timetable_publications enable row level security;
 create policy timetable_publications_select on public.timetable_publications for select to authenticated
   using ((select public.manages_timetable()) or (select public.is_overseer()));
 
-create trigger audit_timetable_slots after insert or update or delete on public.timetable_slots
-  for each row execute function public.audit_row();
 create trigger audit_calendar_events after insert or update or delete on public.calendar_events
   for each row execute function public.audit_row();
 create trigger audit_timetable_publications after insert or update on public.timetable_publications
