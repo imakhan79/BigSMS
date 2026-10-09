@@ -34,6 +34,8 @@ Built with Next.js 15 (App Router, TypeScript, Server Actions), Supabase (Postgr
 
 12. **Timetable: class schedule and calendar.** The **Principal and the Admin Manager** keep a draft timetable under **Timetable** (`/timetable`): weekly classes per course or per class (batch), with room, Faculty and class clashes refused, and calendar events (holidays, exams, term dates, events). **Publishing** copies the draft to the live timetable: the **Principal publishes directly**; the **Admin Manager's publication waits for the Principal**, who approves it (the system then publishes or updates the live timetable from that snapshot) or rejects it with a reason (`publish_timetable()` / `review_timetable()`, kept in `timetable_publications`). Faculty and students are notified. **Faculty see the timetable of their assigned classes and subjects; students see their own** (their courses and class), each as a weekly schedule and a month calendar with holidays and exams. Admins read.
 
+13. **Analytics** (`/analytics`). *Institute performance:* current figures (attendance, exam average and pass rate, assignment average, on-time submissions, lecture completion, work awaiting grading) and historic trends month by month over 3 to 24 months. *Course performance:* each course ranked by any of those measures. *Student attendance:* by course and by student, for a date range, with students below 75% flagged. Only submitted attendance, published exam results and saved grades count. **Visibility follows the roles:** the Principal (and admins) see the whole institute; Faculty only their own courses and students; students only their own figures. Scoping is done in the database (`analytics_current()`, `analytics_monthly()`, `analytics_course_performance()`, `analytics_attendance()`). CSV export throughout.
+
 Admins, Faculty and students are notified in-app at each step.
 
 ## Security model
@@ -66,6 +68,7 @@ supabase/
     20261017000001_assignment_management.sql  assigning to course/class/students, late submissions, submission status
     20261018000001_examination_management.sql  exam formulation, assigning, online answers, results approved by the Principal
     20261019000001_timetable.sql   draft and published class schedule and calendar; Admin Manager publications approved by the Principal
+    20261020000001_analytics.sql   institute, course and attendance analytics scoped by role
   seed.sql                         categories, default KPIs, settings
 scripts/seed.mjs                   demo users and sample course
 public/zicon-logo.png              brand logo
