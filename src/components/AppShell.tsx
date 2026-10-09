@@ -31,6 +31,8 @@ const attendanceGroup: NavGroup = {
   ],
 };
 
+const timetableItem = { href: "/timetable", label: "Timetable", icon: "timetable" } as const;
+
 function adminNav(): NavGroup[] {
   return [
     { items: [{ href: "/admin", label: "Dashboard", icon: "dashboard" }] },
@@ -38,6 +40,7 @@ function adminNav(): NavGroup[] {
       label: "Academics",
       items: [
         { href: "/courses", label: "Courses", icon: "courses" },
+        timetableItem,
         { href: "/admin/categories", label: "Categories", icon: "categories" },
         { href: "/admin/question-bank", label: "Question Bank", icon: "questions" },
       ],
@@ -75,7 +78,7 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
   admin: adminNav(),
   admin_manager: [
     { items: [{ href: "/manager", label: "Dashboard", icon: "dashboard" }] },
-    { label: "Academics", items: [{ href: "/courses", label: "Courses", icon: "courses" }] },
+    { label: "Academics", items: [{ href: "/courses", label: "Courses", icon: "courses" }, timetableItem] },
     {
       label: "Students",
       items: [
@@ -104,7 +107,7 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
   ],
   principal: [
     { items: [{ href: "/principal", label: "Dashboard", icon: "dashboard" }] },
-    { label: "Academics", items: [{ href: "/courses", label: "Courses", icon: "courses" }] },
+    { label: "Academics", items: [{ href: "/courses", label: "Courses", icon: "courses" }, timetableItem] },
     {
       label: "Approvals",
       items: [
@@ -163,6 +166,7 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
     {
       items: [
         { href: "/student", label: "My Courses", icon: "courses" },
+        { href: "/student/timetable", label: "My Timetable", icon: "timetable" },
         { href: "/student/exams", label: "My Exams", icon: "exams" },
         { href: "/student/attendance", label: "My Attendance", icon: "attendance" },
         { href: "/student/id-card", label: "My ID Card", icon: "idCard" },
