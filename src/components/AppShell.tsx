@@ -21,6 +21,16 @@ const PORTAL_NAME: Record<PortalRole, string> = {
   student: "Student Portal",
 };
 
+/** Attendance for the office: the staff and Faculty register, student attendance and the person's own. */
+const attendanceGroup: NavGroup = {
+  label: "Attendance",
+  items: [
+    { href: "/attendance/staff", label: "Staff & Faculty", icon: "attendance" },
+    { href: "/attendance/students", label: "Student Attendance", icon: "students" },
+    { href: "/attendance/me", label: "My Attendance", icon: "timetable" },
+  ],
+};
+
 function adminNav(): NavGroup[] {
   return [
     { items: [{ href: "/admin", label: "Dashboard", icon: "dashboard" }] },
@@ -41,6 +51,7 @@ function adminNav(): NavGroup[] {
         { href: "/enrollment", label: "Student Enrollment", icon: "enrollment" },
       ],
     },
+    attendanceGroup,
     {
       label: "Performance",
       items: [
@@ -75,6 +86,7 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
         { href: "/manager/certificates", label: "Certificate Lists", icon: "certificates" },
       ],
     },
+    attendanceGroup,
     {
       label: "Finance",
       items: [
@@ -102,6 +114,7 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
         { href: "/principal/profile-requests", label: "Profile Changes", icon: "profileChanges" },
       ],
     },
+    attendanceGroup,
     {
       label: "Finance",
       items: [
@@ -127,14 +140,29 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
         { href: "/professor/question-bank", label: "Question Bank", icon: "questions" },
       ],
     },
+    {
+      label: "Attendance",
+      items: [
+        { href: "/attendance/students", label: "Student Attendance", icon: "attendance" },
+        { href: "/attendance/me", label: "My Attendance", icon: "timetable" },
+      ],
+    },
     { label: "Results", items: [{ href: "/professor/changes", label: "Change Requests", icon: "approvals" }] },
     { label: "Performance", items: [{ href: "/professor/analytics", label: "Analytics", icon: "reports" }] },
   ],
-  staff: [{ items: [{ href: "/staff", label: "Dashboard", icon: "dashboard" }] }],
+  staff: [
+    {
+      items: [
+        { href: "/staff", label: "Dashboard", icon: "dashboard" },
+        { href: "/attendance/me", label: "My Attendance", icon: "attendance" },
+      ],
+    },
+  ],
   student: [
     {
       items: [
         { href: "/student", label: "My Courses", icon: "courses" },
+        { href: "/student/attendance", label: "My Attendance", icon: "attendance" },
         { href: "/student/id-card", label: "My ID Card", icon: "idCard" },
         { href: "/profile", label: "My Profile", icon: "profileChanges" },
       ],

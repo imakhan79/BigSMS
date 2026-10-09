@@ -21,6 +21,7 @@ import {
   Presentation,
   ScrollText,
   Settings,
+  UserCheck,
   UserCog,
   UserPen,
   UserPlus,
@@ -58,6 +59,7 @@ const ICONS = {
   results: ClipboardPen,
   profileChanges: UserPen,
   idCard: IdCard,
+  attendance: UserCheck,
 } as const;
 export type NavIcon = keyof typeof ICONS;
 

@@ -12,31 +12,36 @@ export async function AttendanceTab({ courseId, sessionId }: { courseId: string;
   const [{ data: sessions }, roster] = await Promise.all([
     supabase
       .from("attendance_sessions")
-      .select("id, held_on, topic, submitted_at, attendance_records(student_id, status)")
+      .select("id, held_on, topic, submitted_at, batch_id, attendance_records(student_id, status)")
       .eq("course_id", courseId)
       .order("held_on", { ascending: false }),
     getRoster(supabase, courseId),
   ]);
   const selected = sessions?.find((s) => s.id === sessionId);
+  // Classes (batches) with students in them; a register is for the whole course or one class.
+  const classes = [...new Map(roster.filter((s) => s.batch_id).map((s) => [s.batch_id!, s.batch_name ?? ""])).entries()];
+  const className = (batchId: string | null) => (batchId ? classes.find(([id]) => id === batchId)?.[1] ?? "Class" : "All students");
+  const classRoster = (batchId: string | null) => (batchId ? roster.filter((s) => s.batch_id === batchId) : roster);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
       <div className="space-y-6">
         {selected ? (
-          <Register courseId={courseId} session={selected} roster={roster} />
+          <Register courseId={courseId} session={selected} className={className(selected.batch_id)} roster={classRoster(selected.batch_id)} />
         ) : (
           <Alert tone="info" title="Taking attendance">
-            Start a register, mark every student and save it as a draft. Submit it when it is complete. After that, changes need the Principal&apos;s approval.
+            Start a register for the whole course or one class, mark every student and save it as a draft. Only students enrolled in your class can be marked. Submit it when it is complete. After that, changes need the Principal&apos;s approval.
           </Alert>
         )}
         <Card>
           <CardTitle>Registers</CardTitle>
-          <Table head={["Date", "Topic", "Present", "Absent", "Status", ""]} empty={!sessions?.length}>
+          <Table head={["Date", "Class", "Topic", "Present", "Absent", "Status", ""]} empty={!sessions?.length}>
             {sessions?.map((s) => {
               const count = (st: string) => s.attendance_records.filter((r: { status: string }) => r.status === st).length;
               return (
                 <tr key={s.id} className={cn(s.id === sessionId && "bg-secondary/50")}>
                   <Td className="font-medium">{formatDay(s.held_on)}</Td>
+                  <Td>{className(s.batch_id)}</Td>
                   <Td>{s.topic || "—"}</Td>
                   <Td>{count("present") + count("late")}</Td>
                   <Td>{count("absent")}</Td>
@@ -61,6 +66,14 @@ export async function AttendanceTab({ courseId, sessionId }: { courseId: string;
           <form action={createAttendanceSession} className="space-y-3">
             <input type="hidden" name="course_id" value={courseId} />
             <Label label="Date"><Input name="held_on" type="date" defaultValue={today()} max={today()} required /></Label>
+            {!!classes.length && (
+              <Label label="Class">
+                <Select name="batch_id" defaultValue="">
+                  <option value="">All students ({roster.length})</option>
+                  {classes.map(([id, name]) => <option key={id} value={id}>{name} ({classRoster(id).length})</option>)}
+                </Select>
+              </Label>
+            )}
             <Label label="Topic"><Input name="topic" placeholder="Optional" /></Label>
             <SubmitButton className="w-full">Start register</SubmitButton>
           </form>
@@ -73,10 +86,12 @@ export async function AttendanceTab({ courseId, sessionId }: { courseId: string;
 async function Register({
   courseId,
   session,
+  className,
   roster,
 }: {
   courseId: string;
   session: { id: string; held_on: string; topic: string; submitted_at: string | null };
+  className: string;
   roster: Awaited<ReturnType<typeof getRoster>>;
 }) {
   const supabase = await createClient();
@@ -86,7 +101,7 @@ async function Register({
   ]);
   const byStudent = new Map((records ?? []).map((r) => [r.student_id, r]));
   const returnTo = `/professor/courses/${courseId}?tab=attendance&session=${session.id}`;
-  const title = `${formatDay(session.held_on)}${session.topic ? ` · ${session.topic}` : ""}`;
+  const title = `${formatDay(session.held_on)} · ${className}${session.topic ? ` · ${session.topic}` : ""}`;
 
   if (session.submitted_at) {
     return (

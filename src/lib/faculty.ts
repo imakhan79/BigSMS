@@ -8,6 +8,8 @@ export interface RosterStudent {
   student_id: string;
   full_name: string;
   user_code: string | null;
+  batch_id: string | null;
+  batch_name: string | null;
 }
 
 /** Students in one class, or in every class the signed-in Faculty member teaches. */

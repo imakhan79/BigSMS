@@ -141,6 +141,11 @@ const statusTones: Record<string, Tone> = {
   cancelled: "neutral",
   missing: "danger",
   excused: "neutral",
+  present: "success",
+  late: "warning",
+  half_day: "info",
+  absent: "danger",
+  leave: "neutral",
   forwarded: "info",
   withdrawn: "neutral",
 };

@@ -202,7 +202,7 @@ export async function createAttendanceSession(form: FormData) {
   const courseId = str(form, "course_id");
   const { data, error } = await supabase
     .from("attendance_sessions")
-    .insert({ course_id: courseId, held_on: str(form, "held_on"), topic: str(form, "topic") })
+    .insert({ course_id: courseId, held_on: str(form, "held_on"), topic: str(form, "topic"), batch_id: str(form, "batch_id") || null })
     .select("id")
     .single();
   if (error) back(attendancePath(courseId), "error", error.message);

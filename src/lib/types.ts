@@ -145,3 +145,20 @@ export const SALARY_STATUSES: Record<string, string> = {
 
 /** Roles that can be on the payroll. */
 export const EMPLOYEE_ROLES = ["super_admin", "admin", "admin_manager", "principal", "professor", "staff"] as const;
+
+/** Daily attendance status for staff and Faculty. Half a day counts as half attended; leave is not counted. */
+export const STAFF_ATTENDANCE_STATUSES: Record<string, string> = {
+  present: "Present",
+  late: "Late",
+  half_day: "Half day",
+  absent: "Absent",
+  leave: "Leave",
+};
+
+/** Student attendance status in a class register. Late counts as attended; excused is not counted. */
+export const STUDENT_ATTENDANCE_STATUSES: Record<string, string> = {
+  present: "Present",
+  late: "Late",
+  absent: "Absent",
+  excused: "Excused",
+};
