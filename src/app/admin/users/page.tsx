@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
 import { ADMIN_ROLES, ROLE_LABEL, type Profile, type Role } from "@/lib/types";
 import { cn, formatDate } from "@/lib/utils";
 
-const ROLES: Role[] = ["super_admin", "admin", "admin_manager", "principal", "professor", "staff", "student"];
+const ROLES: Role[] = ["super_admin", "admin", "admin_manager", "principal", "professor", "staff", "student", "parent"];
 // Offboarding is done from the user's page so a reason is recorded.
 const STATUSES = ["pending", "active", "inactive"] as const;
 const FILTER_STATUSES = [...STATUSES, "offboarded"] as const;

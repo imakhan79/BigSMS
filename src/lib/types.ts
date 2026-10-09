@@ -68,8 +68,8 @@ export interface StudentProgress {
   assignment_avg: number | null;
 }
 
-/** Roles with a portal. The parent role remains in the database but no longer has access. */
-export type PortalRole = Exclude<Role, "parent">;
+/** Roles with a portal (every role). */
+export type PortalRole = Role;
 
 export const ROLE_HOME: Record<Role, string> = {
   super_admin: "/admin",
@@ -79,7 +79,7 @@ export const ROLE_HOME: Record<Role, string> = {
   professor: "/professor",
   staff: "/staff",
   student: "/student",
-  parent: "/pending", // Parent access has been removed
+  parent: "/parent",
 };
 
 export const ROLE_LABEL: Record<Role, string> = {

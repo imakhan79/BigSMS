@@ -19,6 +19,7 @@ const PORTAL_NAME: Record<PortalRole, string> = {
   professor: "Faculty Portal",
   staff: "Staff Portal",
   student: "Student Portal",
+  parent: "Parent Portal",
 };
 
 /** Attendance for the office: the staff and Faculty register, student attendance and the person's own. */
@@ -183,6 +184,7 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
       ],
     },
   ],
+  parent: [{ items: [{ href: "/parent", label: "My Children", icon: "students" }] }],
 };
 
 export async function AppShell({ profile, children }: { profile: Profile & { role: PortalRole }; children: ReactNode }) {
