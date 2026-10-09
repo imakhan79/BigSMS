@@ -4,10 +4,11 @@ import { CheckCircle2, Circle } from "lucide-react";
 import { submitAssignment, toggleLecture } from "@/app/student/actions";
 import { MaterialLink } from "@/components/MaterialLink";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Badge, Card, CardTitle, Empty, Flash, type FlashParams, Input, LinkButton, PageHeader, Tabs, Textarea } from "@/components/ui";
+import { Alert, Badge, Card, CardTitle, Empty, Flash, type FlashParams, Input, LinkButton, PageHeader, Tabs, Textarea } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { formatDuration } from "@/lib/courses";
+import { SUBMISSION_STATUS_LABEL } from "@/lib/faculty";
 import { cn, formatDate } from "@/lib/utils";
 
 const TABS = [
@@ -120,6 +121,7 @@ export default async function StudentCoursePage({
           {!assignments?.length && <Empty>No assignments yet.</Empty>}
           {assignments?.map((a: any) => {
             const sub = a.submissions?.[0];
+            const pastDue = !!a.due_at && new Date(a.due_at) < new Date();
             return (
               <Card key={a.id}>
                 <div className="flex flex-wrap items-start justify-between gap-2">
@@ -127,7 +129,14 @@ export default async function StudentCoursePage({
                     <h3 className="font-semibold">{a.title}</h3>
                     <p className="text-xs text-muted-foreground">Due {formatDate(a.due_at)} · out of {a.max_score}</p>
                   </div>
-                  {sub ? <Badge value={sub.status} /> : <Badge value="pending">Not submitted</Badge>}
+                  <span className="flex flex-wrap items-center gap-2">
+                    {sub?.late && <Badge value="late">Late submission</Badge>}
+                    {sub ? (
+                      <Badge value={sub.status}>{SUBMISSION_STATUS_LABEL[sub.status] ?? sub.status}</Badge>
+                    ) : (
+                      <Badge value={pastDue ? "overdue" : "pending"}>{pastDue ? "Overdue" : "Not submitted"}</Badge>
+                    )}
+                  </span>
                 </div>
                 {a.instructions && <p className="mt-2 whitespace-pre-wrap text-sm">{a.instructions}</p>}
                 {sub?.status === "graded" ? (
@@ -138,6 +147,9 @@ export default async function StudentCoursePage({
                   </div>
                 ) : (
                   <form action={submitAssignment} className="mt-3 space-y-2">
+                    {pastDue && (
+                      <Alert tone="warning">The due date has passed. You can still {sub ? "resubmit" : "submit"}, but it will be marked as a late submission.</Alert>
+                    )}
                     <input type="hidden" name="course_id" value={id} />
                     <input type="hidden" name="assignment_id" value={a.id} />
                     <Textarea name="content" defaultValue={sub?.content} placeholder="Your answer" aria-label="Your answer" required />
