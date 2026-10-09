@@ -56,7 +56,7 @@ const PORTALS = [
 ];
 
 const FEATURES = [
-  { Icon: ListChecks, title: "Approval workflows", text: "Draft, submit, approve or reject through configurable steps such as Admin then Principal. Nothing reaches students unapproved." },
+  { Icon: ListChecks, title: "Course workflow", text: "Draft, Publish, Edit and Archive. Faculty create and edit; only the Principal or Admin Manager publish, so nothing reaches students unchecked." },
   { Icon: FileStack, title: "Rich course content", text: "Lectures with videos, PDFs, books, notes and worksheets, all stored securely." },
   { Icon: ClipboardCheck, title: "Question bank & quizzes", text: "Shared bank of questions with automatic, tamper-proof grading." },
   { Icon: BarChart3, title: "Analytics & reports", text: "Completion, quiz and submission rates per course, exportable to CSV." },
@@ -65,15 +65,15 @@ const FEATURES = [
 ];
 
 const STEPS = [
-  { title: "Faculty build", text: "Create a course, add lectures and materials, then submit it for approval." },
-  { title: "Principal approves", text: "Review the outline and content, then publish it or send it back with notes." },
+  { title: "Faculty build", text: "Create a course with its ID, duration, outline, curriculum and fee, add lectures and materials, then mark it ready." },
+  { title: "Principal publishes", text: "The Principal or Admin Manager reviews the course and publishes it. Later edits go live when they are published too." },
   { title: "Students learn", text: "Assigned students get notified, study, submit work and take quizzes." },
   { title: "Everyone tracks", text: "Faculty grade, students follow their progress, the principal and admins watch the KPIs." },
 ];
 
 const PREVIEW_ROWS = [
   { course: "Introduction to Programming", prof: "Dr. Haddad", status: "published", completion: 75 },
-  { course: "Calculus I", prof: "Prof. Mensah", status: "pending_approval", completion: 0 },
+  { course: "Calculus I", prof: "Prof. Mensah", status: "edit", completion: 0 },
   { course: "Modern World History", prof: "Dr. Okafor", status: "published", completion: 62 },
   { course: "Organic Chemistry", prof: "Prof. Lindqvist", status: "draft", completion: 0 },
 ];

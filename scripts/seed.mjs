@@ -124,7 +124,7 @@ if (!course) {
   );
 }
 
-// A draft waiting in the approval queue
+// A draft marked ready to publish
 const pending = check(await db.from("courses").select("id").eq("title", "Linear Algebra").maybeSingle(), "find draft");
 if (!pending) {
   check(
@@ -132,7 +132,8 @@ if (!pending) {
       professor_id: ids.professor,
       title: "Linear Algebra",
       description: "Vectors, matrices and linear transformations.",
-      status: "pending_approval",
+      status: "draft",
+      ready_at: new Date().toISOString(),
     }),
     "pending course",
   );

@@ -31,7 +31,7 @@ export default async function ManagerDashboard() {
         actions={[
           { href: "/manager/applications", label: "Applications", description: `${openApps ?? 0} open`, icon: <FileText size={17} /> },
           { href: "/manager/enrollment", label: "Course enrollment", description: "Enrol students in courses", icon: <UserPlus size={17} /> },
-          { href: "/manager/fees", label: "Fee records", description: `${formatMoney(outstanding, currency)} outstanding`, icon: <Wallet size={17} /> },
+          { href: "/finance/fees", label: "Fee records", description: `${formatMoney(outstanding, currency)} outstanding`, icon: <Wallet size={17} /> },
           { href: "/manager/certificates", label: "Certificate lists", description: `${awaiting ?? 0} awaiting the Principal`, icon: <Award size={17} /> },
         ]}
       />
@@ -40,7 +40,7 @@ export default async function ManagerDashboard() {
         <Stat label="Active students" value={students ?? 0} href="/manager/students" icon={<GraduationCap size={16} />} />
         <Stat label="Faculty" value={faculty ?? 0} href="/manager/faculty" />
         <Stat label="Staff" value={staff ?? 0} href="/manager/staff" />
-        <Stat label="Outstanding fees" value={formatMoney(outstanding, currency)} hint={`${open?.length ?? 0} open invoices`} href="/manager/fees?status=open" />
+        <Stat label="Outstanding fees" value={formatMoney(outstanding, currency)} hint={`${open?.length ?? 0} open invoices`} href="/finance/fees?status=open" />
         <Stat label="Draft certificate lists" value={drafts ?? 0} href="/manager/certificates" />
         <Stat label="Awaiting Principal" value={awaiting ?? 0} href="/manager/certificates" />
         <Stat label="Returned by Principal" value={rejected ?? 0} hint="need changes" href="/manager/certificates" />

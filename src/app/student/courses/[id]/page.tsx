@@ -7,6 +7,7 @@ import { SubmitButton } from "@/components/SubmitButton";
 import { Badge, Card, CardTitle, Empty, Flash, type FlashParams, Input, LinkButton, PageHeader, Tabs, Textarea } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import { formatDuration } from "@/lib/courses";
 import { cn, formatDate } from "@/lib/utils";
 
 const TABS = [
@@ -49,7 +50,7 @@ export default async function StudentCoursePage({
     <>
       <PageHeader
         title={course.title}
-        subtitle={teacher ?? undefined}
+        subtitle={[course.code, teacher, course.duration_value ? formatDuration(course.duration_value, course.duration_unit) : null].filter(Boolean).join(" · ")}
         eyebrow={<Link href="/student" className="transition-colors hover:text-foreground">My courses</Link>}
       />
       <Flash params={sp} />
@@ -63,6 +64,12 @@ export default async function StudentCoursePage({
             <pre className="mt-4 whitespace-pre-wrap rounded bg-secondary p-4 font-sans text-sm">{course.outline}</pre>
           ) : (
             <p className="mt-4 text-sm text-muted-foreground">No outline provided.</p>
+          )}
+          {course.curriculum && (
+            <>
+              <h3 className="mt-5 text-sm font-semibold text-primary">Curriculum</h3>
+              <pre className="mt-2 whitespace-pre-wrap rounded bg-secondary p-4 font-sans text-sm">{course.curriculum}</pre>
+            </>
           )}
           <p className="mt-4 text-sm">{completed.size} of {lectures?.length ?? 0} lectures completed.</p>
         </Card>

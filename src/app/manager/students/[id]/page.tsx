@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { deleteDocument, enrollStudents, issueInvoice, reviewDocument, saveStudentDetails, unenrollStudent, uploadDocument } from "@/app/manager/actions";
+import { issueInvoice } from "@/app/finance/actions";
+import { deleteDocument, enrollStudents, reviewDocument, saveStudentDetails, unenrollStudent, uploadDocument } from "@/app/manager/actions";
 import { FeeModeFields, PersonFields } from "@/app/manager/_components";
-import { INVOICE_SELECT, InvoiceTable, type InvoiceRow } from "@/app/manager/_fees";
+import { INVOICE_SELECT, InvoiceTable, type InvoiceRow } from "@/app/finance/_fees";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Badge, Card, CardTitle, Empty, Flash, type FlashParams, Input, Label, PageHeader, Select, Table, Tabs, Td, TextLink } from "@/components/ui";
 import { requireRole } from "@/lib/auth";

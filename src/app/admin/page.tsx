@@ -33,10 +33,10 @@ export default async function AdminDashboard() {
     count("profiles", (q) => q.eq("role", "professor").eq("status", "active")),
     count("profiles", (q) => q.eq("status", "pending")),
     count("courses", (q) => q.eq("status", "published")),
-    count("courses", (q) => q.eq("status", "pending_approval")),
+    count("courses", (q) => q.not("ready_at", "is", null)),
     count("alerts", (q) => q.eq("status", "open")),
     supabase.rpc("course_stats").then((r) => (r.data ?? []) as CourseStat[]),
-    supabase.from("courses").select("id, title, updated_at, profiles!courses_professor_id_fkey(full_name)").eq("status", "pending_approval").order("updated_at").limit(5),
+    supabase.from("courses").select("id, code, title, ready_at, profiles!courses_professor_id_fkey(full_name)").not("ready_at", "is", null).order("ready_at").limit(5),
     supabase.from("alerts").select("id, message, created_at").eq("status", "open").order("created_at", { ascending: false }).limit(5),
   ]);
 
@@ -44,7 +44,7 @@ export default async function AdminDashboard() {
   const avg = (key: keyof CourseStat) => (live.length ? live.reduce((t, s) => t + Number(s[key]), 0) / live.length : null);
   const today = new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
   const name = firstName(profile.full_name);
-  const attention = pendingUsers + pendingCourses + openAlerts;
+  const attention = pendingUsers + openAlerts;
 
   return (
     <>
@@ -57,7 +57,7 @@ export default async function AdminDashboard() {
       <QuickActions
         actions={[
           { href: "/admin/users", label: "Add a user", description: "Onboard Faculty, staff or students", icon: <UserPlus size={17} /> },
-          { href: "/admin/courses", label: "Review courses", description: `${pendingCourses} waiting for approval`, icon: <BookOpenCheck size={17} /> },
+          { href: "/courses", label: "Courses", description: `${pendingCourses} ready to publish`, icon: <BookOpenCheck size={17} /> },
           { href: "/admin/reports", label: "View reports", description: "Completion, scores, submissions", icon: <BarChart3 size={17} /> },
           { href: "/admin/settings", label: "System settings", description: "Configure Big SMS", icon: <Settings size={17} /> },
         ]}
@@ -67,7 +67,7 @@ export default async function AdminDashboard() {
         <Stat label="Active students" value={students} icon={<GraduationCap size={16} />} href="/admin/users?role=student" />
         <Stat label="Active Faculty" value={professors} icon={<Users size={16} />} href="/admin/users?role=professor" />
         <Stat label="Awaiting activation" value={pendingUsers} icon={<UsersRound size={16} />} href="/admin/users?status=pending" />
-        <Stat label="Published courses" value={published} icon={<BookOpen size={16} />} href="/admin/courses?status=published" />
+        <Stat label="Published courses" value={published} icon={<BookOpen size={16} />} href="/courses?stage=published" />
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
@@ -79,7 +79,6 @@ export default async function AdminDashboard() {
           <ul className="space-y-1">
             {[
               { label: "Accounts to activate", value: pendingUsers, href: "/admin/users?status=pending", icon: <ShieldCheck size={16} /> },
-              { label: "Courses to approve", value: pendingCourses, href: "/admin/courses", icon: <BookOpenCheck size={16} /> },
               { label: "Open KPI alerts", value: openAlerts, href: "/admin/alerts", icon: <BellRing size={16} /> },
             ].map((i) => (
               <li key={i.label}>
@@ -106,17 +105,17 @@ export default async function AdminDashboard() {
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
           <Card>
-            <CardTitle action={<TextLink href="/admin/courses">Review all</TextLink>}>Awaiting approval</CardTitle>
+            <CardTitle action={<TextLink href="/courses">All courses</TextLink>} description="The Principal or Admin Manager publishes these">Ready to publish</CardTitle>
             {!pendingList.data?.length ? (
-              <Empty compact icon={<BookOpenCheck size={18} />} title="All caught up">No courses are waiting for approval.</Empty>
+              <Empty compact icon={<BookOpenCheck size={18} />} title="All caught up">No courses are waiting to be published.</Empty>
             ) : (
               <ul className="divide-y divide-border">
                 {pendingList.data.map((c: any) => (
                   <li key={c.id} className="flex items-center justify-between gap-4 py-2.5 text-sm">
-                    <Link href={`/admin/courses/${c.id}`} className="min-w-0 truncate font-medium hover:text-primary">
-                      {c.title} <span className="font-normal text-muted-foreground">· {c.profiles?.full_name}</span>
+                    <Link href={`/courses/${c.id}`} className="min-w-0 truncate font-medium hover:text-primary">
+                      <span className="font-mono text-xs font-normal text-muted-foreground">{c.code}</span> {c.title} <span className="font-normal text-muted-foreground">· {c.profiles?.full_name}</span>
                     </Link>
-                    <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(c.updated_at)}</span>
+                    <span className="shrink-0 text-xs text-muted-foreground">{timeAgo(c.ready_at)}</span>
                   </li>
                 ))}
               </ul>

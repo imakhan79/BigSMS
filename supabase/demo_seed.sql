@@ -100,7 +100,7 @@ begin
 
   insert into public.courses (professor_id, category_id, title, description, outline, status)
   values (v_prof, v_math, 'Linear Algebra', 'Vectors, matrices and linear transformations.',
-          E'Week 1: Vectors\nWeek 2: Matrices\nWeek 3: Determinants', 'pending_approval')
+          E'Week 1: Vectors\nWeek 2: Matrices\nWeek 3: Determinants', 'draft')
   returning id into c_linear;
 
   insert into public.courses (professor_id, category_id, title, description, status)

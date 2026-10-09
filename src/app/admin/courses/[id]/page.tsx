@@ -1,6 +1,6 @@
-import { CourseReview } from "@/components/CourseReview";
+import { redirect } from "next/navigation";
 
-export default async function AdminCourseDetail({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  return <CourseReview id={id} base="/admin/courses" isAdmin />;
+/** Courses moved to the shared Course management section. */
+export default async function CourseMoved({ params }: { params: Promise<{ id: string }> }) {
+  redirect(`/courses/${(await params).id}`);
 }

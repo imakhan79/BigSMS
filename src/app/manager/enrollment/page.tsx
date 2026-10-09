@@ -11,8 +11,8 @@ export default async function EnrollmentPage({ searchParams }: { searchParams: P
   const supabase = await createClient();
   const { data: courses } = await supabase
     .from("courses")
-    .select("id, title, status, professor:profiles!courses_professor_id_fkey(full_name)")
-    .in("status", ["published", "pending_approval", "draft"])
+    .select("id, code, title, status, professor:profiles!courses_professor_id_fkey(full_name)")
+    .in("status", ["published", "draft"])
     .order("title");
   const courseId = params.course ?? courses?.find((c) => c.status === "published")?.id ?? courses?.[0]?.id;
   const [{ data: enrolled }, { data: students }] = await Promise.all([
@@ -33,13 +33,13 @@ export default async function EnrollmentPage({ searchParams }: { searchParams: P
       <form className="mb-6 flex flex-wrap items-end gap-3">
         <Label label="Course" className="min-w-72">
           <Select name="course" defaultValue={courseId}>
-            {courses?.map((c: any) => <option key={c.id} value={c.id}>{c.title} · {c.professor?.full_name}{c.status !== "published" ? ` (${c.status.replace("_", " ")})` : ""}</option>)}
+            {courses?.map((c: any) => <option key={c.id} value={c.id}>{c.code} {c.title} · {c.professor?.full_name}{c.status !== "published" ? ` (${c.status})` : ""}</option>)}
           </Select>
         </Label>
         <SubmitButton variant="outline">Show</SubmitButton>
       </form>
       {!courseId ? (
-        <Empty title="No courses yet">Courses appear here once Faculty create them.</Empty>
+        <Empty title="No courses yet">Courses appear here once they are created under Courses.</Empty>
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
           <Card>

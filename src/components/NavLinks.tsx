@@ -27,6 +27,7 @@ import {
   Users,
   UsersRound,
   Wallet,
+  Banknote,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -50,6 +51,7 @@ const ICONS = {
   applications: FileText,
   enrollment: UserPlus,
   fees: Wallet,
+  salaries: Banknote,
   certificates: Award,
   faculty: Presentation,
   timetable: CalendarDays,

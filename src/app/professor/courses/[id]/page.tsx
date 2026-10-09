@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Badge, Flash, type FlashParams, PageHeader, Tabs } from "@/components/ui";
+import { CourseStageBadge } from "@/components/CourseManagement";
+import { Flash, type FlashParams, PageHeader, Tabs } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { Course } from "@/lib/types";
@@ -44,8 +45,8 @@ export default async function ProfessorCoursePage({
       <PageHeader
         eyebrow={<Link href="/professor/courses" className="transition-colors hover:text-foreground">My courses</Link>}
         title={course.title}
-        subtitle="Course workspace"
-        action={<Badge value={course.status} />}
+        subtitle={<><span className="font-mono">{course.code}</span> · Course workspace</>}
+        action={<CourseStageBadge course={course as Course} />}
       />
       <Flash params={sp} />
       <Tabs items={TABS.map((t) => ({ href: `/professor/courses/${id}?tab=${t.id}`, label: t.label, active: tab === t.id }))} />

@@ -21,13 +21,13 @@ const PORTAL_NAME: Record<PortalRole, string> = {
   student: "Student Portal",
 };
 
-function adminNav(superAdmin: boolean): NavGroup[] {
+function adminNav(): NavGroup[] {
   return [
     { items: [{ href: "/admin", label: "Dashboard", icon: "dashboard" }] },
     {
       label: "Academics",
       items: [
-        { href: "/admin/courses", label: "Courses", icon: "courses" },
+        { href: "/courses", label: "Courses", icon: "courses" },
         { href: "/admin/categories", label: "Categories", icon: "categories" },
         { href: "/admin/question-bank", label: "Question Bank", icon: "questions" },
       ],
@@ -38,7 +38,6 @@ function adminNav(superAdmin: boolean): NavGroup[] {
         { href: "/admin/users", label: "All Users", icon: "users" },
         { href: "/admin/users?role=student", label: "Students", icon: "students" },
         { href: "/admin/users?role=staff", label: "Staff", icon: "staff" },
-        ...(superAdmin ? [{ href: "/admin/workflows", label: "Approval Workflows", icon: "workflows" } as const] : []),
       ],
     },
     {
@@ -60,10 +59,11 @@ function adminNav(superAdmin: boolean): NavGroup[] {
 }
 
 export const NAV: Record<PortalRole, NavGroup[]> = {
-  super_admin: adminNav(true),
-  admin: adminNav(false),
+  super_admin: adminNav(),
+  admin: adminNav(),
   admin_manager: [
     { items: [{ href: "/manager", label: "Dashboard", icon: "dashboard" }] },
+    { label: "Academics", items: [{ href: "/courses", label: "Courses", icon: "courses" }] },
     {
       label: "Students",
       items: [
@@ -71,8 +71,14 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
         { href: "/manager/students", label: "Students", icon: "students" },
         { href: "/manager/profile-requests", label: "Profile Changes", icon: "profileChanges" },
         { href: "/manager/enrollment", label: "Course Enrollment", icon: "enrollment" },
-        { href: "/manager/fees", label: "Fee Records", icon: "fees" },
         { href: "/manager/certificates", label: "Certificate Lists", icon: "certificates" },
+      ],
+    },
+    {
+      label: "Finance",
+      items: [
+        { href: "/finance/fees", label: "Fee Records", icon: "fees" },
+        { href: "/finance/salaries", label: "Staff Salaries", icon: "salaries" },
       ],
     },
     {
@@ -85,13 +91,20 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
   ],
   principal: [
     { items: [{ href: "/principal", label: "Dashboard", icon: "dashboard" }] },
+    { label: "Academics", items: [{ href: "/courses", label: "Courses", icon: "courses" }] },
     {
       label: "Approvals",
       items: [
-        { href: "/principal/courses", label: "Course Approvals", icon: "approvals" },
         { href: "/principal/certificates", label: "Certificate Lists", icon: "certificates" },
         { href: "/principal/changes", label: "Result Changes", icon: "results" },
         { href: "/principal/profile-requests", label: "Profile Changes", icon: "profileChanges" },
+      ],
+    },
+    {
+      label: "Finance",
+      items: [
+        { href: "/finance/fees", label: "Fee Records", icon: "fees" },
+        { href: "/finance/salaries", label: "Staff Salaries", icon: "salaries" },
       ],
     },
     {

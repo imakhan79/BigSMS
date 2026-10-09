@@ -187,60 +187,6 @@ export async function deleteDocument(form: FormData) {
   back(path, "ok", "Document deleted.");
 }
 
-// Fees ----------------------------------------------------------------------------
-export async function issueInvoice(form: FormData) {
-  const { supabase } = await office();
-  const path = str(form, "back") || "/manager/fees";
-  const amount = Number(str(form, "amount"));
-  if (!(amount > 0)) back(path, "error", "Enter an amount greater than zero.");
-  const { data, error } = await supabase
-    .from("invoices")
-    .insert({
-      student_id: str(form, "student_id"),
-      title: str(form, "title"),
-      description: str(form, "description"),
-      amount,
-      due_on: str(form, "due_on"),
-    })
-    .select("invoice_no")
-    .single();
-  if (error) back(path, "error", error.message);
-  revalidatePath("/manager", "layout");
-  back(path, "ok", `Invoice ${data.invoice_no} issued.`);
-}
-
-export async function recordPayment(form: FormData) {
-  const { supabase } = await office();
-  const path = str(form, "back") || "/manager/fees";
-  const amount = Number(str(form, "amount"));
-  if (!(amount > 0)) back(path, "error", "Enter an amount greater than zero.");
-  const { data, error } = await supabase
-    .from("payments")
-    .insert({
-      invoice_id: str(form, "invoice_id"),
-      amount,
-      method: str(form, "method"),
-      paid_on: str(form, "paid_on") || undefined,
-      reference: str(form, "reference"),
-    })
-    .select("receipt_no")
-    .single();
-  if (error) back(path, "error", error.message);
-  revalidatePath("/manager", "layout");
-  back(path, "ok", `Payment recorded. Receipt ${data.receipt_no}.`);
-}
-
-export async function cancelInvoice(form: FormData) {
-  const { supabase } = await office();
-  const path = str(form, "back") || "/manager/fees";
-  const reason = str(form, "reason");
-  if (!reason) back(path, "error", "Give a reason for cancelling the invoice.");
-  const { error } = await supabase.from("invoices").update({ status: "cancelled", cancelled_reason: reason }).eq("id", str(form, "id"));
-  if (error) back(path, "error", error.message);
-  revalidatePath("/manager", "layout");
-  back(path, "ok", "Invoice cancelled.");
-}
-
 // Enrollment ----------------------------------------------------------------------
 export async function enrollStudents(form: FormData) {
   const { supabase } = await office();

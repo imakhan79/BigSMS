@@ -12,7 +12,7 @@ export default async function ProfessorDashboard() {
   const profile = await requireRole("professor");
   const supabase = await createClient();
 
-  const [{ data: statsData }, { data: alerts }, { data: toGrade }, roster] = await Promise.all([
+  const [{ data: statsData }, { data: alerts }, { data: toGrade }, roster, { count: ready }] = await Promise.all([
     supabase.rpc("course_stats"),
     supabase.from("alerts").select("id, message, created_at, course_id").neq("status", "resolved").order("created_at", { ascending: false }).limit(5),
     supabase
@@ -23,6 +23,7 @@ export default async function ProfessorDashboard() {
       .order("submitted_at")
       .limit(8),
     getRoster(supabase),
+    supabase.from("courses").select("id", { count: "exact", head: true }).eq("professor_id", profile.id).not("ready_at", "is", null),
   ]);
   const names = new Map(roster.map((s) => [s.student_id, s.full_name]));
   const stats = (statsData ?? []) as CourseStat[];
@@ -43,7 +44,7 @@ export default async function ProfessorDashboard() {
 
       <QuickActions
         actions={[
-          { href: "/professor/courses", label: "New course", description: "Create and submit for approval", icon: <BookPlus size={17} /> },
+          { href: "/professor/courses", label: "New course", description: "Create, then mark ready to publish", icon: <BookPlus size={17} /> },
           { href: "/professor/question-bank", label: "Question bank", description: "Write and reuse questions", icon: <FileQuestion size={17} /> },
           { href: "/professor/analytics", label: "Analytics", description: "Track course performance", icon: <BarChart3 size={17} /> },
           { href: "/notifications", label: "Notifications", description: "Approvals and alerts", icon: <Bell size={17} /> },
@@ -52,8 +53,8 @@ export default async function ProfessorDashboard() {
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <Stat label="Published" value={count("published")} icon={<BookOpen size={16} />} />
-        <Stat label="Awaiting approval" value={count("pending_approval")} icon={<Clock size={16} />} />
-        <Stat label="Drafts / rejected" value={count("draft") + count("rejected")} icon={<PencilLine size={16} />} />
+        <Stat label="Ready to publish" value={ready ?? 0} icon={<Clock size={16} />} />
+        <Stat label="Drafts" value={count("draft")} icon={<PencilLine size={16} />} />
         <Stat label="Students enrolled" value={stats.reduce((t, s) => t + Number(s.enrolled), 0)} icon={<GraduationCap size={16} />} />
       </div>
 

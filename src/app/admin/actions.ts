@@ -70,17 +70,6 @@ export async function offboardUser(form: FormData) {
   back(path, "ok", "User offboarded. Their access has ended; records are kept.");
 }
 
-// Approval workflows (Super Admin) --------------------------------------------
-export async function saveCourseWorkflow(form: FormData) {
-  await requireRole("super_admin");
-  const supabase = await createClient();
-  const roles = form.getAll("step").map(String).filter(Boolean);
-  const { error } = await supabase.rpc("set_approval_workflow", { p_workflow: "course_publication", p_roles: roles });
-  if (error) back("/admin/workflows", "error", error.message);
-  revalidatePath("/", "layout");
-  back("/admin/workflows", "ok", "Course approval workflow saved.");
-}
-
 // Categories ------------------------------------------------------------------
 export async function createCategory(form: FormData) {
   const supabase = await admin();
