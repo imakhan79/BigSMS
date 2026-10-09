@@ -80,6 +80,11 @@ export function CertificateListsTable({ lists, hrefBase }: { lists: CertificateL
 export function EntryFigures({ entry, currency }: { entry: CertificateEntryRow; currency: string }) {
   return (
     <>
+      <Td className="whitespace-nowrap">
+        {pct(entry.final_percentage)}
+        {entry.final_grade && <span className="ml-1 font-medium">· {entry.final_grade}</span>}
+      </Td>
+      <Td>{pct(entry.exam_average)}</Td>
       <Td>{pct(entry.completion_rate)}</Td>
       <Td>{pct(entry.attendance_rate)}</Td>
       <Td className={cn("whitespace-nowrap", Number(entry.outstanding_fees) > 0 && "font-medium text-warning")}>
