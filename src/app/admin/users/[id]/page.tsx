@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { offboardUser, updateUser, updateUserDetails } from "@/app/admin/actions";
+import { linkChild, offboardUser, unlinkChild, updateUser, updateUserDetails } from "@/app/admin/actions";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Badge, Card, CardTitle, Flash, type FlashParams, Input, Label, PageHeader, Textarea, TextLink } from "@/components/ui";
+import { Badge, Card, CardTitle, Flash, type FlashParams, Input, Label, PageHeader, Select, Textarea, TextLink } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { ADMIN_ROLES, ROLE_LABEL, type Profile } from "@/lib/types";
@@ -32,6 +32,15 @@ export default async function UserDetailPage({
     const a = actors?.find((x) => x.id === actorId);
     return a ? a.full_name || a.email : actorId ? "—" : "System";
   };
+
+  // A parent account sees what its linked children see.
+  const [{ data: links }, { data: students }] = user.role === "parent"
+    ? await Promise.all([
+        supabase.from("parent_students").select("student:profiles!parent_students_student_id_fkey(id, full_name, user_code)").eq("parent_id", user.id),
+        supabase.from("profiles").select("id, full_name, user_code").eq("role", "student").eq("status", "active").order("full_name"),
+      ])
+    : [{ data: [] }, { data: [] }];
+  const linked = (links ?? []).map((l) => l.student as unknown as { id: string; full_name: string; user_code: string | null }).filter(Boolean);
 
   const canManage = isSuper || (!ADMIN_ROLES.includes(user.role) && user.id !== viewer.id);
   const path = `/admin/users/${user.id}`;
@@ -110,6 +119,41 @@ export default async function UserDetailPage({
           )}
         </Card>
       </div>
+
+      {user.role === "parent" && (
+        <Card className="mt-6">
+          <CardTitle description="The parent sees exactly what these students see in their portal, read-only.">Children</CardTitle>
+          {!linked.length && <p className="mb-3 text-sm text-muted-foreground">No children linked yet.</p>}
+          <ul className="mb-4 divide-y divide-border text-sm">
+            {linked.map((c) => (
+              <li key={c.id} className="flex items-center justify-between gap-3 py-2">
+                <span><span className="font-medium">{c.full_name}</span> <span className="font-mono text-xs text-muted-foreground">{c.user_code}</span></span>
+                {canManage && (
+                  <form action={unlinkChild}>
+                    <input type="hidden" name="parent_id" value={user.id} />
+                    <input type="hidden" name="student_id" value={c.id} />
+                    <SubmitButton size="sm" variant="ghost">Unlink</SubmitButton>
+                  </form>
+                )}
+              </li>
+            ))}
+          </ul>
+          {canManage && (
+            <form action={linkChild} className="flex flex-wrap items-end gap-3">
+              <input type="hidden" name="parent_id" value={user.id} />
+              <Label label="Link a student" className="min-w-64 flex-1">
+                <Select name="student_id" required defaultValue="">
+                  <option value="" disabled>Choose a student</option>
+                  {(students ?? []).filter((s) => !linked.some((c) => c.id === s.id)).map((s) => (
+                    <option key={s.id} value={s.id}>{s.full_name}{s.user_code ? ` (${s.user_code})` : ""}</option>
+                  ))}
+                </Select>
+              </Label>
+              <SubmitButton>Link</SubmitButton>
+            </form>
+          )}
+        </Card>
+      )}
 
       {canManage && user.status !== "offboarded" && (
         <Card className="mt-6 border-danger/30">

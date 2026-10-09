@@ -28,6 +28,7 @@ const DEMO_ACCOUNTS: Record<string, string> = {
   principal: "principal@bigsms.demo",
   professor: "professor@bigsms.demo",
   student: "student@bigsms.demo",
+  parent: "parent@bigsms.demo",
 };
 
 export async function demoSignIn(form: FormData) {

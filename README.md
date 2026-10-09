@@ -1,6 +1,6 @@
 # Big SMS
 
-Learning management system by Zicon, with portals for **Super Admin**, **Admin**, **Admin Manager**, **Principal**, **Faculty**, **Staff** and **Student**. (The former Parent role has been removed: existing parent accounts can sign in but have no access.)
+Learning management system by Zicon, with portals for **Super Admin**, **Admin**, **Admin Manager**, **Principal**, **Faculty**, **Staff**, **Student** and **Parent**.
 
 Built with Next.js 15 (App Router, TypeScript, Server Actions), Supabase (Postgres, Auth, Storage, RLS) and Tailwind CSS using the Zicon brand colours.
 
@@ -15,6 +15,7 @@ Built with Next.js 15 (App Router, TypeScript, Server Actions), Supabase (Postgr
 | **Faculty** (role key `professor`) | Sees only students enrolled in their own courses (assigned classes), and of them only name, System ID, attendance, marks, progress, assignments and submission status, class timetable, exam results and final report. No student contact details, student records or financial data, and cannot enrol students or edit profiles. Enters attendance, exam marks, assignment grades and submission status, and final reports. Also: create/edit/categorise their courses and mark them ready to publish (the Principal or Admin Manager publishes); lectures and materials; quizzes from the question bank; analytics; KPI notifications |
 | **Staff** | Staff portal with their details, notifications and their own attendance (staff modules to follow). |
 | **Student** | Sees only their own information: no other students, Faculty, staff, administrative or other students' financial data (teachers' and signatories' names only). Cannot edit their own profile; requests changes instead. Own ID card. View assigned (published) courses and outlines, lectures and materials, mark lectures complete, submit the assignments assigned to them (also after the due date, marked late), take quizzes (one attempt, graded server-side) |
+| **Parent** | Read-only **Parent Portal** (`/parent`): sees exactly what their linked children see as students (courses and progress, timetable and calendar, attendance from submitted registers, assigned work and grades, assigned exams and approved results, fees, certificates) and nothing else. Admins link parents to children on the parent's user page. |
 
 ## Approval workflows
 
@@ -70,6 +71,7 @@ supabase/
     20261019000001_timetable.sql   draft and published class schedule and calendar; Admin Manager publications approved by the Principal
     20261020000001_analytics.sql   institute, course and attendance analytics scoped by role
     20261021000001_certificate_eligibility.sql  certificates need a submitted final report; final report and exam average on lists
+    20261022000001_parent_portal.sql  Parent role back on: parents read what their children see
   seed.sql                         categories, default KPIs, settings
 scripts/seed.mjs                   demo users and sample course
 public/zicon-logo.png              brand logo
@@ -113,6 +115,7 @@ src/
    | Principal | principal@bigsms.demo | Demo@12345 |
    | Faculty | professor@bigsms.demo | Demo@12345 |
    | Student | student@bigsms.demo / student2@bigsms.demo | Demo@12345 |
+   | Parent (of Sara Khan) | parent@bigsms.demo | Demo@12345 |
 
 4. **Auth settings.** In Supabase → Authentication → URL Configuration, add `http://localhost:3000/auth/callback` (and your production URL) to the redirect URLs for email confirmation and password reset.
 

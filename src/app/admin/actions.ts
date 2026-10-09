@@ -166,3 +166,24 @@ export async function deleteSetting(form: FormData) {
   revalidatePath("/admin/settings");
   back("/admin/settings", "ok", "Setting removed.");
 }
+
+// Parent links: which students a parent account can see -------------------------
+export async function linkChild(form: FormData) {
+  const supabase = await admin();
+  const parentId = str(form, "parent_id");
+  const path = `/admin/users/${parentId}`;
+  const { error } = await supabase.from("parent_students").insert({ parent_id: parentId, student_id: str(form, "student_id") });
+  if (error) back(path, "error", error.code === "23505" ? "That child is already linked." : error.message);
+  revalidatePath(path);
+  back(path, "ok", "Child linked. The parent now sees what this student sees.");
+}
+
+export async function unlinkChild(form: FormData) {
+  const supabase = await admin();
+  const parentId = str(form, "parent_id");
+  const path = `/admin/users/${parentId}`;
+  const { error } = await supabase.from("parent_students").delete().eq("parent_id", parentId).eq("student_id", str(form, "student_id"));
+  if (error) back(path, "error", error.message);
+  revalidatePath(path);
+  back(path, "ok", "Child unlinked.");
+}

@@ -12,12 +12,12 @@ export async function getProfile(): Promise<Profile | null> {
 
 /**
  * Ensures an active user with one of the given roles; redirects otherwise.
- * A Super Admin satisfies any "admin" requirement. Parent accounts no longer have access.
+ * A Super Admin satisfies any "admin" requirement.
  */
 export async function requireRole(...roles: PortalRole[]): Promise<Profile & { role: PortalRole }> {
   const profile = await getProfile();
   if (!profile) redirect("/login");
-  if (profile.status !== "active" || profile.role === "parent") redirect("/pending");
+  if (profile.status !== "active") redirect("/pending");
   const allowed = roles.includes(profile.role) || (profile.role === "super_admin" && roles.includes("admin"));
   if (roles.length && !allowed) redirect(ROLE_HOME[profile.role]);
   return profile as Profile & { role: PortalRole };
