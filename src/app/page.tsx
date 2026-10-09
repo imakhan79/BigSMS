@@ -17,6 +17,7 @@ import {
   Users,
 } from "lucide-react";
 import { DemoLogin } from "@/components/DemoLogin";
+import { Entrance, MotionItem, Parallax, Reveal, ScrollProgress } from "@/components/motion";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Badge, LinkButton, Progress } from "@/components/ui";
 import { getProfile } from "@/lib/auth";
@@ -80,11 +81,11 @@ const PREVIEW_ROWS = [
 
 function SectionHeading({ eyebrow, title, text }: { eyebrow: string; title: string; text?: string }) {
   return (
-    <div className="max-w-2xl">
+    <Reveal className="max-w-2xl">
       <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-accent"><span className="h-px w-6 bg-accent" aria-hidden />{eyebrow}</p>
       <h2 className="mt-2 font-display text-2xl font-semibold text-primary sm:text-[2.1rem]">{title}</h2>
-      {text && <p className="mt-3 text-muted-foreground">{text}</p>}
-    </div>
+      {text && <p className="mt-3 text-pretty text-muted-foreground">{text}</p>}
+    </Reveal>
   );
 }
 
@@ -93,13 +94,20 @@ export default async function Home() {
   if (profile) redirect(profile.status === "active" ? ROLE_HOME[profile.role] : "/pending");
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-dvh bg-background">
+      <ScrollProgress />
+      <a
+        href="#content"
+        className="sr-only z-[70] rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground focus:not-sr-only focus:fixed focus:left-3 focus:top-3"
+      >
+        Skip to content
+      </a>
       <header className="sticky top-0 z-30 border-b border-border bg-surface/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
-          <Link href="/" className="flex items-center gap-2.5">
+          <Link href="/" className="flex items-center gap-2.5" aria-label="LGITE home">
             <BrandLockup crestClass="h-11" />
           </Link>
-          <nav className="ml-auto hidden items-center gap-7 text-sm text-muted-foreground md:flex">
+          <nav aria-label="Sections" className="ml-auto hidden items-center gap-7 text-sm text-muted-foreground md:flex">
             {[["#portals", "Portals"], ["#features", "Features"], ["#workflow", "How it works"], ["#demo", "Demo"]].map(([href, label]) => (
               <a key={href} href={href} className="transition-colors hover:text-foreground">{label}</a>
             ))}
@@ -111,26 +119,31 @@ export default async function Home() {
         </div>
       </header>
 
+      <main id="content" tabIndex={-1} className="outline-none">
       <section className="border-b border-border">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 py-16 sm:px-6 lg:grid-cols-[1fr_1.15fr] lg:py-24">
-          <div className="animate-fade-in">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Lahore Garrison Institute of Technical Education</p>
-            <h1 className="mt-4 font-display text-4xl font-semibold leading-[1.1] text-primary sm:text-[3.4rem]">
-              Every course, every learner, <span className="text-accent">one system.</span>
-            </h1>
-            <p className="mt-5 max-w-lg text-lg text-muted-foreground">
+          <Entrance>
+            <MotionItem as="p" className="text-xs font-semibold uppercase tracking-[0.14em] text-primary">Lahore Garrison Institute of Technical Education</MotionItem>
+            <MotionItem>
+              <h1 className="mt-4 text-balance font-display text-4xl font-semibold leading-[1.1] text-primary sm:text-[3.4rem]">
+                Every course, every learner, <span className="text-accent">one system.</span>
+              </h1>
+            </MotionItem>
+            <MotionItem as="p" className="mt-5 max-w-lg text-pretty text-lg text-muted-foreground">
               Big SMS connects administrators, principals, Faculty and students, from course approval to the final grade.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
+            </MotionItem>
+            <MotionItem className="mt-8 flex flex-wrap gap-3">
               <LinkButton href="/login#demo" className="h-10 px-5">
                 Try the live demo <ArrowRight size={16} />
               </LinkButton>
               <LinkButton href="/signup" variant="outline" className="h-10 px-5">Create an account</LinkButton>
-            </div>
-          </div>
+            </MotionItem>
+          </Entrance>
 
           {/* Product preview: a faithful miniature of the admin dashboard, not decoration. */}
-          <div className="animate-fade-in overflow-hidden rounded-lg border border-border bg-surface shadow-pop [animation-delay:80ms]" aria-hidden>
+          <Entrance step={0}>
+          <Parallax distance={18}>
+          <MotionItem className="overflow-hidden rounded-lg border border-border bg-surface shadow-pop" aria-hidden>
             <div className="flex items-center gap-1.5 border-b border-border bg-muted/60 px-4 py-2.5">
               <span className="h-2.5 w-2.5 rounded-full bg-border" />
               <span className="h-2.5 w-2.5 rounded-full bg-border" />
@@ -167,29 +180,31 @@ export default async function Home() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </MotionItem>
+          </Parallax>
+          </Entrance>
         </div>
       </section>
 
       <section id="portals" className="mx-auto max-w-6xl scroll-mt-14 px-4 py-16 sm:px-6 lg:py-20">
         <SectionHeading eyebrow="Portals" title="A focused workspace for every role" text="Each role sees exactly the tools and data it needs, and nothing it shouldn't." />
-        <div className="mt-10 grid overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-3 [&>*]:bg-surface" style={{ gap: 1 }}>
+        <Reveal stagger className="mt-10 grid gap-px overflow-hidden rounded-lg border border-border bg-border sm:grid-cols-2 lg:grid-cols-3 [&>*]:bg-surface">
           {PORTALS.map(({ Icon, title, text }) => (
-            <div key={title} className="p-6">
+            <MotionItem key={title} className="p-6">
               <Icon size={20} className="text-accent" aria-hidden />
               <h3 className="mt-4 font-semibold text-primary">{title}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{text}</p>
-            </div>
+            </MotionItem>
           ))}
-        </div>
+        </Reveal>
       </section>
 
       <section id="features" className="scroll-mt-14 border-y border-border bg-surface">
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
           <SectionHeading eyebrow="Features" title="Everything a modern institution needs" />
-          <div className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+          <Reveal stagger className="mt-10 grid gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map(({ Icon, title, text }) => (
-              <div key={title} className="flex gap-4">
+              <MotionItem key={title} className="flex gap-4">
                 <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground">
                   <Icon size={18} aria-hidden />
                 </span>
@@ -197,23 +212,23 @@ export default async function Home() {
                   <h3 className="font-semibold">{title}</h3>
                   <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{text}</p>
                 </div>
-              </div>
+              </MotionItem>
             ))}
-          </div>
+          </Reveal>
         </div>
       </section>
 
       <section id="workflow" className="mx-auto max-w-6xl scroll-mt-14 px-4 py-16 sm:px-6 lg:py-20">
         <SectionHeading eyebrow="How it works" title="From draft to final grade" />
-        <ol className="mt-10 grid gap-8 md:grid-cols-4 md:gap-6">
+        <Reveal as="ol" stagger={0.09} className="mt-10 grid gap-8 md:grid-cols-4 md:gap-6">
           {STEPS.map((s, i) => (
-            <li key={s.title} className="border-t-2 border-accent pt-5">
+            <MotionItem as="li" key={s.title} className="border-t-2 border-accent pt-5">
               <span className="text-xs font-semibold tabular-nums text-accent">0{i + 1}</span>
               <h3 className="mt-1 font-semibold text-primary">{s.title}</h3>
               <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{s.text}</p>
-            </li>
+            </MotionItem>
           ))}
-        </ol>
+        </Reveal>
       </section>
 
       <section id="demo" className="scroll-mt-14 bg-primary text-primary-foreground [&_.text-accent]:text-gold [&_.bg-accent]:bg-gold [&_h2]:text-primary-foreground [&_p.text-muted-foreground]:text-primary-foreground/80">
@@ -223,11 +238,12 @@ export default async function Home() {
             title="See it in action"
             text="Sign in instantly as any role, no password needed. The demo is loaded with courses, lectures, assignments, quizzes and grades."
           />
-          <div className="rounded-lg bg-surface p-4 text-foreground shadow-pop">
+          <Reveal delay={0.08} className="rounded-lg bg-surface p-4 text-foreground shadow-pop">
             <DemoLogin />
-          </div>
+          </Reveal>
         </div>
       </section>
+      </main>
 
       <footer className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-6 text-sm text-muted-foreground sm:px-6">

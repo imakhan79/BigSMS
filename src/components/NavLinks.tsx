@@ -31,6 +31,8 @@ import {
   Wallet,
   Banknote,
 } from "lucide-react";
+import { LayoutGroup, m } from "motion/react";
+import { spring } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 /** Icons are referenced by name so the nav config can live in server components. */
@@ -86,11 +88,16 @@ function isActive(item: NavItem, pathname: string, search: URLSearchParams, all:
   return isPortalRoot ? pathname === path : pathname === path || pathname.startsWith(`${path}/`);
 }
 
-export function NavLinks({ groups, onNavigate }: { groups: NavGroup[]; onNavigate?: () => void }) {
+/**
+ * The active item's highlight is one shared element that glides to the new item on navigation.
+ * `instance` keeps the sidebar and the mobile drawer from sharing it.
+ */
+export function NavLinks({ groups, onNavigate, instance = "sidebar" }: { groups: NavGroup[]; onNavigate?: () => void; instance?: string }) {
   const pathname = usePathname();
   const search = useSearchParams();
   const all = groups.flatMap((g) => g.items);
   return (
+    <LayoutGroup id={instance}>
     <nav className="space-y-5" aria-label="Main">
       {groups.map((group, gi) => (
         <div key={group.label ?? gi}>
@@ -108,13 +115,22 @@ export function NavLinks({ groups, onNavigate }: { groups: NavGroup[]; onNavigat
                     onClick={onNavigate}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "relative flex h-8 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors duration-150",
-                      active ? "bg-sidebar-active font-medium text-white" : "text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-foreground",
+                      "relative flex h-9 items-center gap-2.5 rounded-md px-2.5 text-sm transition-colors duration-150 lg:h-8",
+                      active ? "font-medium text-white" : "text-sidebar-muted hover:bg-sidebar-hover hover:text-sidebar-foreground",
                     )}
                   >
-                    {active && <span className="absolute inset-y-1.5 -left-3 w-[3px] rounded-r bg-gold" aria-hidden />}
-                    <Icon size={16} strokeWidth={active ? 2.2 : 1.8} className={cn("shrink-0", active && "text-gold")} aria-hidden />
-                    <span className="truncate">{item.label}</span>
+                    {active && (
+                      <m.span layoutId="nav-active" transition={spring} className="absolute inset-0 rounded-md bg-sidebar-active" aria-hidden>
+                        <span className="absolute inset-y-1.5 -left-3 w-[3px] rounded-r bg-gold" />
+                      </m.span>
+                    )}
+                    <Icon
+                      size={16}
+                      strokeWidth={active ? 2.2 : 1.8}
+                      className={cn("relative shrink-0", active && "text-gold")}
+                      aria-hidden
+                    />
+                    <span className="relative truncate">{item.label}</span>
                   </Link>
                 </li>
               );
@@ -123,5 +139,6 @@ export function NavLinks({ groups, onNavigate }: { groups: NavGroup[]; onNavigat
         </div>
       ))}
     </nav>
+    </LayoutGroup>
   );
 }

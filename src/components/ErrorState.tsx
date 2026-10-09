@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { RotateCcw, TriangleAlert } from "lucide-react";
+import { Appear } from "@/components/motion";
 import { buttonClass } from "@/components/ui";
 
 /** Rendered by each portal's error.tsx: keeps the shell, explains the failure, offers a retry. */
@@ -12,7 +13,7 @@ export function ErrorState({ error, reset, home }: { error: Error & { digest?: s
   }, [error]);
 
   return (
-    <div className="mx-auto flex max-w-lg animate-fade-in flex-col items-center py-16 text-center" role="alert">
+    <Appear className="mx-auto flex max-w-lg flex-col items-center py-16 text-center" role="alert">
       <span className="flex h-12 w-12 items-center justify-center rounded-full bg-danger/10 text-danger" aria-hidden>
         <TriangleAlert size={22} />
       </span>
@@ -30,6 +31,6 @@ export function ErrorState({ error, reset, home }: { error: Error & { digest?: s
           Back to dashboard
         </Link>
       </div>
-    </div>
+    </Appear>
   );
 }
