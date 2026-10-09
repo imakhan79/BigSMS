@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireRole } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
-import { back, str } from "@/lib/utils";
+import { back, fromLocalInput, str } from "@/lib/utils";
 
 async function professor() {
   const profile = await requireRole("professor");
@@ -79,29 +79,89 @@ export async function deleteMaterial(form: FormData) {
   done(coursePath(courseId, "lectures"), "Material removed.");
 }
 
-// Assignments -----------------------------------------------------------------
+// Assignments (BRD 10) ----------------------------------------------------------
+// Formulated as drafts, then assigned to the whole course, one class or chosen students.
+
+function assignmentFields(form: FormData) {
+  const audience = ["course", "batch", "students"].includes(str(form, "audience")) ? str(form, "audience") : "course";
+  return {
+    title: str(form, "title"),
+    instructions: str(form, "instructions"),
+    due_at: fromLocalInput(str(form, "due_at")),
+    max_score: Number(str(form, "max_score")) || 100,
+    audience,
+    batch_id: audience === "batch" ? str(form, "batch_id") || null : null,
+  };
+}
+
+/** Replaces the chosen students of a 'students' assignment. */
+async function setAssignmentStudents(supabase: Awaited<ReturnType<typeof createClient>>, assignmentId: string, form: FormData, path: string) {
+  const chosen = new Set(form.getAll("student_ids").map(String));
+  if (!chosen.size) back(path, "error", "Choose at least one student.");
+  const { data: current } = await supabase.from("assignment_students").select("student_id").eq("assignment_id", assignmentId);
+  const had = new Set((current ?? []).map((r) => r.student_id));
+  const removed = [...had].filter((id) => !chosen.has(id));
+  const added = [...chosen].filter((id) => !had.has(id));
+  if (removed.length) {
+    const { error } = await supabase.from("assignment_students").delete().eq("assignment_id", assignmentId).in("student_id", removed);
+    if (error) back(path, "error", error.message);
+  }
+  if (added.length) {
+    const { error } = await supabase.from("assignment_students").insert(added.map((student_id) => ({ assignment_id: assignmentId, student_id })));
+    if (error) back(path, "error", error.message);
+  }
+}
+
 export async function saveAssignment(form: FormData) {
   const { supabase } = await professor();
   const courseId = str(form, "course_id");
-  const due = str(form, "due_at");
-  const { error } = await supabase.from("assignments").insert({
-    course_id: courseId,
-    title: str(form, "title"),
-    instructions: str(form, "instructions"),
-    due_at: due ? new Date(due).toISOString() : null,
-    max_score: Number(str(form, "max_score")) || 100,
-    published: form.get("published") === "on",
-  });
-  if (error) back(coursePath(courseId, "assignments"), "error", error.message);
-  done(coursePath(courseId, "assignments"), "Assignment created.");
+  const path = coursePath(courseId, "assignments");
+  const fields = assignmentFields(form);
+  if (fields.audience === "batch" && !fields.batch_id) back(path, "error", "Choose the class.");
+  if (fields.audience === "students" && !form.getAll("student_ids").length) back(path, "error", "Choose at least one student.");
+  const { data, error } = await supabase.from("assignments").insert({ ...fields, course_id: courseId, published: false }).select("id").single();
+  if (error) back(path, "error", error.message);
+  if (fields.audience === "students") await setAssignmentStudents(supabase, data.id, form, path);
+  if (form.get("assign_now") === "on") {
+    const { data: count, error: assignError } = await supabase.rpc("assign_assignment", { p_assignment_id: data.id });
+    if (assignError) back(path, "error", `Draft saved, but it could not be assigned: ${assignError.message}`);
+    done(path, `Assignment assigned to ${count} student${count === 1 ? "" : "s"}.`);
+  }
+  done(path, "Assignment saved as a draft.");
 }
 
-export async function toggleAssignment(form: FormData) {
+export async function updateAssignment(form: FormData) {
   const { supabase } = await professor();
   const courseId = str(form, "course_id");
-  const { error } = await supabase.from("assignments").update({ published: str(form, "published") === "true" }).eq("id", str(form, "id"));
-  if (error) back(coursePath(courseId, "assignments"), "error", error.message);
-  done(coursePath(courseId, "assignments"), "Assignment updated.");
+  const path = coursePath(courseId, "assignments");
+  const id = str(form, "id");
+  const fields = assignmentFields(form);
+  // Who it is for is fixed once students hand in work; the form then omits it.
+  const row = form.has("audience") ? fields : { title: fields.title, instructions: fields.instructions, due_at: fields.due_at, max_score: fields.max_score };
+  if (form.has("audience") && fields.audience === "batch" && !fields.batch_id) back(path, "error", "Choose the class.");
+  if (form.has("audience") && fields.audience === "students") await setAssignmentStudents(supabase, id, form, path);
+  const { error } = await supabase.from("assignments").update(row).eq("id", id);
+  if (error) back(path, "error", error.message);
+  if (form.has("audience") && fields.audience !== "students") await supabase.from("assignment_students").delete().eq("assignment_id", id);
+  done(path, "Assignment updated.");
+}
+
+export async function assignAssignment(form: FormData) {
+  const { supabase } = await professor();
+  const courseId = str(form, "course_id");
+  const path = coursePath(courseId, "assignments");
+  const { data, error } = await supabase.rpc("assign_assignment", { p_assignment_id: str(form, "id") });
+  if (error) back(path, "error", error.message);
+  done(path, `Assignment assigned to ${data} student${data === 1 ? "" : "s"}. They have been notified.`);
+}
+
+export async function withdrawAssignment(form: FormData) {
+  const { supabase } = await professor();
+  const courseId = str(form, "course_id");
+  const path = coursePath(courseId, "assignments");
+  const { error } = await supabase.from("assignments").update({ published: false }).eq("id", str(form, "id"));
+  if (error) back(path, "error", error.message);
+  done(path, "Assignment withdrawn. It is a draft again.");
 }
 
 export async function deleteAssignment(form: FormData) {

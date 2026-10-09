@@ -8,9 +8,29 @@ export function str(form: FormData, key: string): string {
   return String(form.get(key) ?? "").trim();
 }
 
+/** The institute's time zone (Lahore). Pakistan has no daylight saving, so the offset is fixed. */
+export const INSTITUTE_TZ = "Asia/Karachi";
+const INSTITUTE_OFFSET = "+05:00";
+
 export function formatDate(value: string | null | undefined) {
   if (!value) return "—";
-  return new Date(value).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short" });
+  return new Date(value).toLocaleString("en-GB", { dateStyle: "medium", timeStyle: "short", timeZone: INSTITUTE_TZ });
+}
+
+/** A datetime-local input value ("2026-10-09T23:59") read as institute time, as an ISO timestamp. */
+export function fromLocalInput(value: string): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) return null;
+  return new Date(`${value.slice(0, 16)}:00${INSTITUTE_OFFSET}`).toISOString();
+}
+
+/** A timestamp as a datetime-local input value in institute time. */
+export function toLocalInput(value: string | null | undefined): string {
+  if (!value) return "";
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: INSTITUTE_TZ, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+  }).formatToParts(new Date(value));
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "";
+  return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
 }
 
 /** "just now", "5m ago", "3h ago", "2d ago", then a short date. */
