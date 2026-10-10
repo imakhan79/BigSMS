@@ -196,25 +196,48 @@ export async function createQuiz(form: FormData) {
     .select("id")
     .single();
   if (error) back(coursePath(courseId, "quizzes"), "error", error.message);
-  done(`${coursePath(courseId, "quizzes")}&quiz=${data.id}`, "Quiz created. Now select questions from the bank.");
+  done(`${coursePath(courseId, "quizzes")}&quiz=${data.id}`, "Quiz created. Now add its questions.");
 }
 
-export async function setQuizQuestions(form: FormData) {
-  const { supabase } = await professor();
+export async function addQuizQuestion(form: FormData) {
+  const { profile, supabase } = await professor();
   const courseId = str(form, "course_id");
   const quizId = str(form, "quiz_id");
   const path = `${coursePath(courseId, "quizzes")}&quiz=${quizId}`;
-  const ids = form.getAll("question_id").map(String);
+  const options = str(form, "options").split("\n").map((o) => o.trim()).filter(Boolean);
+  const correct = Number(str(form, "correct_index")) - 1;
+  if (options.length < 2 || options.length > 6) back(path, "error", "Enter 2–6 options, one per line.");
+  if (!(correct >= 0 && correct < options.length)) back(path, "error", "Correct option number is out of range.");
 
-  const { error: delError } = await supabase.from("quiz_questions").delete().eq("quiz_id", quizId);
-  if (delError) back(path, "error", delError.message);
-  if (ids.length) {
-    const { error } = await supabase
-      .from("quiz_questions")
-      .insert(ids.map((question_id, position) => ({ quiz_id: quizId, question_id, position })));
-    if (error) back(path, "error", error.message);
+  const { data: question, error } = await supabase
+    .from("questions")
+    .insert({ prompt: str(form, "prompt"), options, correct_index: correct, difficulty: str(form, "difficulty") || "medium", created_by: profile.id })
+    .select("id")
+    .single();
+  if (error) back(path, "error", error.message);
+  const { count } = await supabase.from("quiz_questions").select("*", { count: "exact", head: true }).eq("quiz_id", quizId);
+  const { error: linkError } = await supabase
+    .from("quiz_questions")
+    .insert({ quiz_id: quizId, question_id: question.id, position: count ?? 0 });
+  if (linkError) {
+    await supabase.from("questions").delete().eq("id", question.id);
+    back(path, "error", linkError.message);
   }
-  done(path, `${ids.length} question(s) selected.`);
+  done(path, "Question added.");
+}
+
+export async function removeQuizQuestion(form: FormData) {
+  const { supabase } = await professor();
+  const courseId = str(form, "course_id");
+  const quizId = str(form, "quiz_id");
+  const questionId = str(form, "question_id");
+  const path = `${coursePath(courseId, "quizzes")}&quiz=${quizId}`;
+  const { error } = await supabase.from("quiz_questions").delete().eq("quiz_id", quizId).eq("question_id", questionId);
+  if (error) back(path, "error", error.message);
+  // Questions belong to their quiz now; drop it unless another quiz still uses it.
+  const { count } = await supabase.from("quiz_questions").select("*", { count: "exact", head: true }).eq("question_id", questionId);
+  if (!count) await supabase.from("questions").delete().eq("id", questionId);
+  done(path, "Question removed.");
 }
 
 export async function toggleQuiz(form: FormData) {

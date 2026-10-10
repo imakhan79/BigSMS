@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { createQuiz, deleteQuiz, setQuizQuestions, toggleQuiz } from "@/app/professor/actions";
+import { addQuizQuestion, createQuiz, deleteQuiz, removeQuizQuestion, toggleQuiz } from "@/app/professor/actions";
 import { StudentCell } from "@/app/professor/_components";
 import { SubmitButton } from "@/components/SubmitButton";
-import { Badge, Card, CardTitle, Empty, Input, Label, Table, Td, Textarea, TextLink } from "@/components/ui";
+import { Badge, Card, CardTitle, Empty, Input, Label, Select, Table, Td, Textarea } from "@/components/ui";
 import { getRoster } from "@/lib/faculty";
 import { createClient } from "@/lib/supabase/server";
 import { cn, formatDate } from "@/lib/utils";
@@ -19,10 +19,13 @@ export async function QuizzesTab({ courseId, quizId }: { courseId: string; quizI
   ]);
   const students = new Map(roster.map((s) => [s.student_id, s]));
   const selected = quizzes?.find((q) => q.id === quizId);
-  const { data: bank } = selected
-    ? await supabase.from("questions").select("id, prompt, difficulty, course_categories(name)").order("created_at", { ascending: false })
+  const { data: links } = selected
+    ? await supabase
+        .from("quiz_questions")
+        .select("question_id, questions(prompt, options, correct_index, difficulty)")
+        .eq("quiz_id", selected.id)
+        .order("position")
     : { data: null };
-  const chosen = new Set<string>(selected?.quiz_questions.map((q: { question_id: string }) => q.question_id) ?? []);
 
   return (
     <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
@@ -37,7 +40,7 @@ export async function QuizzesTab({ courseId, quizId }: { courseId: string; quizI
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge value={q.published ? "published" : "draft"} />
-                <Link href={`/professor/courses/${courseId}?tab=quizzes&quiz=${q.id}`} className="text-sm text-primary hover:underline">Select questions</Link>
+                <Link href={`/professor/courses/${courseId}?tab=quizzes&quiz=${q.id}`} className="text-sm text-primary hover:underline">Questions</Link>
                 <form action={toggleQuiz}>
                   <input type="hidden" name="id" value={q.id} />
                   <input type="hidden" name="course_id" value={courseId} />
@@ -70,27 +73,54 @@ export async function QuizzesTab({ courseId, quizId }: { courseId: string; quizI
 
         {selected && (
           <Card>
-            <CardTitle action={<TextLink href="/professor/question-bank">Add to bank</TextLink>}>
-              Questions for “{selected.title}”
-            </CardTitle>
-            {!bank?.length ? (
-              <Empty>The question bank is empty. Add questions first.</Empty>
+            <CardTitle>Questions for “{selected.title}”</CardTitle>
+            {!links?.length ? (
+              <Empty>No questions yet. Add the first one below.</Empty>
             ) : (
-              <form action={setQuizQuestions} className="space-y-2">
-                <input type="hidden" name="course_id" value={courseId} />
-                <input type="hidden" name="quiz_id" value={selected.id} />
-                <div className="max-h-[28rem] space-y-1 overflow-y-auto rounded-md border border-border p-2">
-                  {bank.map((b: any) => (
-                    <label key={b.id} className="flex cursor-pointer items-start gap-3 rounded p-2 text-sm hover:bg-secondary">
-                      <input type="checkbox" name="question_id" value={b.id} defaultChecked={chosen.has(b.id)} className="mt-1" />
-                      <span className="flex-1">{b.prompt}</span>
-                      <Badge value={b.difficulty} />
-                    </label>
-                  ))}
-                </div>
-                <SubmitButton>Save selection</SubmitButton>
-              </form>
+              <ol className="space-y-3">
+                {links.map((l: any, i: number) => (
+                  <li key={l.question_id} className="rounded-md border border-border p-3 text-sm">
+                    <div className="flex flex-wrap items-start justify-between gap-2">
+                      <p className="font-medium">{i + 1}. {l.questions.prompt}</p>
+                      <div className="flex items-center gap-2">
+                        <Badge value={l.questions.difficulty} />
+                        <form action={removeQuizQuestion}>
+                          <input type="hidden" name="course_id" value={courseId} />
+                          <input type="hidden" name="quiz_id" value={selected.id} />
+                          <input type="hidden" name="question_id" value={l.question_id} />
+                          <SubmitButton size="sm" variant="ghost" confirm="Remove this question from the quiz?">Remove</SubmitButton>
+                        </form>
+                      </div>
+                    </div>
+                    <ol className="mt-2 list-[upper-alpha] space-y-0.5 pl-6">
+                      {l.questions.options.map((o: string, j: number) => (
+                        <li key={j} className={cn(j === l.questions.correct_index && "font-semibold text-success")}>{o}</li>
+                      ))}
+                    </ol>
+                  </li>
+                ))}
+              </ol>
             )}
+
+            <form action={addQuizQuestion} className="mt-4 space-y-3 border-t border-border pt-4">
+              <input type="hidden" name="course_id" value={courseId} />
+              <input type="hidden" name="quiz_id" value={selected.id} />
+              <Label label="Question"><Textarea name="prompt" required /></Label>
+              <Label label="Options (one per line, 2–6)"><Textarea name="options" required /></Label>
+              <div className="grid grid-cols-2 gap-3">
+                <Label label="Correct option #">
+                  <Input name="correct_index" type="number" min={1} max={6} defaultValue={1} required />
+                </Label>
+                <Label label="Difficulty">
+                  <Select name="difficulty" defaultValue="medium">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                  </Select>
+                </Label>
+              </div>
+              <SubmitButton>Add question</SubmitButton>
+            </form>
           </Card>
         )}
       </div>

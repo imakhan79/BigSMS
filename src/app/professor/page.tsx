@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BarChart3, Bell, BellRing, BookOpen, BookPlus, ClipboardCheck, Clock, FileQuestion, GraduationCap, PencilLine } from "lucide-react";
+import { BarChart3, Bell, BellRing, BookOpen, BookPlus, ClipboardCheck, Clock, GraduationCap, PencilLine } from "lucide-react";
 import { QuickActions } from "@/components/DashboardWidgets";
 import { Badge, Card, CardTitle, Empty, LinkButton, PageHeader, Stat, Table, Td } from "@/components/ui";
 import { requireRole } from "@/lib/auth";
@@ -45,7 +45,6 @@ export default async function ProfessorDashboard() {
       <QuickActions
         actions={[
           { href: "/professor/courses", label: "New course", description: "Create, then mark ready to publish", icon: <BookPlus size={17} /> },
-          { href: "/professor/question-bank", label: "Question bank", description: "Write and reuse questions", icon: <FileQuestion size={17} /> },
           { href: "/professor/analytics", label: "Analytics", description: "Track course performance", icon: <BarChart3 size={17} /> },
           { href: "/notifications", label: "Notifications", description: "Approvals and alerts", icon: <Bell size={17} /> },
         ]}
