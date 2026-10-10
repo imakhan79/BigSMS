@@ -44,7 +44,6 @@ function adminNav(): NavGroup[] {
         { href: "/courses", label: "Courses", icon: "courses" },
         timetableItem,
         { href: "/admin/categories", label: "Categories", icon: "categories" },
-        { href: "/admin/question-bank", label: "Question Bank", icon: "questions" },
       ],
     },
     {
@@ -145,7 +144,6 @@ export const NAV: Record<PortalRole, NavGroup[]> = {
       items: [
         { href: "/professor/courses", label: "My Courses", icon: "courses" },
         { href: "/professor/timetable", label: "Timetable", icon: "timetable" },
-        { href: "/professor/question-bank", label: "Question Bank", icon: "questions" },
       ],
     },
     {

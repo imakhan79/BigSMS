@@ -10,7 +10,7 @@ export default async function CategoriesPage({ searchParams }: { searchParams: P
 
   return (
     <>
-      <PageHeader title="Course categories" subtitle="Used by Faculty to categorise courses and questions" />
+      <PageHeader title="Course categories" subtitle="Used by Faculty to categorise courses" />
       <Flash params={params} />
       <Card>
         <form action={createCategory} className="mb-4 flex gap-2">

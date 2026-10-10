@@ -59,7 +59,7 @@ const PORTALS = [
 const FEATURES = [
   { Icon: ListChecks, title: "Course workflow", text: "Draft, Publish, Edit and Archive. Faculty create and edit; only the Principal or Admin Manager publish, so nothing reaches students unchecked." },
   { Icon: FileStack, title: "Rich course content", text: "Lectures with videos, PDFs, books, notes and worksheets, all stored securely." },
-  { Icon: ClipboardCheck, title: "Question bank & quizzes", text: "Shared bank of questions with automatic, tamper-proof grading." },
+  { Icon: ClipboardCheck, title: "Quizzes", text: "Multiple-choice quizzes with automatic, tamper-proof grading." },
   { Icon: BarChart3, title: "Analytics & reports", text: "Completion, quiz and submission rates per course, exportable to CSV." },
   { Icon: BellRing, title: "KPI alerts", text: "Set thresholds and alert Faculty automatically when a course falls behind." },
   { Icon: Lock, title: "Secure by design", text: "Row-level security in the database: every role sees only what it should." },

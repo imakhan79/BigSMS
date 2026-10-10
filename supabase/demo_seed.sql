@@ -172,7 +172,7 @@ begin
     (a_fizz, v_s2, 'Attempted with while loop, see link.', 'https://example.com/bilal-fizzbuzz'),
     (a_site, v_s1, 'My homepage is live.', 'https://example.com/sara');
 
-  -- Question bank and quizzes
+  -- Quizzes and their questions
   with ins as (
     insert into public.questions (created_by, category_id, prompt, options, correct_index, difficulty) values
       (v_prof, v_cs, 'Which keyword defines a function in Python?', array['func', 'def', 'function', 'lambda'], 1, 'easy'),
