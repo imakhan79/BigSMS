@@ -249,7 +249,21 @@ export default async function Home() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-6 text-sm text-muted-foreground sm:px-6">
           <div className="flex items-center gap-3">
             <Crest className="h-10" />
-            <span>{BRAND.product} · © {new Date().getFullYear()} {BRAND.name}</span>
+            <div>
+              <span>{BRAND.product} · © {new Date().getFullYear()} {BRAND.name}</span>
+              <p className="mt-1 italic">
+                Powered by{" "}
+                <a
+                  href="https://www.zicongroup.com/technology"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-medium text-primary underline-offset-4 transition-colors hover:underline"
+                >
+                  Zicon Technology
+                </a>
+                !
+              </p>
+            </div>
           </div>
           <div className="flex gap-5">
             <Link href="/login" className="transition-colors hover:text-foreground">Sign in</Link>
